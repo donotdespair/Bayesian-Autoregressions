@@ -31,6 +31,27 @@ u_t\mid d_t, y_{t-1}, \dots, y_{t-p} &\sim\mathcal{N}\left(0, \sigma^2\right)
 \end{align}
 where $\alpha_d$ is a $d$-vector of coefficients on deterministic terms, and parameters $\alpha_1,\dots,\alpha_p$ are autoregressive slopes.
 
+## Matrix notation for the model
 
+To simplify the notation and the derivations introduce matrix notation for the model. Let $T$ be the available sample size for the variable $y$. Define a $T$-vector of zeros, $\mathbf{0}_T$, the identity matrix of order $T$, $\mathbf{I}_T$, $T\times1$ vectors:
+\begin{align}
+\mathbf{y} = \begin{bmatrix} y_1\\ \vdots \\ y_T\end{bmatrix}, \quad
+\text{ and }\quad
+\mathbf{u} = \begin{bmatrix} u_1\\ \vdots \\ u_T\end{bmatrix},
+\end{align}
+a $k\times1$ vector $\mathbf{x}_t = \begin{bmatrix}d_t' & y_{t-1}&\dots& y_{t-} \end{bmatrix}'$, where $k=d+p$, and a $T\times k$ matrix collecting the explanatory variables:
+\begin{align}
+\mathbf{x} = \begin{bmatrix} x_1'\\ \vdots \\ x_T'\end{bmatrix}.
+\end{align}
+Collect the parameters of the conditional mean equation in a $k$-vector:
+\begin{align}
+\boldsymbol\alpha = \begin{bmatrix} \alpha_d'& \alpha_1 & \dots & \alpha_p\end{bmatrix}'.
+\end{align}
+
+Then the model can be written in a concise notation as:
+\begin{align}
+\mathbf{y} &= \mathbf{x} \boldsymbol\alpha + \mathbf{u}\\
+\mathbf{u}\mid \mathbf{x} &\sim\mathcal{N}_T\left(\mathbf{0}_T, \sigma^2\mathbf{I}_T\right).
+\end{align}
 
 ## References {.unnumbered}
