@@ -9,7 +9,7 @@
 <meta name="author" content="Tomasz Woźniak">
 <meta name="author" content="Your Name">
 
-<title>Macroeconometrics Research Report - Bayesian Autoregressions</title>
+<title>Macroeconometrics Students Present - Bayesian Autoregressions</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -74,7 +74,7 @@ ul.task-list li input[type="checkbox"] {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">Macroeconometrics Research Report</span>
+    <span class="navbar-title">Macroeconometrics Students Present</span>
     </a>
   </div>
           <div id="quarto-search" class="" title="Search"></div>
@@ -93,6 +93,8 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#autoregressions" id="toc-autoregressions" class="nav-link active" data-scroll-target="#autoregressions">Autoregressions</a>
   <ul class="collapse">
   <li><a href="#the-arp-model" id="toc-the-arp-model" class="nav-link" data-scroll-target="#the-arp-model">The AR(<span class="math inline">\(p\)</span>) model</a></li>
+  <li><a href="#matrix-notation-for-the-model" id="toc-matrix-notation-for-the-model" class="nav-link" data-scroll-target="#matrix-notation-for-the-model">Matrix notation for the model</a></li>
+  <li><a href="#likelihood-function" id="toc-likelihood-function" class="nav-link" data-scroll-target="#likelihood-function">Likelihood function</a></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul></li>
   </ul>
@@ -147,6 +149,35 @@ ul.task-list li input[type="checkbox"] {
 y_t &amp;= \alpha_d' d_t + \alpha_1 y_{t-1} + \dots + \alpha_p y_{t-p} + u_t\\
 u_t\mid d_t, y_{t-1}, \dots, y_{t-p} &amp;\sim\mathcal{N}\left(0, \sigma^2\right)
 \end{align}\]</span> where <span class="math inline">\(\alpha_d\)</span> is a <span class="math inline">\(d\)</span>-vector of coefficients on deterministic terms, and parameters <span class="math inline">\(\alpha_1,\dots,\alpha_p\)</span> are autoregressive slopes.</p>
+</section>
+<section id="matrix-notation-for-the-model" class="level2">
+<h2 class="anchored" data-anchor-id="matrix-notation-for-the-model">Matrix notation for the model</h2>
+<p>To simplify the notation and the derivations introduce matrix notation for the model. Let <span class="math inline">\(T\)</span> be the available sample size for the variable <span class="math inline">\(y\)</span>. Define a <span class="math inline">\(T\)</span>-vector of zeros, <span class="math inline">\(\mathbf{0}_T\)</span>, the identity matrix of order <span class="math inline">\(T\)</span>, <span class="math inline">\(\mathbf{I}_T\)</span>, <span class="math inline">\(T\times1\)</span> vectors: <span class="math display">\[\begin{align}
+\mathbf{y} = \begin{bmatrix} y_1\\ \vdots \\ y_T\end{bmatrix}, \quad
+\text{ and }\quad
+\mathbf{u} = \begin{bmatrix} u_1\\ \vdots \\ u_T\end{bmatrix},
+\end{align}\]</span> a <span class="math inline">\(k\times1\)</span> vector <span class="math inline">\(\mathbf{x}_t = \begin{bmatrix}d_t' &amp; y_{t-1}&amp;\dots&amp; y_{t-} \end{bmatrix}'\)</span>, where <span class="math inline">\(k=d+p\)</span>, and a <span class="math inline">\(T\times k\)</span> matrix collecting the explanatory variables: <span class="math display">\[\begin{align}
+\mathbf{X} = \begin{bmatrix} \mathbf{x}_1'\\ \vdots \\ \mathbf{x}_T'\end{bmatrix}.
+\end{align}\]</span> Collect the parameters of the conditional mean equation in a <span class="math inline">\(k\)</span>-vector: <span class="math display">\[\begin{align}
+\boldsymbol\alpha = \begin{bmatrix} \alpha_d'&amp; \alpha_1 &amp; \dots &amp; \alpha_p\end{bmatrix}'.
+\end{align}\]</span></p>
+<p>Then the model can be written in a concise notation as: <span class="math display">\[\begin{align}
+\mathbf{y} &amp;= \mathbf{X} \boldsymbol\alpha + \mathbf{u}\\
+\mathbf{u}\mid \mathbf{X} &amp;\sim\mathcal{N}_T\left(\mathbf{0}_T, \sigma^2\mathbf{I}_T\right).
+\end{align}\]</span></p>
+</section>
+<section id="likelihood-function" class="level2">
+<h2 class="anchored" data-anchor-id="likelihood-function">Likelihood function</h2>
+<p>The model equations imply the predictive density of the data vector <span class="math inline">\(\mathbf{y}\)</span>. To see this, consider the model equation as a linear transformation of a normal vector <span class="math inline">\(\mathbf{u}\)</span>. Therefore, the data vector follows a multivariate normal distribution given by: <span class="math display">\[\begin{align}
+\mathbf{y}\mid \mathbf{X}, \boldsymbol\alpha, \sigma^2 &amp;\sim\mathcal{N}_T\left(\mathbf{X} \boldsymbol\alpha, \sigma^2\mathbf{I}_T\right).
+\end{align}\]</span></p>
+<p>This distribution determines the shape of the likelihood function that is defined as the sampling data density: <span class="math display">\[\begin{align}
+L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X})\equiv p\left(\mathbf{y}\mid \mathbf{X}, \boldsymbol\alpha, \sigma^2 \right).
+\end{align}\]</span></p>
+<p>The likelihood function that for the sake of the estimation of the parameters, and after plugging in data in place of matrices <span class="math inline">\(\mathbf{y}\)</span> and <span class="math inline">\(\mathbf{X}\)</span>, is considered a function of parameters <span class="math inline">\(\boldsymbol\alpha\)</span> and <span class="math inline">\(\sigma^2\)</span> is given by: <span class="math display">\[\begin{align}
+L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
+(2\pi)^{-\frac{T}{2}}\left(\sigma^2\right)^{-\frac{T}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)'(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)\right\}.
+\end{align}\]</span></p>
 </section>
 <section id="references" class="level2 unnumbered">
 <h2 class="unnumbered anchored" data-anchor-id="references">References</h2>

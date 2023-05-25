@@ -14,6 +14,20 @@
     "text": "The AR(\\(p\\)) model\nThe model is set for a univariate time series whose observation at time \\(t\\) is denoted by \\(y_t\\). It includes a \\(d\\)-vector \\(d_t\\) of deterministic terms and \\(p\\) lags of the dependent variable on the right-hand side of the model equation. It is complemented by error term \\(u_t\\) that, in this note, is zero-mean normally distributed with variance \\(\\sigma^2\\). Then the model equations are: \\[\\begin{align}\ny_t &= \\alpha_d' d_t + \\alpha_1 y_{t-1} + \\dots + \\alpha_p y_{t-p} + u_t\\\\\nu_t\\mid d_t, y_{t-1}, \\dots, y_{t-p} &\\sim\\mathcal{N}\\left(0, \\sigma^2\\right)\n\\end{align}\\] where \\(\\alpha_d\\) is a \\(d\\)-vector of coefficients on deterministic terms, and parameters \\(\\alpha_1,\\dots,\\alpha_p\\) are autoregressive slopes."
   },
   {
+    "objectID": "index.html#matrix-notation-for-the-model",
+    "href": "index.html#matrix-notation-for-the-model",
+    "title": "Bayesian Autoregressions",
+    "section": "Matrix notation for the model",
+    "text": "Matrix notation for the model\nTo simplify the notation and the derivations introduce matrix notation for the model. Let \\(T\\) be the available sample size for the variable \\(y\\). Define a \\(T\\)-vector of zeros, \\(\\mathbf{0}_T\\), the identity matrix of order \\(T\\), \\(\\mathbf{I}_T\\), \\(T\\times1\\) vectors: \\[\\begin{align}\n\\mathbf{y} = \\begin{bmatrix} y_1\\\\ \\vdots \\\\ y_T\\end{bmatrix}, \\quad\n\\text{ and }\\quad\n\\mathbf{u} = \\begin{bmatrix} u_1\\\\ \\vdots \\\\ u_T\\end{bmatrix},\n\\end{align}\\] a \\(k\\times1\\) vector \\(\\mathbf{x}_t = \\begin{bmatrix}d_t' & y_{t-1}&\\dots& y_{t-} \\end{bmatrix}'\\), where \\(k=d+p\\), and a \\(T\\times k\\) matrix collecting the explanatory variables: \\[\\begin{align}\n\\mathbf{X} = \\begin{bmatrix} \\mathbf{x}_1'\\\\ \\vdots \\\\ \\mathbf{x}_T'\\end{bmatrix}.\n\\end{align}\\] Collect the parameters of the conditional mean equation in a \\(k\\)-vector: \\[\\begin{align}\n\\boldsymbol\\alpha = \\begin{bmatrix} \\alpha_d'& \\alpha_1 & \\dots & \\alpha_p\\end{bmatrix}'.\n\\end{align}\\]\nThen the model can be written in a concise notation as: \\[\\begin{align}\n\\mathbf{y} &= \\mathbf{X} \\boldsymbol\\alpha + \\mathbf{u}\\\\\n\\mathbf{u}\\mid \\mathbf{X} &\\sim\\mathcal{N}_T\\left(\\mathbf{0}_T, \\sigma^2\\mathbf{I}_T\\right).\n\\end{align}\\]"
+  },
+  {
+    "objectID": "index.html#likelihood-function",
+    "href": "index.html#likelihood-function",
+    "title": "Bayesian Autoregressions",
+    "section": "Likelihood function",
+    "text": "Likelihood function\nThe model equations imply the predictive density of the data vector \\(\\mathbf{y}\\). To see this, consider the model equation as a linear transformation of a normal vector \\(\\mathbf{u}\\). Therefore, the data vector follows a multivariate normal distribution given by: \\[\\begin{align}\n\\mathbf{y}\\mid \\mathbf{X}, \\boldsymbol\\alpha, \\sigma^2 &\\sim\\mathcal{N}_T\\left(\\mathbf{X} \\boldsymbol\\alpha, \\sigma^2\\mathbf{I}_T\\right).\n\\end{align}\\]\nThis distribution determines the shape of the likelihood function that is defined as the sampling data density: \\[\\begin{align}\nL(\\boldsymbol\\alpha,\\sigma^2|\\mathbf{y}, \\mathbf{X})\\equiv p\\left(\\mathbf{y}\\mid \\mathbf{X}, \\boldsymbol\\alpha, \\sigma^2 \\right).\n\\end{align}\\]\nThe likelihood function that for the sake of the estimation of the parameters, and after plugging in data in place of matrices \\(\\mathbf{y}\\) and \\(\\mathbf{X}\\), is considered a function of parameters \\(\\boldsymbol\\alpha\\) and \\(\\sigma^2\\) is given by: \\[\\begin{align}\nL(\\boldsymbol\\alpha,\\sigma^2|\\mathbf{y}, \\mathbf{X}) =\n(2\\pi)^{-\\frac{T}{2}}\\left(\\sigma^2\\right)^{-\\frac{T}{2}}\\exp\\left\\{-\\frac{1}{2}\\frac{1}{\\sigma^2}(\\mathbf{y} - \\mathbf{X}\\boldsymbol\\alpha)'(\\mathbf{y} - \\mathbf{X}\\boldsymbol\\alpha)\\right\\}.\n\\end{align}\\]"
+  },
+  {
     "objectID": "index.html#references",
     "href": "index.html#references",
     "title": "Bayesian Autoregressions",
