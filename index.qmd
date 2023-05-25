@@ -41,7 +41,7 @@ To simplify the notation and the derivations introduce matrix notation for the m
 \end{align}
 a $k\times1$ vector $\mathbf{x}_t = \begin{bmatrix}d_t' & y_{t-1}&\dots& y_{t-} \end{bmatrix}'$, where $k=d+p$, and a $T\times k$ matrix collecting the explanatory variables:
 \begin{align}
-\mathbf{x} = \begin{bmatrix} x_1'\\ \vdots \\ x_T'\end{bmatrix}.
+\mathbf{X} = \begin{bmatrix} \mathbf{x}_1'\\ \vdots \\ \mathbf{x}_T'\end{bmatrix}.
 \end{align}
 Collect the parameters of the conditional mean equation in a $k$-vector:
 \begin{align}
@@ -50,8 +50,26 @@ Collect the parameters of the conditional mean equation in a $k$-vector:
 
 Then the model can be written in a concise notation as:
 \begin{align}
-\mathbf{y} &= \mathbf{x} \boldsymbol\alpha + \mathbf{u}\\
-\mathbf{u}\mid \mathbf{x} &\sim\mathcal{N}_T\left(\mathbf{0}_T, \sigma^2\mathbf{I}_T\right).
+\mathbf{y} &= \mathbf{X} \boldsymbol\alpha + \mathbf{u}\\
+\mathbf{u}\mid \mathbf{X} &\sim\mathcal{N}_T\left(\mathbf{0}_T, \sigma^2\mathbf{I}_T\right).
+\end{align}
+
+## Likelihood function
+
+The model equations imply the predictive density of the data vector $\mathbf{y}$. To see this, consider the model equation as a linear transformation of a normal vector $\mathbf{u}$. Therefore, the data vector follows a multivariate normal distribution given by:
+\begin{align}
+\mathbf{y}\mid \mathbf{X}, \boldsymbol\alpha, \sigma^2 &\sim\mathcal{N}_T\left(\mathbf{X} \boldsymbol\alpha, \sigma^2\mathbf{I}_T\right).
+\end{align}
+
+This distribution determines the shape of the likelihood function that is defined as the sampling data density:
+\begin{align}
+L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X})\equiv p\left(\mathbf{y}\mid \mathbf{X}, \boldsymbol\alpha, \sigma^2 \right).
+\end{align}
+
+The likelihood function that for the sake of the estimation of the parameters, and after plugging in data in place of matrices $\mathbf{y}$ and $\mathbf{X}$, is considered a function of parameters $\boldsymbol\alpha$ and $\sigma^2$ is given by:
+\begin{align}
+L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) = 
+(2\pi)^{-\frac{T}{2}}\left(\sigma^2\right)^{-\frac{T}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)'(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)\right\}.
 \end{align}
 
 ## References {.unnumbered}
