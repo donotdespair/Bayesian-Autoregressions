@@ -7,6 +7,13 @@
     "text": "Abstract. We present the basics of Bayesian estimation and inference for autoregressive models. The range of topics includes the natural conjugate analysis using normal-inverted-gamma 2 prior distribution and its extensions focusing on hierarchical modelling, conditional heteroskedasticity, and Student-t error terms. We focus on forecasting and sampling from the predictive density.\nKeywords. Autoregressions, Bayesian Inference, forecasting, heteroskedasticity, shrinkage prior"
   },
   {
+    "objectID": "index.html#the-arp-model",
+    "href": "index.html#the-arp-model",
+    "title": "Bayesian Autoregressions",
+    "section": "The AR(\\(p\\)) model",
+    "text": "The AR(\\(p\\)) model\nThe model is set for a univariate time series whose observation at time \\(t\\) is denoted by \\(y_t\\). It includes a \\(d\\)-vector \\(d_t\\) of deterministic terms and \\(p\\) lags of the dependent variable on the right-hand side of the model equation. It is complemented by error term \\(u_t\\) that, in this note, is zero-mean normally distributed with variance \\(\\sigma^2\\). Then the model equations are: \\[\\begin{align}\ny_t &= \\alpha_d' d_t + \\alpha_1 y_{t-1} + \\dots + \\alpha_p y_{t-p} + u_t\\\\\nu_t\\mid d_t, y_{t-1}, \\dots, y_{t-p} &\\sim\\mathcal{N}\\left(0, \\sigma^2\\right)\n\\end{align}\\] where \\(\\alpha_d\\) is a \\(d\\)-vector of coefficients on deterministic terms, and parameters \\(\\alpha_1,\\dots,\\alpha_p\\) are autoregressive slopes."
+  },
+  {
     "objectID": "index.html#references",
     "href": "index.html#references",
     "title": "Bayesian Autoregressions",
