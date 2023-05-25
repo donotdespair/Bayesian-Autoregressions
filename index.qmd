@@ -18,8 +18,18 @@ bibliography: references.bib
 >
 > **Keywords.** Autoregressions, Bayesian Inference, forecasting, heteroskedasticity, shrinkage prior
 
-# Introduction
+# Autoregressions
 
+Autoregressions are a popular class of linear models that are the most useful for time series persistence analysis and forecasting a random variable's unknown future values. The simplicity of their formulation, estimation, and range of applications in which they occur useful decides on their continued employment. 
+
+## The AR($p$) model
+
+The model is set for a univariate time series whose observation at time $t$ is denoted by $y_t$. It includes a $d$-vector $d_t$ of deterministic terms and $p$ lags of the dependent variable on the right-hand side of the model equation. It is complemented by error term $u_t$ that, in this note, is zero-mean normally distributed with variance $\sigma^2$. Then the model equations are:
+\begin{align}
+y_t &= \alpha_d' d_t + \alpha_1 y_{t-1} + \dots + \alpha_p y_{t-p} + u_t\\
+u_t\mid d_t, y_{t-1}, \dots, y_{t-p} &\sim\mathcal{N}\left(0, \sigma^2\right)
+\end{align}
+where $\alpha_d$ is a $d$-vector of coefficients on deterministic terms, and parameters $\alpha_1,\dots,\alpha_p$ are autoregressive slopes.
 
 
 
