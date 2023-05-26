@@ -74,4 +74,49 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 (2\pi)^{-\frac{T}{2}}\left(\sigma^2\right)^{-\frac{T}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)'(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)\right\}.
 \end{align}
 
-## References {.unnumbered}
+
+# Natural-Conjugate Analysis
+
+## Normal-inverted gamma 2 prior
+
+## Normal-inverted gamma 2 posterior
+
+## Sampling draws from the posterior
+
+
+
+# Hierarchical Prior Analysis
+
+## Estimating autoregressive prior shrinkage
+
+### Inverted gamma 2 scale mixture of normal
+
+### Gamma scale mixture of normal
+
+## Estimating error term variance prior scale
+
+## Dummy observation prior
+
+
+
+
+# Model Extensions
+
+## Student-$t$ error term
+
+## Estimating autoregressions after 2020
+
+## Stochastic volatility heteroskedasticity
+
+
+
+# Forecasting
+
+## Conditional predictive density
+
+## Algorithm to sample from the predictive density
+
+## Sampler implementation in R
+
+
+# References {.unnumbered}
