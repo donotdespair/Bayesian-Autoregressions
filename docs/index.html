@@ -78,7 +78,19 @@ ul.task-list li input[type="checkbox"] {
     <span class="navbar-title">Macroeconometrics Students Present</span>
     </a>
   </div>
-          <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/donotdespair/Bayesian-Autoregressions"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -96,8 +108,36 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#the-arp-model" id="toc-the-arp-model" class="nav-link" data-scroll-target="#the-arp-model">The AR(<span class="math inline">\(p\)</span>) model</a></li>
   <li><a href="#matrix-notation-for-the-model" id="toc-matrix-notation-for-the-model" class="nav-link" data-scroll-target="#matrix-notation-for-the-model">Matrix notation for the model</a></li>
   <li><a href="#likelihood-function" id="toc-likelihood-function" class="nav-link" data-scroll-target="#likelihood-function">Likelihood function</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul></li>
+  <li><a href="#natural-conjugate-analysis" id="toc-natural-conjugate-analysis" class="nav-link" data-scroll-target="#natural-conjugate-analysis">Natural-Conjugate Analysis</a>
+  <ul class="collapse">
+  <li><a href="#normal-inverted-gamma-2-prior" id="toc-normal-inverted-gamma-2-prior" class="nav-link" data-scroll-target="#normal-inverted-gamma-2-prior">Normal-inverted gamma 2 prior</a></li>
+  <li><a href="#normal-inverted-gamma-2-posterior" id="toc-normal-inverted-gamma-2-posterior" class="nav-link" data-scroll-target="#normal-inverted-gamma-2-posterior">Normal-inverted gamma 2 posterior</a></li>
+  <li><a href="#sampling-draws-from-the-posterior" id="toc-sampling-draws-from-the-posterior" class="nav-link" data-scroll-target="#sampling-draws-from-the-posterior">Sampling draws from the posterior</a></li>
+  </ul></li>
+  <li><a href="#hierarchical-prior-analysis" id="toc-hierarchical-prior-analysis" class="nav-link" data-scroll-target="#hierarchical-prior-analysis">Hierarchical Prior Analysis</a>
+  <ul class="collapse">
+  <li><a href="#estimating-autoregressive-prior-shrinkage" id="toc-estimating-autoregressive-prior-shrinkage" class="nav-link" data-scroll-target="#estimating-autoregressive-prior-shrinkage">Estimating autoregressive prior shrinkage</a>
+  <ul class="collapse">
+  <li><a href="#inverted-gamma-2-scale-mixture-of-normal" id="toc-inverted-gamma-2-scale-mixture-of-normal" class="nav-link" data-scroll-target="#inverted-gamma-2-scale-mixture-of-normal">Inverted gamma 2 scale mixture of normal</a></li>
+  <li><a href="#gamma-scale-mixture-of-normal" id="toc-gamma-scale-mixture-of-normal" class="nav-link" data-scroll-target="#gamma-scale-mixture-of-normal">Gamma scale mixture of normal</a></li>
+  </ul></li>
+  <li><a href="#estimating-error-term-variance-prior-scale" id="toc-estimating-error-term-variance-prior-scale" class="nav-link" data-scroll-target="#estimating-error-term-variance-prior-scale">Estimating error term variance prior scale</a></li>
+  <li><a href="#dummy-observation-prior" id="toc-dummy-observation-prior" class="nav-link" data-scroll-target="#dummy-observation-prior">Dummy observation prior</a></li>
+  </ul></li>
+  <li><a href="#model-extensions" id="toc-model-extensions" class="nav-link" data-scroll-target="#model-extensions">Model Extensions</a>
+  <ul class="collapse">
+  <li><a href="#student-t-error-term" id="toc-student-t-error-term" class="nav-link" data-scroll-target="#student-t-error-term">Student-<span class="math inline">\(t\)</span> error term</a></li>
+  <li><a href="#estimating-autoregressions-after-2020" id="toc-estimating-autoregressions-after-2020" class="nav-link" data-scroll-target="#estimating-autoregressions-after-2020">Estimating autoregressions after 2020</a></li>
+  <li><a href="#stochastic-volatility-heteroskedasticity" id="toc-stochastic-volatility-heteroskedasticity" class="nav-link" data-scroll-target="#stochastic-volatility-heteroskedasticity">Stochastic volatility heteroskedasticity</a></li>
+  </ul></li>
+  <li><a href="#forecasting" id="toc-forecasting" class="nav-link" data-scroll-target="#forecasting">Forecasting</a>
+  <ul class="collapse">
+  <li><a href="#conditional-predictive-density" id="toc-conditional-predictive-density" class="nav-link" data-scroll-target="#conditional-predictive-density">Conditional predictive density</a></li>
+  <li><a href="#algorithm-to-sample-from-the-predictive-density" id="toc-algorithm-to-sample-from-the-predictive-density" class="nav-link" data-scroll-target="#algorithm-to-sample-from-the-predictive-density">Algorithm to sample from the predictive density</a></li>
+  <li><a href="#sampler-implementation-in-r" id="toc-sampler-implementation-in-r" class="nav-link" data-scroll-target="#sampler-implementation-in-r">Sampler implementation in R</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 </nav>
     </div>
@@ -186,11 +226,65 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 (2\pi)^{-\frac{T}{2}}\left(\sigma^2\right)^{-\frac{T}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)'(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)\right\}.
 \end{align}\]</span></p>
 </section>
-<section id="references" class="level2 unnumbered">
-<h2 class="unnumbered anchored" data-anchor-id="references">References</h2>
-
-
 </section>
+<section id="natural-conjugate-analysis" class="level1">
+<h1>Natural-Conjugate Analysis</h1>
+<section id="normal-inverted-gamma-2-prior" class="level2">
+<h2 class="anchored" data-anchor-id="normal-inverted-gamma-2-prior">Normal-inverted gamma 2 prior</h2>
+</section>
+<section id="normal-inverted-gamma-2-posterior" class="level2">
+<h2 class="anchored" data-anchor-id="normal-inverted-gamma-2-posterior">Normal-inverted gamma 2 posterior</h2>
+</section>
+<section id="sampling-draws-from-the-posterior" class="level2">
+<h2 class="anchored" data-anchor-id="sampling-draws-from-the-posterior">Sampling draws from the posterior</h2>
+</section>
+</section>
+<section id="hierarchical-prior-analysis" class="level1">
+<h1>Hierarchical Prior Analysis</h1>
+<section id="estimating-autoregressive-prior-shrinkage" class="level2">
+<h2 class="anchored" data-anchor-id="estimating-autoregressive-prior-shrinkage">Estimating autoregressive prior shrinkage</h2>
+<section id="inverted-gamma-2-scale-mixture-of-normal" class="level3">
+<h3 class="anchored" data-anchor-id="inverted-gamma-2-scale-mixture-of-normal">Inverted gamma 2 scale mixture of normal</h3>
+</section>
+<section id="gamma-scale-mixture-of-normal" class="level3">
+<h3 class="anchored" data-anchor-id="gamma-scale-mixture-of-normal">Gamma scale mixture of normal</h3>
+</section>
+</section>
+<section id="estimating-error-term-variance-prior-scale" class="level2">
+<h2 class="anchored" data-anchor-id="estimating-error-term-variance-prior-scale">Estimating error term variance prior scale</h2>
+</section>
+<section id="dummy-observation-prior" class="level2">
+<h2 class="anchored" data-anchor-id="dummy-observation-prior">Dummy observation prior</h2>
+</section>
+</section>
+<section id="model-extensions" class="level1">
+<h1>Model Extensions</h1>
+<section id="student-t-error-term" class="level2">
+<h2 class="anchored" data-anchor-id="student-t-error-term">Student-<span class="math inline">\(t\)</span> error term</h2>
+</section>
+<section id="estimating-autoregressions-after-2020" class="level2">
+<h2 class="anchored" data-anchor-id="estimating-autoregressions-after-2020">Estimating autoregressions after 2020</h2>
+</section>
+<section id="stochastic-volatility-heteroskedasticity" class="level2">
+<h2 class="anchored" data-anchor-id="stochastic-volatility-heteroskedasticity">Stochastic volatility heteroskedasticity</h2>
+</section>
+</section>
+<section id="forecasting" class="level1">
+<h1>Forecasting</h1>
+<section id="conditional-predictive-density" class="level2">
+<h2 class="anchored" data-anchor-id="conditional-predictive-density">Conditional predictive density</h2>
+</section>
+<section id="algorithm-to-sample-from-the-predictive-density" class="level2">
+<h2 class="anchored" data-anchor-id="algorithm-to-sample-from-the-predictive-density">Algorithm to sample from the predictive density</h2>
+</section>
+<section id="sampler-implementation-in-r" class="level2">
+<h2 class="anchored" data-anchor-id="sampler-implementation-in-r">Sampler implementation in R</h2>
+</section>
+</section>
+<section id="references" class="level1 unnumbered">
+<h1 class="unnumbered">References</h1>
+
+
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{woźniak2023,

@@ -28,10 +28,87 @@
     "text": "Likelihood function\nThe model equations imply the predictive density of the data vector \\(\\mathbf{y}\\). To see this, consider the model equation as a linear transformation of a normal vector \\(\\mathbf{u}\\). Therefore, the data vector follows a multivariate normal distribution given by: \\[\\begin{align}\n\\mathbf{y}\\mid \\mathbf{X}, \\boldsymbol\\alpha, \\sigma^2 &\\sim\\mathcal{N}_T\\left(\\mathbf{X} \\boldsymbol\\alpha, \\sigma^2\\mathbf{I}_T\\right).\n\\end{align}\\]\nThis distribution determines the shape of the likelihood function that is defined as the sampling data density: \\[\\begin{align}\nL(\\boldsymbol\\alpha,\\sigma^2|\\mathbf{y}, \\mathbf{X})\\equiv p\\left(\\mathbf{y}\\mid \\mathbf{X}, \\boldsymbol\\alpha, \\sigma^2 \\right).\n\\end{align}\\]\nThe likelihood function that for the sake of the estimation of the parameters, and after plugging in data in place of matrices \\(\\mathbf{y}\\) and \\(\\mathbf{X}\\), is considered a function of parameters \\(\\boldsymbol\\alpha\\) and \\(\\sigma^2\\) is given by: \\[\\begin{align}\nL(\\boldsymbol\\alpha,\\sigma^2|\\mathbf{y}, \\mathbf{X}) =\n(2\\pi)^{-\\frac{T}{2}}\\left(\\sigma^2\\right)^{-\\frac{T}{2}}\\exp\\left\\{-\\frac{1}{2}\\frac{1}{\\sigma^2}(\\mathbf{y} - \\mathbf{X}\\boldsymbol\\alpha)'(\\mathbf{y} - \\mathbf{X}\\boldsymbol\\alpha)\\right\\}.\n\\end{align}\\]"
   },
   {
-    "objectID": "index.html#references",
-    "href": "index.html#references",
+    "objectID": "index.html#normal-inverted-gamma-2-prior",
+    "href": "index.html#normal-inverted-gamma-2-prior",
     "title": "Bayesian Autoregressions",
-    "section": "References",
-    "text": "References"
+    "section": "Normal-inverted gamma 2 prior",
+    "text": "Normal-inverted gamma 2 prior"
+  },
+  {
+    "objectID": "index.html#normal-inverted-gamma-2-posterior",
+    "href": "index.html#normal-inverted-gamma-2-posterior",
+    "title": "Bayesian Autoregressions",
+    "section": "Normal-inverted gamma 2 posterior",
+    "text": "Normal-inverted gamma 2 posterior"
+  },
+  {
+    "objectID": "index.html#sampling-draws-from-the-posterior",
+    "href": "index.html#sampling-draws-from-the-posterior",
+    "title": "Bayesian Autoregressions",
+    "section": "Sampling draws from the posterior",
+    "text": "Sampling draws from the posterior"
+  },
+  {
+    "objectID": "index.html#estimating-autoregressive-prior-shrinkage",
+    "href": "index.html#estimating-autoregressive-prior-shrinkage",
+    "title": "Bayesian Autoregressions",
+    "section": "Estimating autoregressive prior shrinkage",
+    "text": "Estimating autoregressive prior shrinkage\n\nInverted gamma 2 scale mixture of normal\n\n\nGamma scale mixture of normal"
+  },
+  {
+    "objectID": "index.html#estimating-error-term-variance-prior-scale",
+    "href": "index.html#estimating-error-term-variance-prior-scale",
+    "title": "Bayesian Autoregressions",
+    "section": "Estimating error term variance prior scale",
+    "text": "Estimating error term variance prior scale"
+  },
+  {
+    "objectID": "index.html#dummy-observation-prior",
+    "href": "index.html#dummy-observation-prior",
+    "title": "Bayesian Autoregressions",
+    "section": "Dummy observation prior",
+    "text": "Dummy observation prior"
+  },
+  {
+    "objectID": "index.html#student-t-error-term",
+    "href": "index.html#student-t-error-term",
+    "title": "Bayesian Autoregressions",
+    "section": "Student-\\(t\\) error term",
+    "text": "Student-\\(t\\) error term"
+  },
+  {
+    "objectID": "index.html#estimating-autoregressions-after-2020",
+    "href": "index.html#estimating-autoregressions-after-2020",
+    "title": "Bayesian Autoregressions",
+    "section": "Estimating autoregressions after 2020",
+    "text": "Estimating autoregressions after 2020"
+  },
+  {
+    "objectID": "index.html#stochastic-volatility-heteroskedasticity",
+    "href": "index.html#stochastic-volatility-heteroskedasticity",
+    "title": "Bayesian Autoregressions",
+    "section": "Stochastic volatility heteroskedasticity",
+    "text": "Stochastic volatility heteroskedasticity"
+  },
+  {
+    "objectID": "index.html#conditional-predictive-density",
+    "href": "index.html#conditional-predictive-density",
+    "title": "Bayesian Autoregressions",
+    "section": "Conditional predictive density",
+    "text": "Conditional predictive density"
+  },
+  {
+    "objectID": "index.html#algorithm-to-sample-from-the-predictive-density",
+    "href": "index.html#algorithm-to-sample-from-the-predictive-density",
+    "title": "Bayesian Autoregressions",
+    "section": "Algorithm to sample from the predictive density",
+    "text": "Algorithm to sample from the predictive density"
+  },
+  {
+    "objectID": "index.html#sampler-implementation-in-r",
+    "href": "index.html#sampler-implementation-in-r",
+    "title": "Bayesian Autoregressions",
+    "section": "Sampler implementation in R",
+    "text": "Sampler implementation in R"
   }
 ]
