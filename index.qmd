@@ -10,7 +10,9 @@ author:
 execute:
   echo: false
   
-citation: true
+date: 2023-05-25
+citation: 
+  url: https://donotdespair.github.io/Bayesian-Autoregressions/
 bibliography: references.bib
 ---
 
