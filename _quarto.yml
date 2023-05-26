@@ -6,6 +6,9 @@ website:
   title: "Macroeconometrics Students Present"
   navbar:
     background: "light"
+    right:
+    - icon: github
+      href: https://github.com/donotdespair/Bayesian-Autoregressions
 
 bibliography: references.bib
 
