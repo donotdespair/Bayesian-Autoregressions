@@ -19,7 +19,7 @@ bibliography: references.bib
 
 > **Abstract.** We present the basics of Bayesian estimation and inference for autoregressive models. The range of topics includes the natural conjugate analysis using normal-inverted-gamma 2 prior distribution and its extensions focusing on hierarchical modelling, conditional heteroskedasticity, and Student-t error terms. We focus on forecasting and sampling from the predictive density.
 >
-> **Keywords.** Autoregressions, Bayesian Inference, forecasting, heteroskedasticity, shrinkage prior
+> **Keywords.** Autoregressions, Bayesian Inference, Forecasting, Heteroskedasticity, Hierarchical Modelling, Natural Conjugacy, Shrinkage Prior
 
 # Autoregressions
 
