@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Bayesian Autoregressions",
     "section": "",
-    "text": "Abstract. We present the basics of Bayesian estimation and inference for autoregressive models. The range of topics includes the natural conjugate analysis using normal-inverted-gamma 2 prior distribution and its extensions focusing on hierarchical modelling, conditional heteroskedasticity, and Student-t error terms. We focus on forecasting and sampling from the predictive density.\nKeywords. Autoregressions, Bayesian Inference, forecasting, heteroskedasticity, shrinkage prior"
+    "text": "Abstract. We present the basics of Bayesian estimation and inference for autoregressive models. The range of topics includes the natural conjugate analysis using normal-inverted-gamma 2 prior distribution and its extensions focusing on hierarchical modelling, conditional heteroskedasticity, and Student-t error terms. We focus on forecasting and sampling from the predictive density.\nKeywords. Autoregressions, Bayesian Inference, Forecasting, Heteroskedasticity, Hierarchical Modelling, Natural Conjugacy, Shrinkage Prior"
   },
   {
     "objectID": "index.html#the-arp-model",
