@@ -1,11 +1,11 @@
 ---
 title: "Bayesian Autoregressions"
-author:
-  - name: "Tomasz Woźniak"
-    affiliation: University of Melbourne
+authors:
+  - name: Tomasz Woźniak
     url: https://github.com/donotdespair
     orcid: 0000-0003-2212-2378
-  - name: "Thomas Kronholm Møller & Jonas Loopers Davidsen"
+  - name: Thomas Kronholm Møller
+  - name: Jonas Loopers Davidsen
 
 execute:
   echo: false
