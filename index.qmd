@@ -5,76 +5,99 @@ author:
     affiliation: University of Melbourne
     url: https://github.com/donotdespair
     orcid: 0000-0003-2212-2378
-  - name: "Your Name"
-
+  - name: "Ray Gomez"
 execute:
-  echo: false
   
+  echo: false
 citation: 
   issued: 2023-05-25
   url: https://donotdespair.github.io/Bayesian-Autoregressions/
   doi: 10.26188/23255657
 bibliography: references.bib
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
-> **Abstract.** We present the basics of Bayesian estimation and inference for autoregressive models. The range of topics includes the natural conjugate analysis using normal-inverted-gamma 2 prior distribution and its extensions focusing on hierarchical modelling, conditional heteroskedasticity, and Student-t error terms. We focus on forecasting and sampling from the predictive density.
+> **Abstract.** We present the basics of Bayesian estimation and
+> inference for autoregressive models. The range of topics includes the
+> natural conjugate analysis using normal-inverted-gamma 2 prior
+> distribution and its extensions focusing on hierarchical modelling,
+> conditional heteroskedasticity, and Student-t error terms. We focus on
+> forecasting and sampling from the predictive density.
 >
-> **Keywords.** Autoregressions, Bayesian Inference, Forecasting, Heteroskedasticity, Hierarchical Modelling, Natural Conjugacy, Shrinkage Prior
+> **Keywords.** Autoregressions, Bayesian Inference, Forecasting,
+> Heteroskedasticity, Hierarchical Modelling, Natural Conjugacy,
+> Shrinkage Prior
 
 # Autoregressions
 
-Autoregressions are a popular class of linear models that are the most useful for time series persistence analysis and forecasting a random variable's unknown future values. The simplicity of their formulation, estimation, and range of applications in which they occur useful decides on their continued employment. 
+Autoregressions are a popular class of linear models that are the most
+useful for time series persistence analysis and forecasting a random
+variable's unknown future values. The simplicity of their formulation,
+estimation, and range of applications in which they occur useful decides
+on their continued employment.
 
 ## The AR($p$) model
 
-The model is set for a univariate time series whose observation at time $t$ is denoted by $y_t$. It includes a $d$-vector $d_t$ of deterministic terms and $p$ lags of the dependent variable on the right-hand side of the model equation. It is complemented by error term $u_t$ that, in this note, is zero-mean normally distributed with variance $\sigma^2$. Then the model equations are:
-\begin{align}
+The model is set for a univariate time series whose observation at time
+$t$ is denoted by $y_t$. It includes a $d$-vector $d_t$ of deterministic
+terms and $p$ lags of the dependent variable on the right-hand side of
+the model equation. It is complemented by error term $u_t$ that, in this
+note, is zero-mean normally distributed with variance $\sigma^2$. Then
+the model equations are: \begin{align}
 y_t &= \alpha_d' d_t + \alpha_1 y_{t-1} + \dots + \alpha_p y_{t-p} + u_t\\
 u_t\mid d_t, y_{t-1}, \dots, y_{t-p} &\sim\mathcal{N}\left(0, \sigma^2\right)
-\end{align}
-where $\alpha_d$ is a $d$-vector of coefficients on deterministic terms, and parameters $\alpha_1,\dots,\alpha_p$ are autoregressive slopes.
+\end{align} where $\alpha_d$ is a $d$-vector of coefficients on
+deterministic terms, and parameters $\alpha_1,\dots,\alpha_p$ are
+autoregressive slopes.
 
 ## Matrix notation for the model
 
-To simplify the notation and the derivations introduce matrix notation for the model. Let $T$ be the available sample size for the variable $y$. Define a $T$-vector of zeros, $\mathbf{0}_T$, the identity matrix of order $T$, $\mathbf{I}_T$, $T\times1$ vectors:
-\begin{align}
+To simplify the notation and the derivations introduce matrix notation
+for the model. Let $T$ be the available sample size for the variable
+$y$. Define a $T$-vector of zeros, $\mathbf{0}_T$, the identity matrix
+of order $T$, $\mathbf{I}_T$, $T\times1$ vectors: \begin{align}
 \mathbf{y} = \begin{bmatrix} y_1\\ \vdots \\ y_T\end{bmatrix}, \quad
 \text{ and }\quad
 \mathbf{u} = \begin{bmatrix} u_1\\ \vdots \\ u_T\end{bmatrix},
-\end{align}
-a $k\times1$ vector $\mathbf{x}_t = \begin{bmatrix}d_t' & y_{t-1}&\dots& y_{t-} \end{bmatrix}'$, where $k=d+p$, and a $T\times k$ matrix collecting the explanatory variables:
-\begin{align}
+\end{align} a $k\times1$ vector
+$\mathbf{x}_t = \begin{bmatrix}d_t' & y_{t-1}&\dots& y_{t-} \end{bmatrix}'$,
+where $k=d+p$, and a $T\times k$ matrix collecting the explanatory
+variables: \begin{align}
 \mathbf{X} = \begin{bmatrix} \mathbf{x}_1'\\ \vdots \\ \mathbf{x}_T'\end{bmatrix}.
-\end{align}
-Collect the parameters of the conditional mean equation in a $k$-vector:
-\begin{align}
+\end{align} Collect the parameters of the conditional mean equation in a
+$k$-vector: \begin{align}
 \boldsymbol\alpha = \begin{bmatrix} \alpha_d'& \alpha_1 & \dots & \alpha_p\end{bmatrix}'.
 \end{align}
 
-Then the model can be written in a concise notation as:
-\begin{align}
+Then the model can be written in a concise notation as: \begin{align}
 \mathbf{y} &= \mathbf{X} \boldsymbol\alpha + \mathbf{u}\\
 \mathbf{u}\mid \mathbf{X} &\sim\mathcal{N}_T\left(\mathbf{0}_T, \sigma^2\mathbf{I}_T\right).
 \end{align}
 
 ## Likelihood function
 
-The model equations imply the predictive density of the data vector $\mathbf{y}$. To see this, consider the model equation as a linear transformation of a normal vector $\mathbf{u}$. Therefore, the data vector follows a multivariate normal distribution given by:
+The model equations imply the predictive density of the data vector
+$\mathbf{y}$. To see this, consider the model equation as a linear
+transformation of a normal vector $\mathbf{u}$. Therefore, the data
+vector follows a multivariate normal distribution given by:
 \begin{align}
 \mathbf{y}\mid \mathbf{X}, \boldsymbol\alpha, \sigma^2 &\sim\mathcal{N}_T\left(\mathbf{X} \boldsymbol\alpha, \sigma^2\mathbf{I}_T\right).
 \end{align}
 
-This distribution determines the shape of the likelihood function that is defined as the sampling data density:
-\begin{align}
+This distribution determines the shape of the likelihood function that
+is defined as the sampling data density: \begin{align}
 L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X})\equiv p\left(\mathbf{y}\mid \mathbf{X}, \boldsymbol\alpha, \sigma^2 \right).
 \end{align}
 
-The likelihood function that for the sake of the estimation of the parameters, and after plugging in data in place of matrices $\mathbf{y}$ and $\mathbf{X}$, is considered a function of parameters $\boldsymbol\alpha$ and $\sigma^2$ is given by:
-\begin{align}
+The likelihood function that for the sake of the estimation of the
+parameters, and after plugging in data in place of matrices $\mathbf{y}$
+and $\mathbf{X}$, is considered a function of parameters
+$\boldsymbol\alpha$ and $\sigma^2$ is given by: \begin{align}
 L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) = 
 (2\pi)^{-\frac{T}{2}}\left(\sigma^2\right)^{-\frac{T}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)'(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)\right\}.
 \end{align}
-
 
 # Natural-Conjugate Analysis
 
@@ -83,8 +106,6 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 ## Normal-inverted gamma 2 posterior
 
 ## Sampling draws from the posterior
-
-
 
 # Hierarchical Prior Analysis
 
@@ -98,18 +119,405 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 
 ## Dummy observation prior
 
-
-
-
 # Model Extensions
 
 ## Student-$t$ error term
 
 ## Estimating autoregressions after 2020
 
+
+### Algorithm with code
+
+From the concise matrix notation:
+
+$$\textbf{y}=\textbf{X}\boldsymbol{\alpha} +\textbf{u}$$
+$$\textbf{u}|\textbf{X}\sim \mathcal{N}_T(0,\sigma^2\text{diag}(C))$$
+
+This first step is to sample draws of the vector of COVID volatility
+variables $C=[1\quad...\quad1 \quad \bar{c}_0\quad \bar{c}_1\quad \bar{c}_2\quad 1+(\bar{c}_2-1)\rho\quad 1+(\bar{c}_2-1)\rho^2\quad...]'$.
+
+This is done by estimating parameters in $\theta=(\bar{c}_0,\bar{c}_1,\bar{c}_2,\rho)$ by
+sampling from their own marginal posterior via a Metropolis MCMC
+algorithm:
+
+1.  Initialize $\theta$ at the posterior mode which is can be located
+    via numerical optimization. We executed this in `R` through the
+    following function, `c.posterior.mode`. This function takes in data
+    representing matrix $\textbf{y}$ and returns values for $\theta$
+    that minimize its negative log-posterior, as well as the
+    corresponding Hessian.
+
+```{r COVID parameters posterior maximization, echo = TRUE}
+#| code-fold: true
+#| code-summary: "show code"
+c.posterior.mode <- function(data, p=4, k1=1, k2=100, start_date=c(1991,1)){
+
+  v.neglogPost <- function(theta){
+    N = ncol(data)
+    K = 1 + p*N
+    Y       = ts(data[(p+1):nrow(data),], start=start_date, frequency=4)
+    T = nrow(Y)
+    X       = matrix(1,T,1)
+    # nrow(X)
+    for (i in 1:p){
+      X     = cbind(X,data[(p+1):nrow(data)-i,])
+    }
+    
+    # Calculate MLE for prior 
+    ############################################################
+    A.hat       = solve(t(X)%*%X)%*%t(X)%*%Y
+    Sigma.hat   = t(Y-X%*%A.hat)%*%(Y-X%*%A.hat)/nrow(Y)
+    
+    # Specify prior distribution
+    ############################################################
+    kappa.1     = k1
+    kappa.2     = k2
+    kappa.3     = 1
+    A.prior     = matrix(0,nrow(A.hat),ncol(A.hat))
+    A.prior[2:(N+1),] = kappa.3*diag(N)
+    V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
+    S.prior     = diag(diag(Sigma.hat))
+    nu.prior    = N+1
+    
+    vec <- theta[1:3]
+    for (i in 4:12){
+      vec <- c(vec, 1 + (theta[3]-1)*theta[4]^(i-3))
+    }  
+    
+    V <- c(ts(rep(1, nrow(Y)-12), c(1991,1), frequency = 4) , vec)    
+    
+    Y.tilde <- diag(1/V)%*%Y
+    X.tilde <- diag(1/V)%*%X
+    A.tilde.hat <- solve((t(X.tilde)%*%X.tilde+solve(V.prior)))%*%(t(X.tilde)%*%Y.tilde+solve(V.prior)%*%A.prior)
+    epsilon.tilde <-Y.tilde - X.tilde%*%A.tilde.hat
+    
+    # Log-likelihood      
+    logL <- log(prod(V^(-N)))+(-N/2)*log(det(t(X.tilde)%*%X.tilde+solve(V.prior)))+
+            (-(T-p+nu.prior)/2)*log(det(S.prior +t(epsilon.tilde)%*%epsilon.tilde + 
+            t(A.tilde.hat-A.prior)%*%solve(V.prior)%*%(A.tilde.hat-A.prior)))
+    
+    # Pareto(1,1) and Beta(3,1.5) priors 
+    pareto.a=1
+    pareto.b=1
+    beta.a=3
+    beta.b=1.5
+    beta.cons <- 1/beta(beta.a,beta.b)
+    
+    # Log-prior
+    logP <- log((pareto.a*pareto.b^pareto.a)/(theta[1]^(pareto.a+1))*
+    (pareto.a*pareto.b^pareto.a)/(theta[2]^(pareto.a+1))*
+    (pareto.a*pareto.b^pareto.a)/(theta[3]^(pareto.a+1))*
+    beta.cons*theta[4]^(beta.a-1)*(1-theta[4])^(beta.b-1))
+    
+    # negative log-posterior
+    neglogPost <- -(logL+logP)
+    
+    return(neglogPost)
+  }
+   
+  # numerically minimize the negative log-likelihood
+  post.maximizer <- optim(par=c(50, 50, 50, 0.5), fn=v.neglogPost, method="L-BFGS-B", 
+                          lower=c(1, 1, 1, 0.0001),
+                          upper=c(100,100,100,0.99999), hessian = TRUE)
+  
+  return(list(maximizer=post.maximizer$par, hessian=post.maximizer$hessian))
+
+}
+```
+
+2.  Draw candidate $\theta^{*}$ from $N_4(\theta^{(s-1)},cW)$, where $W$
+    is the inverse Hessian of the negative log posterior of $\theta$ at
+    the mode, which is also calculated computationally, and $c$ is a
+    scaling factor.
+
+3.  Set:
+
+$$\theta^{(s)}=  \begin{cases}
+        \theta^* & \text{with pr.} \quad \alpha^{(s)} 
+        \\
+        \\
+        \theta^{(s-1)} & \text{with pr.} \quad 1-\alpha^{(s)} 
+  \end{cases}$$
+
+$$\alpha^{(s)} =\text{min}\Big[1,\frac{P(\theta^*|Y,X,\underline{\gamma})}{P(\theta^{(s-1)}|Y,X,\underline{\gamma})}\Big]$$
+
+4.  Define $C^{(s)}$ matrix using $\theta^{(s)}$:
+
+$$C^{(s)}=[1\quad...\quad1 \quad \bar{c}_0^{(s)}\quad \bar{c}_1^{(s)}\quad \bar{c}_2^{(s)}\quad 1+(\bar{c}_2^{(s)}-1)\rho^{(s)}\quad 1+(\bar{c}_2^{(s)}-1)\rho^{(s)2}\quad...]'$$
+
+Steps 2 to 4 are implemented via the function, `mh.mcmc` which takes in
+data, the posterior mode of $\theta$, and the inverse Hessian from
+`c.posterior.mode` and returns the draws of $\theta$.
+
+```{r Metropolis-Hastings function, echo = TRUE}
+#| code-fold: true
+#| code-summary: "show code"
+library(MASS)
+library(coda)
+mh.mcmc <- function(data, p=1, S.mh = 1000, c, W = diag(4), theta.init,
+                    k1 = 1, k2 = 100, start_date = c(1991,1)){
+ # N = no. of variables
+  N = ncol(data)
+  # p = no. of lags
+  K = 1 + p*N
+  # forecast horizon
+  # h       = 8
+  Y       = ts(data[(p+1):nrow(data),], start=start_date, frequency=4)
+  T = nrow(Y)
+  X       = matrix(1,T,1)
+  # nrow(X)
+  for (i in 1:p){
+    X     = cbind(X,data[(p+1):nrow(data)-i,])
+  }
+  
+
+  # Calculate MLE for prior 
+  ############################################################
+  A.hat       = solve(t(X)%*%X)%*%t(X)%*%Y
+  Sigma.hat   = t(Y-X%*%A.hat)%*%(Y-X%*%A.hat)/nrow(Y)
+  
+  # Specify prior distribution
+  ############################################################
+  kappa.1     = k1
+  kappa.2     = k2
+  kappa.3     = 1
+  A.prior     = matrix(0,nrow(A.hat),ncol(A.hat))
+  A.prior[2:(N+1),] = kappa.3*diag(N)
+  V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
+  S.prior     = diag(diag(Sigma.hat))
+  nu.prior    = N+1
+  
+  # Metropolis-Hastings 
+  ###########################################################
+  # v0, v1, v2, rho
+  Theta <- matrix(NA,S.mh,4)
+  theta_old <- theta.init
+  
+  set.seed(1)
+  for (s in 1:S.mh){
+
+    covid.vec <- function(theta){
+      vec <- theta[1:3]
+      for (i in 4:12){
+        vec <- c(vec, 1 + (theta[3]-1)*theta[4]^(i-3))
+      }
+      
+      return(vec)
+    }
+
+    # Covid volatility likelihood kernel
+    v.logL <- function(V){
+      Y.tilde <- diag(1/V)%*%Y
+      X.tilde <- diag(1/V)%*%X
+      A.tilde.hat <- solve((t(X.tilde)%*%X.tilde+solve(V.prior)))%*%(t(X.tilde)%*%Y.tilde+solve(V.prior)%*%A.prior)
+      epsilon.tilde <-Y.tilde - X.tilde%*%A.tilde.hat
+
+      logL <- log(prod(V^(-N)))+(-N/2)*log(det(t(X.tilde)%*%X.tilde+solve(V.prior)))+
+              (-(T-p+nu.prior)/2)*log(det(S.prior +t(epsilon.tilde)%*%epsilon.tilde + 
+              t(A.tilde.hat-A.prior)%*%solve(V.prior)%*%(A.tilde.hat-A.prior)))
+
+      return(logL)
+    }
+  
+    # Covid volatility prior
+    v.logP <- function(theta, pareto.a=1, pareto.b=1, beta.a=3, beta.b=1.5){
+      beta.cons <- 1/beta(beta.a,beta.b)
+  
+      logP <- log((pareto.a*pareto.b^pareto.a)/(theta[1]^(pareto.a+1))*
+      (pareto.a*pareto.b^pareto.a)/(theta[2]^(pareto.a+1))*
+      (pareto.a*pareto.b^pareto.a)/(theta[3]^(pareto.a+1))*
+       beta.cons*theta[4]^(beta.a-1)*(1-theta[4])^(beta.b-1))
+      
+      return(logP)
+    }
+
+    v_ones <- ts(rep(1, nrow(Y)-12), c(1991,1), frequency = 4) 
+    V.old <- c(v_ones, covid.vec(theta_old))    
+      
+    # New candidate parameters values
+    theta_new <- mvrnorm(1, theta_old, c*W)
+    V.new <- c(v_ones, covid.vec(theta_new))
+    
+    # Calculate posteriors 
+    v.logpost_old <- v.logL(V.old)+v.logP(theta_old)
+    v.logpost_new <- v.logL(V.new)+v.logP(theta_new)
+    
+    # Posterior ratio
+    post.ratio <- exp(v.logpost_new-v.logpost_old)
+    
+    # Acceptance/rejection alpha
+    alpha <- min(1, post.ratio)
+    
+    u_star <- runif(1)
+    
+    if (alpha > u_star){
+      Theta[s,] <- theta_new
+    } else {Theta[s,] <- theta_old}
+    
+    theta_old <- Theta[s,]  
+  }
+  
+  colnames(Theta) <- c("c0", "c1" , "c2", "rho")
+
+  re <- list(Theta=Theta, 
+             AcceptRate = 1 - rejectionRate(as.mcmc(Theta[,1])))
+  return(re)
+}
+
+```
+
+5.  These $\theta$ draws, are then used to draw $\boldsymbol{\alpha}$
+    and $\Sigma$ from the following posterior distribution:
+
+$$P(\boldsymbol{\alpha}|Y,X,\Sigma,C)=MN_{K\times N}(\bar{\boldsymbol{\alpha}},\Sigma,\bar{V})$$
+$$P(\Sigma|Y,X,C)=IW_N(\bar{S},\bar{\nu})\\$$
+
+$$\bar{V}=(X'\text{diag}(C^2)X+\underline{V}^{-1})^{-1}$$
+$$\bar{\boldsymbol{\alpha}}=\bar{V}(X'\text{diag}(C^2)Y+\underline{V}^{-1}\underline{\boldsymbol{\alpha}})$$
+$$\bar{\nu}=T+\underline{\nu}$$
+$$\bar{S}=\underline{S}+Y'\text{diag}(C^2)Y+\underline{\boldsymbol{\alpha}}'\underline{V}^{-1}\underline{\boldsymbol{\alpha}}-\bar{\boldsymbol{\alpha}}'\bar{V}^{-1}\bar{\boldsymbol{\alpha}}$$
+
+This sampling is implemented via the function `covid.est` below:
+
+```{r Estimation, echo = TRUE}
+#| code-fold: true
+#| code-summary: "show code"
+covid.est <- function(data, p=4, S=100, k1=1, k2=100, start_date = c(1991,1), Theta.mh){
+
+  N = ncol(data)
+  K = 1 + p*N
+
+  Y       = ts(data[(p+1):nrow(data),], start=start_date, frequency=4)
+  T = nrow(Y)
+  X       = matrix(1,T,1)
+
+  for (i in 1:p){
+    X     = cbind(X,data[(p+1):nrow(data)-i,])
+  }
+  
+  covid.vec <- function(theta){
+    vec <- theta[1:3]
+    for (i in 4:12){
+      vec <- c(vec, 1 + (theta[3]-1)*theta[4]^(i-3))
+    }
+      
+    return(vec)
+  }
+  
+  diagV.sqinv <- array(NA, c(nrow(Y),nrow(Y),S))
+  
+  for (s in 1:S){
+    v_ones <- ts(rep(1, nrow(Y)-12), c(1991,1), frequency = 4) 
+    diagV.sqinv[,,s] <- diag(c(v_ones, covid.vec(Theta.mh[s,]))^(-2))
+  }
+  
+  # Calculate MLE for prior 
+  ############################################################
+  A.hat       = solve(t(X)%*%X)%*%t(X)%*%Y
+  Sigma.hat   = t(Y-X%*%A.hat)%*%(Y-X%*%A.hat)/nrow(Y)
+
+  # Specify prior distribution
+  ############################################################
+  kappa.1     = k1
+  kappa.2     = k2
+  kappa.3     = 1
+  A.prior     = matrix(0,nrow(A.hat),ncol(A.hat))
+  A.prior[2:(N+1),] = kappa.3*diag(N)
+  V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
+  S.prior     = diag(diag(Sigma.hat))
+  nu.prior    = N+1
+  
+  # Posterior draws 
+  ############################################################
+  Sigma.posterior   = array(NA,c(N,N,S))
+  A.posterior       = array (NA,c(K,N,S))
+  
+  for (s in 1:S){
+    V.bar.inv   = t(X)%*%diagV.sqinv[,,s]%*%X + diag(1/diag(V.prior))
+    V.bar       = solve(V.bar.inv)
+    A.bar       = V.bar%*%(t(X)%*%diagV.sqinv[,,s]%*%Y + diag(1/diag(V.prior))%*%A.prior)
+    nu.bar      = nrow(Y) + nu.prior
+    S.bar       = S.prior + t(Y)%*%diagV.sqinv[,,s]%*%Y + t(A.prior)%*%diag(1/diag(V.prior))%*%
+                  A.prior - t(A.bar)%*%V.bar.inv%*%A.bar
+    S.bar.inv   = solve(S.bar)
+    L                 = t(chol(V.bar))
+    
+    # RF posterior draws
+    Sigma.posterior[,,s] <- solve(rWishart(1, df=nu.bar, Sigma=S.bar.inv)[,,1])
+    cholSigma.s     = chol(Sigma.posterior[,,s])
+    A.posterior[,,s]       = matrix(mvrnorm(1,as.vector(A.bar), Sigma.posterior[,,s]%x%V.bar),ncol=N)
+    A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%cholSigma.s
+  }
+
+  re <- list("A.posterior"=A.posterior, "Sigma.posterior"=Sigma.posterior, "Theta"= Theta.mh)
+  return(re)
+}
+
+```
+
+The implementation of the above estimation procedure is demonstrated
+below, on an independent bi-variate Gaussian random walk with drift
+series. Both series have 128 observations, exhibit an increasing
+stochastic trend due to a drift term of $\mu=1$, and were generated to
+have increased volatility (i.e., three times the standard deviation) on
+periods $t\in[129,136]$ before returning to a standard deviation of 1 in
+the last 4 periods. This artificially generated series aims to mimic unit-root non-stationary macroeconomic variables that experiences heightened volatility during COVID-19.
+
+```{r RW sample, echo = T}
+#| code-fold: true
+#| code-summary: "show code"
+set.seed(1291042)
+
+# Generate RW series with drift and higher variance at covid periods.
+RW1 <- ts(cumsum(c(1+rnorm(116, mean = 0, sd = 1),1+rnorm(8, mean = 0, sd = 3),1+rnorm(4, mean = 0, sd = 1))))
+RW2 <- ts(cumsum(c(1+rnorm(116, mean = 0, sd = 1),1+rnorm(8, mean = 0, sd = 3),1+rnorm(4, mean = 0, sd = 1))))
+Y <- cbind(RW1, RW2)
+
+# Plot the series
+par(mfrow=c(1,2), mar=c(2,2,2,2))
+plot(y=RW1, x = 1:128, type = "l", col = "turquoise4", 
+     lwd = 1.5, ylab = "", xlab = "", main = "RW with drift 1")
+plot(y=RW2, x = 1:128, type = "l", col = "plum4", 
+     lwd = 1.5, ylab = "",xlab = "", main = "RW with drift 2")
+```
+
+First, `posterior.mode` and `mh.mcmc` are used to draw COVID volatility vectors $C^{(s)}$. As seen in the plots below, MCMC draws of $\theta$ converges to a somewhat stationary series after 22,000 draws.
+
+```{r RW Metropolis MCMC, echo = T}
+#| code-fold: true
+#| code-summary: "show code"
+
+# Locate posterior mode of COVID volatility  
+RW.post.mode <- c.posterior.mode(Y, p = 1)
+
+# Run Metropolis MCMC
+set.seed(1291042)
+RW.theta <- mh.mcmc(Y, p = 1, S.mh = 22000, c = 0.1, 
+        W = solve(RW.post.mode$hessian), theta.init = RW.post.mode$maximizer)
+
+# Plot theta draws
+plot.ts(RW.theta$Theta, main = "Metropolis MCMC draws")
+```
+
+Using the last 10,000 MCMC draws, `covid.est` is ran to draw $\boldsymbol{\alpha}$ and $\Sigma$. As seen in the results table below, the estimated posterior means of $\boldsymbol{\alpha}$ and $\Sigma$ are relatively close to the true values, except for $\alpha_{11}$ which is quite far from the true value of 1.
+
+```{r RW Estimation, echo = T}
+#| code-fold: true
+#| code-summary: "show code"
+RW.est <- covid.est(Y, p = 1, S = 10000, Theta.mh = RW.theta$Theta[12001:22000,]) 
+
+A.mean_tab <- as.data.frame(round(apply(RW.est$A.posterior, 1:2, mean),2))
+colnames(A.mean_tab) <- c("RW1", "RW2")
+
+Sigma.mean_tab <- as.data.frame(round(apply(RW.est$Sigma.posterior, 1:2, mean),2))
+colnames(Sigma.mean_tab) <- c("RW1", "RW2")
+
+library(rmarkdown)
+paged_table(A.mean_tab)
+paged_table(Sigma.mean_tab)
+```
+
 ## Stochastic volatility heteroskedasticity
-
-
 
 # Forecasting
 
@@ -118,6 +526,5 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 ## Algorithm to sample from the predictive density
 
 ## Sampler implementation in R
-
 
 # References {.unnumbered}
