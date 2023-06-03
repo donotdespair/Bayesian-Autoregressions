@@ -127,45 +127,40 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 
 The 2020 COVID-19 pandemic significantly altered the global economic
 landscape. It may be argued that the pre and post COVID periods are not
-able to be easily compared, or that the most severe changes for COVID
+easily comparable, or that the most severe changes for COVID
 would best be discounted due to their warping effect on the overall
-data. However, Michele Lenza and Giorgio E. Primiceri disagree. In their paper *How to estimate a vector autoregression after March 2020*, rather
+data. However, @lenza2022estimate disagree. In their paper *How to estimate a vector autoregression after March 2020*, rather
 than discount data, they suggest that the effects of COVID be modeled as
 a temporary spike in volatility. They found that the first three periods
 of the pandemic are where volatility is the most unpredictable and this
 finding holds regardless of whether monthly or quarterly data is being
-used. For higher frequency data the exact effect is unknown though should cover at least the first 3 months of the pandemic. Thus, they propose the following change to the standard formula for calculating structural variable auto regressions.
+used. For higher frequency data the exact effect is unknown though should cover at least the first 3 months of the pandemic. Thus, they propose the following change to the standard formula for autoregressions:
 
-$$y_t = X_t\alpha + c_tu_t$$
+$$y_t = \mathbf{x}_t'\boldsymbol\alpha + c_tu_t,$$
 
-Where y~t~ is the vector of parameters of interest.
-$$X_t = I_t \otimes x'_t~$$ 
-$$x_t = [1\quad y'_{t-1}\quad ... \quad y'_{t-p}]$$
-$$\alpha = [\alpha'_d\quad \alpha_1\quad...\quad\alpha_p]'$$
-u~t~ is the error term.
-c~t~ is a variance multiplier. That is, for every
-period before COVID it takes a value of 1 and for the first 3 periods of
-COVID it takes values \bar{c}~0~, \bar{c}~1~, \bar{c}~2~, and then in all future periods a value of 
-$$c_{t*+j} = 1 + (\bar{c}_2 - 1)\rho^{j-2} $$
-This creates a vector that leaves the error term unchanged before COVID, has a surge in volatility during COVID, and then decays geometrically after COVID. This approximates the observed shocks to volatility.
+where $c_t$ is a standard deviation multiplier. That is, for every
+period before COVID it takes a value of 1, for the first 3 periods of
+COVID it takes values $\bar{c}_0$, $\bar{c}_1$, $\bar{c}_2$, and then in all future periods a value of 
+$$c_{t*+j} = 1 + (\bar{c}_2 - 1)\rho^{j-2}, $$
+where $\rho\in(0,1)$ captures the exponential decay in the value of the conditional standard deviation towards the value one. This creates a vector that leaves the error term unchanged before COVID, has a surge in volatility during COVID, and then decays geometrically after COVID. This structure approximates the observed shocks to volatility and facilitates straightforward estimation.
 
-By dividing both sides by c~t~ this can be rewritten as 
-$$\bar{y}_t = \bar{X}_tα + u_t$$
-where $\bar{y}_t = y_t/c_t$ and $\bar{X}_t = X_t/c_t$. These simple transformations then lend themselves to analysis using whatever method is prefered.
+By dividing both sides by $c_t$ the model equation can be rewritten as 
+$$\bar{y}_t = \bar{\mathbf{x}}_t'\boldsymbol\alpha + u_t$$
+where $\bar{y}_t = y_t/c_t$ and $\bar{\mathbf{x}}_t = \mathbf{x}_t/c_t$. These simple transformations then lend themselves to analysis using whatever estimation method is preferred.
 
-The main difficulty arises in the estimation of c~t~ as it is an unknown parameter in many cases.
+The main difficulty arises in the estimation of $c_t$ as it is an unknown parameter in many cases.
 
 ### Methodology
 
-To estimate the values for c~0~, c~1~, and c~2~. $C$ is a vector of COVID volatility variables:
+To estimate the values for $c_0$, $c_1$, and $c_2$ define a $T$-vector $\mathbf{c}$ of COVID volatility variables:
 
-$$C=[1\quad...\quad1 \quad c_0\quad c_1\quad c_2\quad 1+(c_2-1)\rho\quad 1+(c_2-1)\rho^2\quad...]'$$
+$$\mathbf{c}=\begin{bmatrix}1&\dots& c_0 & c_1 & c_2 & 1+(c_2-1)\rho &  1+(c_2-1)\rho^2&\dots\end{bmatrix}'$$
 
-Intuitively, volatility variables for periods before COVID are set to unity. Heightened volatility during the first three quarters of COVID are parameterized, then they are assumed to decay at a geometric rate beginning at the fourth quarter since the pandemic's onset.
+Intuitively, volatility variable for the period before COVID is set to unity. Heightened volatility during the first three quarters of COVID are parameterized, then they are assumed to decay at a geometric rate beginning at the fourth quarter since the pandemic's onset.
 
-These COVID volatility parameters $\theta=(c_0\quad c_1\quad c_2\quad\rho)$ are estimated from their own marginal posterior as proposed by Lenza & Primiceri (2020):
+These COVID volatility parameters are collected in a vector $\boldsymbol\theta=(c_0\quad c_1\quad c_2\quad\rho)$ and are estimated from their own marginal posterior as proposed by @lenza2022estimate:
 
-$$P(\theta|Y,X,\underline{\gamma})\propto P(Y,X|\theta,\underline{\gamma})P(\theta|\underline{\gamma})$$
+$$p(\boldsymbol\theta\mid\mathbf{y},\mathbf{X},\underline{\gamma})\propto P(\mathbf{y}\mid\mathbf{X},\boldsymbol\theta,\underline{\gamma})p(\boldsymbol\theta\mid\underline{\gamma})$$
 
 where the likelihood function is given as:
 
