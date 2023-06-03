@@ -131,25 +131,23 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 From the concise matrix notation:
 
 $$\textbf{y}=\textbf{X}\boldsymbol{\alpha} +\textbf{u}$$
-$$\textbf{u}|\textbf{X}\sim \mathcal{N}_T(0,\sigma^2\text{diag}(C))$$
+$$\textbf{u}|\textbf{X}\sim \mathcal{N}_T(0,\sigma^2\text{diag}(\textbf{c}^2))$$
 
 This first step is to sample draws of the vector of COVID volatility
-variables $C=[1\quad...\quad1 \quad \bar{c}_0\quad \bar{c}_1\quad \bar{c}_2\quad 1+(\bar{c}_2-1)\rho\quad 1+(\bar{c}_2-1)\rho^2\quad...]'$.
+variables $\textbf{c}=[1\quad...\quad1 \quad \bar{c}_0\quad \bar{c}_1\quad \bar{c}_2\quad 1+(\bar{c}_2-1)\rho\quad 1+(\bar{c}_2-1)\rho^2\quad...]'$.
 
-This is done by estimating parameters in $\theta=(\bar{c}_0,\bar{c}_1,\bar{c}_2,\rho)$ by
+This is done by estimating parameters in $\boldsymbol\theta=(\bar{c}_0,\bar{c}_1,\bar{c}_2,\rho)$ by
 sampling from their own marginal posterior via a Metropolis MCMC
 algorithm:
 
-1.  Initialize $\theta$ at the posterior mode which is can be located
+1.  Initialize $\boldsymbol\theta$ at the posterior mode which is can be located
     via numerical optimization. We executed this in `R` through the
     following function, `c.posterior.mode`. This function takes in data
-    representing matrix $\textbf{y}$ and returns values for $\theta$
+    representing matrix $\textbf{y}$ and returns values for $\boldsymbol\theta$
     that minimize its negative log-posterior, as well as the
     corresponding Hessian.
 
 ```{r COVID parameters posterior maximization, echo = TRUE}
-#| code-fold: true
-#| code-summary: "show code"
 c.posterior.mode <- function(data, p=4, k1=1, k2=100, start_date=c(1991,1)){
 
   v.neglogPost <- function(theta){
@@ -225,33 +223,31 @@ c.posterior.mode <- function(data, p=4, k1=1, k2=100, start_date=c(1991,1)){
 }
 ```
 
-2.  Draw candidate $\theta^{*}$ from $N_4(\theta^{(s-1)},cW)$, where $W$
-    is the inverse Hessian of the negative log posterior of $\theta$ at
+2.  Draw candidate $\boldsymbol\theta^{*}$ from $N_4(\boldsymbol\theta^{(s-1)},cW)$, where $W$
+    is the inverse Hessian of the negative log posterior of $\boldsymbol\theta$ at
     the mode, which is also calculated computationally, and $c$ is a
     scaling factor.
 
 3.  Set:
 
-$$\theta^{(s)}=  \begin{cases}
-        \theta^* & \text{with pr.} \quad \alpha^{(s)} 
+$$\boldsymbol\theta^{(s)}=  \begin{cases}
+        \boldsymbol\theta^* & \text{with pr.} \quad \alpha^{(s)} 
         \\
         \\
-        \theta^{(s-1)} & \text{with pr.} \quad 1-\alpha^{(s)} 
+        \boldsymbol\theta^{(s-1)} & \text{with pr.} \quad 1-\alpha^{(s)} 
   \end{cases}$$
 
-$$\alpha^{(s)} =\text{min}\Big[1,\frac{P(\theta^*|Y,X,\underline{\gamma})}{P(\theta^{(s-1)}|Y,X,\underline{\gamma})}\Big]$$
+$$\alpha^{(s)} =\text{min}\Big[1,\frac{p(\boldsymbol\theta^*|Y,X,\underline{\gamma})}{p(\boldsymbol\theta^{(s-1)}|Y,X,\underline{\gamma})}\Big]$$
 
-4.  Define $C^{(s)}$ matrix using $\theta^{(s)}$:
+4.  Define $\textbf{c}^{(s)}$ matrix using $\boldsymbol\theta^{(s)}$:
 
-$$C^{(s)}=[1\quad...\quad1 \quad \bar{c}_0^{(s)}\quad \bar{c}_1^{(s)}\quad \bar{c}_2^{(s)}\quad 1+(\bar{c}_2^{(s)}-1)\rho^{(s)}\quad 1+(\bar{c}_2^{(s)}-1)\rho^{(s)2}\quad...]'$$
+$$\textbf{c}^{(s)}=[1\quad...\quad1 \quad \bar{c}_0^{(s)}\quad \bar{c}_1^{(s)}\quad \bar{c}_2^{(s)}\quad 1+(\bar{c}_2^{(s)}-1)\rho^{(s)}\quad 1+(\bar{c}_2^{(s)}-1)\rho^{(s)2}\quad...]'$$
 
 Steps 2 to 4 are implemented via the function, `mh.mcmc` which takes in
-data, the posterior mode of $\theta$, and the inverse Hessian from
-`c.posterior.mode` and returns the draws of $\theta$.
+data, the posterior mode of $\boldsymbol\theta$, and the inverse Hessian from
+`c.posterior.mode` and returns the draws of $\boldsymbol\theta$.
 
 ```{r Metropolis-Hastings function, echo = TRUE}
-#| code-fold: true
-#| code-summary: "show code"
 library(MASS)
 library(coda)
 mh.mcmc <- function(data, p=1, S.mh = 1000, c, W = diag(4), theta.init,
@@ -366,22 +362,21 @@ mh.mcmc <- function(data, p=1, S.mh = 1000, c, W = diag(4), theta.init,
 
 ```
 
-5.  These $\theta$ draws, are then used to draw $\boldsymbol{\alpha}$
-    and $\Sigma$ from the following posterior distribution:
+5.  These $\boldsymbol\theta$ draws, are then used to draw $\boldsymbol{\alpha}$
+    and $\sigma^2$ from the following posterior distribution:
 
-$$P(\boldsymbol{\alpha}|Y,X,\Sigma,C)=MN_{K\times N}(\bar{\boldsymbol{\alpha}},\Sigma,\bar{V})$$
-$$P(\Sigma|Y,X,C)=IW_N(\bar{S},\bar{\nu})\\$$
+$$p(\boldsymbol{\alpha}\mid\mathbf{y},\mathbf{X},\sigma^2,\textbf{c})=\mathcal{N}_{k}(\bar{\boldsymbol{\alpha}},\sigma^2,\bar{\mathbf{V}})$$
+$$p(\sigma^2|\mathbf{y},\mathbf{X},\textbf{c})=\mathcal{IG}2(\bar{s},\bar{\nu})\\$$
 
-$$\bar{V}=(X'\text{diag}(C^2)X+\underline{V}^{-1})^{-1}$$
-$$\bar{\boldsymbol{\alpha}}=\bar{V}(X'\text{diag}(C^2)Y+\underline{V}^{-1}\underline{\boldsymbol{\alpha}})$$
+$$\bar{\mathbf{V}}=(\mathbf{X}'\text{diag}(\textbf{c}^2)^{-1}\mathbf{X}+\underline{\mathbf{V}}^{-1})^{-1}$$
+$$\bar{\boldsymbol{\alpha}}=\bar{\mathbf{V}}(\mathbf{X}'\text{diag}(\textbf{c}^2)^{-1}\mathbf{y}+\underline{\mathbf{V}}^{-1}\underline{\boldsymbol{\alpha}})$$
 $$\bar{\nu}=T+\underline{\nu}$$
-$$\bar{S}=\underline{S}+Y'\text{diag}(C^2)Y+\underline{\boldsymbol{\alpha}}'\underline{V}^{-1}\underline{\boldsymbol{\alpha}}-\bar{\boldsymbol{\alpha}}'\bar{V}^{-1}\bar{\boldsymbol{\alpha}}$$
+$$\bar{s}=\underline{s}+\mathbf{y}'\text{diag}(\textbf{c}^2)^{-1}\mathbf{y}+\underline{\boldsymbol{\alpha}}'\underline{\mathbf{V}}^{-1}\underline{\boldsymbol{\alpha}}-\bar{\boldsymbol{\alpha}}'\bar{\mathbf{V}}^{-1}\bar{\boldsymbol{\alpha}}$$
 
 This sampling is implemented via the function `covid.est` below:
 
 ```{r Estimation, echo = TRUE}
-#| code-fold: true
-#| code-summary: "show code"
+
 covid.est <- function(data, p=4, S=100, k1=1, k2=100, start_date = c(1991,1), Theta.mh){
 
   N = ncol(data)
@@ -453,68 +448,6 @@ covid.est <- function(data, p=4, S=100, k1=1, k2=100, start_date = c(1991,1), Th
   return(re)
 }
 
-```
-
-The implementation of the above estimation procedure is demonstrated
-below, on an independent bi-variate Gaussian random walk with drift
-series. Both series have 128 observations, exhibit an increasing
-stochastic trend due to a drift term of $\mu=1$, and were generated to
-have increased volatility (i.e., three times the standard deviation) on
-periods $t\in[129,136]$ before returning to a standard deviation of 1 in
-the last 4 periods. This artificially generated series aims to mimic unit-root non-stationary macroeconomic variables that experiences heightened volatility during COVID-19.
-
-```{r RW sample, echo = T}
-#| code-fold: true
-#| code-summary: "show code"
-set.seed(1291042)
-
-# Generate RW series with drift and higher variance at covid periods.
-RW1 <- ts(cumsum(c(1+rnorm(116, mean = 0, sd = 1),1+rnorm(8, mean = 0, sd = 3),1+rnorm(4, mean = 0, sd = 1))))
-RW2 <- ts(cumsum(c(1+rnorm(116, mean = 0, sd = 1),1+rnorm(8, mean = 0, sd = 3),1+rnorm(4, mean = 0, sd = 1))))
-Y <- cbind(RW1, RW2)
-
-# Plot the series
-par(mfrow=c(1,2), mar=c(2,2,2,2))
-plot(y=RW1, x = 1:128, type = "l", col = "turquoise4", 
-     lwd = 1.5, ylab = "", xlab = "", main = "RW with drift 1")
-plot(y=RW2, x = 1:128, type = "l", col = "plum4", 
-     lwd = 1.5, ylab = "",xlab = "", main = "RW with drift 2")
-```
-
-First, `posterior.mode` and `mh.mcmc` are used to draw COVID volatility vectors $C^{(s)}$. As seen in the plots below, MCMC draws of $\theta$ converges to a somewhat stationary series after 22,000 draws.
-
-```{r RW Metropolis MCMC, echo = T}
-#| code-fold: true
-#| code-summary: "show code"
-
-# Locate posterior mode of COVID volatility  
-RW.post.mode <- c.posterior.mode(Y, p = 1)
-
-# Run Metropolis MCMC
-set.seed(1291042)
-RW.theta <- mh.mcmc(Y, p = 1, S.mh = 22000, c = 0.1, 
-        W = solve(RW.post.mode$hessian), theta.init = RW.post.mode$maximizer)
-
-# Plot theta draws
-plot.ts(RW.theta$Theta, main = "Metropolis MCMC draws")
-```
-
-Using the last 10,000 MCMC draws, `covid.est` is ran to draw $\boldsymbol{\alpha}$ and $\Sigma$. As seen in the results table below, the estimated posterior means of $\boldsymbol{\alpha}$ and $\Sigma$ are relatively close to the true values, except for $\alpha_{11}$ which is quite far from the true value of 1.
-
-```{r RW Estimation, echo = T}
-#| code-fold: true
-#| code-summary: "show code"
-RW.est <- covid.est(Y, p = 1, S = 10000, Theta.mh = RW.theta$Theta[12001:22000,]) 
-
-A.mean_tab <- as.data.frame(round(apply(RW.est$A.posterior, 1:2, mean),2))
-colnames(A.mean_tab) <- c("RW1", "RW2")
-
-Sigma.mean_tab <- as.data.frame(round(apply(RW.est$Sigma.posterior, 1:2, mean),2))
-colnames(Sigma.mean_tab) <- c("RW1", "RW2")
-
-library(rmarkdown)
-paged_table(A.mean_tab)
-paged_table(Sigma.mean_tab)
 ```
 
 ## Stochastic volatility heteroskedasticity
