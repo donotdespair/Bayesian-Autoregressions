@@ -1,11 +1,13 @@
 ---
 title: "Bayesian Autoregressions"
-author:
-  - name: "Tomasz Woźniak"
-    affiliation: University of Melbourne
+authors:
+  - name: Tomasz Woźniak
     url: https://github.com/donotdespair
     orcid: 0000-0003-2212-2378
+  - name: Thomas Kronholm Møller
+  - name: Jonas Loopers Davidsen
   - name: "Ray Gomez"
+
 execute:
   
   echo: false
@@ -101,11 +103,163 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 
 # Natural-Conjugate Analysis
 
+> **Authors:** Thomas Kronholm Møller & Jonas Loopers Davidsen
+
+## Likelihood as normal-inverted gamma 2
+
+In order to facilitate deriving the posterior distribution, the likelihood function can be rewritten to a $\mathcal{NIG}2$-distribution given by:
+
+```{=tex}
+\begin{align}
+L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) &\propto \left(\sigma^2\right)^{-\frac{T-(k+2)+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right)'\mathbf{X}'\mathbf{X}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right) \right\}\\
+&\qquad\times\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right) \right\},
+\end{align}
+```
+where $\boldsymbol{\hat{\alpha}} = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{y}$ in the maximum likelihood estimator of $\boldsymbol\alpha$. It is now quite straight forward to identify the $\mathcal{NIG}2$-kernel. By remembering that the $\mathcal{NIG}2$-distribution is characterized by its four moments, we get the following outcome:
+
+```{=tex}
+\begin{align}
+L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) = \mathcal{NIG}2\left(\mu=\boldsymbol{\hat{\alpha}},\Sigma=\left(\mathbf{X}'\mathbf{X}\right)^{-1},s=\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right),\nu=T-k-2\right)
+\end{align}
+```
 ## Normal-inverted gamma 2 prior
 
+The prior distribution of the natural conjugate is determined by the form of the distribution of the parameters implied by the likelihood function discussed above. The priors for the Normal-inverse gamma 2 distribution can thus be written as:
+
+```{=tex}
+\begin{align}
+p(\boldsymbol\alpha,\sigma^2) &= p(\boldsymbol\alpha|\sigma^2)p(\sigma^2)\\
+      p(\boldsymbol\alpha|\sigma^2) &= \mathcal{N}(\underline{\boldsymbol\alpha},\sigma^2\underline{\mathbf{V}}^2_{\boldsymbol\alpha})\\
+      p(\sigma^2) & = \mathcal{IG}2(\underline{s},\underline{\nu})
+\end{align}
+```
+Using the distributions above, we can write the kernel of the $\mathcal{NIG}2$ prior as:
+
+```{=tex}
+\begin{align}
+\mathcal{NIG}2_{k}(\underline{\boldsymbol\alpha},\underline{\mathbf{V}}_{\boldsymbol\alpha}, \underline{s}, \underline{\nu}) \propto (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\frac{1}{\underline{\mathbf{V}}_{\boldsymbol\alpha}}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
+\end{align}
+```
 ## Normal-inverted gamma 2 posterior
 
+The product of the prior distribution and the likelihood function as introduced above gives the posterior distribution given by:
+
+```{=tex}
+\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) \propto L(\mathbf{y}|\mathbf{X}, \boldsymbol\alpha, \sigma^2)p(\boldsymbol\alpha,\sigma^2) =  L(\mathbf{y}|\mathbf{X}, \boldsymbol\alpha, \sigma^2)p( \boldsymbol\alpha| \sigma^2)p(\sigma^2)
+\end{align}
+```
+Now plugging in the expressions for the likelihood and the prior distribution:
+```{=tex}
+\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &\propto \left(\sigma^2\right)^{-\frac{T-(k-2)+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right)'\mathbf{X}'\mathbf{X}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right) \right\}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right) \right\} \\
+&\times (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'\underline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
+\end{align}
+```
+By collecting all terms and simplifying the expressions, the joint posterior distribution can be derived to be:
+
+```{=tex}
+\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &\propto (\sigma^2)^{-\frac{T+\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2} (\boldsymbol\alpha-\overline{\boldsymbol\alpha})'\overline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\overline{\boldsymbol\alpha})\right\} \times \exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\underline{s}-\overline{\boldsymbol\alpha}'\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}+\underline{\boldsymbol\alpha}'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{y}'\mathbf{y}\right)\right\}
+\\&= (\sigma^2)^{\frac{\overline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2} (\boldsymbol\alpha-\overline{\boldsymbol\alpha})'\overline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\overline{\boldsymbol\alpha})\right\} \times \exp\left\{-\frac{1}{2}\frac{\overline{s}}{\sigma^2}\right\}
+\end{align}
+```
+This now fully defines the joint posterior distribution as is it is in a normal inverse gamma 2 form with its corresponding four moments:
+
+```{=tex}
+\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &= \mathcal{NIG}2_{k}\left(\overline{\boldsymbol\alpha},\overline{\mathbf{V}}_{\boldsymbol\alpha},\overline{s},\overline{\nu}\right)\\
+\overline{\boldsymbol\alpha} &= \overline{\mathbf{V}}_{\boldsymbol\alpha}( \underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{X}'\mathbf{y})\\
+\overline{\mathbf{V}}_{\boldsymbol\alpha} &=\left(\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}+\mathbf{X}'\mathbf{X}\right)^{-1} \\
+\overline{s} &= \underline{s}-\overline{\boldsymbol\alpha}'\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}+\underline{\boldsymbol\alpha}'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{y}'\mathbf{y}\\
+\overline{\nu} &= \underline{\nu}+T
+\end{align}
+```
 ## Sampling draws from the posterior
+
+We start by generating a random walk, which can be used to validate that our estimation is indeed correct.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+T       = 100
+N       = 1
+
+y       = apply(matrix(rnorm(T * N), ncol = N), 2, cumsum)
+y       = as.matrix(y)
+p       = 1
+d       = 1
+
+k    = p + d 
+
+T     = nrow(y)
+Y     = as.matrix(y[(p+1):T,])
+X     = cbind(rep(1, T - p), y[1:(T - p),])
+
+```
+
+Now, defining our priors for $\underline{\boldsymbol\alpha}$, $\underline{\mathbf{V}}_{\boldsymbol\alpha}$, $\underline{s}$ and $\underline{\nu}$:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+
+priors = list(
+  alpha   = as.matrix(rep(0, k)),
+  Sigma   = diag(2),
+  S       = 1,
+  nu      = 3
+)
+```
+
+and computing the function for the posterior parameters:
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+posterior = function(y, priors){
+  Sigma.inv = t(X) %*% X + priors$Sigma
+  Sigma     = solve(Sigma.inv)
+  alpha     = Sigma %*% (t(X) %*% Y + solve(priors$Sigma) %*% priors$alpha)
+  S         = as.numeric(t(Y) %*% Y + priors$S + t(priors$alpha) %*% solve(priors$Sigma) %*% priors$alpha 
+                     - t(alpha) %*% Sigma.inv %*% alpha)
+  nu        = T + priors$nu 
+  
+  return(list(
+    Sigma  = Sigma,
+    alpha  = alpha,
+    S      = S,
+    nu     = nu
+  ))
+}
+
+post = posterior(y = y, priors = priors)
+```
+
+We are then able to do the estimation of our parameters using the Gibbs sampler provided below.
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+posterior.draws = function(S, posterior){
+  Sigma2.posterior      = as.matrix(posterior$S / rchisq(S, posterior$nu))
+  alpha.posterior       = simplify2array(
+    lapply(1:S, function(i){
+      mvtnorm::rmvnorm(1, mean = posterior$alpha, sigma = Sigma2.posterior[i,] * posterior$Sigma)
+    })
+  )
+  output = cbind(t(alpha.posterior[1,,]), Sigma2.posterior)
+  return(output)
+}
+
+draws = posterior.draws(S = 1000, posterior = post)
+```
+
+
 
 # Hierarchical Prior Analysis
 
