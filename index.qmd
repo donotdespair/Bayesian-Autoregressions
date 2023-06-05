@@ -86,10 +86,11 @@ In order to facilitate deriving the posterior distribution, the likelihood funct
 
 ```{=tex}
 \begin{align}
-L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) \propto \left(\sigma^2\right)^{-\frac{T-(k+2)+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right)'\mathbf{X}'\mathbf{X}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right) \right\}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right) \right\}
+L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) &\propto \left(\sigma^2\right)^{-\frac{T-(k+2)+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right)'\mathbf{X}'\mathbf{X}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right) \right\}\\
+&\qquad\times\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right) \right\},
 \end{align}
 ```
-where $k=d+p$. It is now quite straight forward to identify the $\mathcal{NIG}2$-kernel. By remembering that the $\mathcal{NIG}2$-distribution is characterized by its four moments, we get the following outcome:
+where $\boldsymbol{\hat{\alpha}} = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{y}$ in the maximum likelihood estimator of $\boldsymbol\alpha$. It is now quite straight forward to identify the $\mathcal{NIG}2$-kernel. By remembering that the $\mathcal{NIG}2$-distribution is characterized by its four moments, we get the following outcome:
 
 ```{=tex}
 \begin{align}
@@ -107,7 +108,7 @@ p(\boldsymbol\alpha,\sigma^2) &= p(\boldsymbol\alpha|\sigma^2)p(\sigma^2)\\
       p(\sigma^2) & = \mathcal{IG}2(\underline{s},\underline{\nu})
 \end{align}
 ```
-Using the distributions above, we can write the kernel of the $\mathcal{NIG}2$ as:
+Using the distributions above, we can write the kernel of the $\mathcal{NIG}2$ prior as:
 
 ```{=tex}
 \begin{align}
@@ -127,15 +128,15 @@ Now plugging in the expressions for the likelihood and the prior distribution:
 ```{=tex}
 \begin{align}
 p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &\propto \left(\sigma^2\right)^{-\frac{T-(k-2)+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right)'\mathbf{X}'\mathbf{X}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right) \right\}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right) \right\} \\
-&\times (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\frac{1}{\underline{\mathbf{V}}_{\boldsymbol\alpha}}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
+&\times (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'\underline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
 \end{align}
 ```
 By collecting all terms and simplifying the expressions, the joint posterior distribution can be derived to be:
 
 ```{=tex}
 \begin{align}
-p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &\propto (\sigma^2)^{-\frac{T+\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\frac{1}{\underline{\mathbf{V}}_{\boldsymbol\alpha}} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})'(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\} \times \exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\underline{s}-\overline{\boldsymbol\alpha}\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}'+\underline{\boldsymbol\alpha}\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}'+\mathbf{y}'\mathbf{y}\right)\right\}
-\\&= (\sigma^2)^{\frac{\overline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\frac{1}{\underline{\mathbf{V}}_{\boldsymbol\alpha}} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})'(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\} \times \exp\left\{-\frac{1}{2}\frac{\overline{s}}{\sigma^2}\right\}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &\propto (\sigma^2)^{-\frac{T+\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2} (\boldsymbol\alpha-\overline{\boldsymbol\alpha})'\overline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\overline{\boldsymbol\alpha})\right\} \times \exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\underline{s}-\overline{\boldsymbol\alpha}'\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}+\underline{\boldsymbol\alpha}'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{y}'\mathbf{y}\right)\right\}
+\\&= (\sigma^2)^{\frac{\overline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2} (\boldsymbol\alpha-\overline{\boldsymbol\alpha})'\overline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\overline{\boldsymbol\alpha})\right\} \times \exp\left\{-\frac{1}{2}\frac{\overline{s}}{\sigma^2}\right\}
 \end{align}
 ```
 This now fully defines the joint posterior distribution as is it is in a normal inverse gamma 2 form with its corresponding four moments:
@@ -143,9 +144,9 @@ This now fully defines the joint posterior distribution as is it is in a normal 
 ```{=tex}
 \begin{align}
 p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &= \mathcal{NIG}2_{k}\left(\overline{\boldsymbol\alpha},\overline{\mathbf{V}}_{\boldsymbol\alpha},\overline{s},\overline{\nu}\right)\\
-\overline{\boldsymbol\alpha} &= (\underline{\boldsymbol\alpha} \underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}+\mathbf{X}'\mathbf{y})\overline{\mathbf{V}}_{\boldsymbol\alpha}\\
+\overline{\boldsymbol\alpha} &= \overline{\mathbf{V}}_{\boldsymbol\alpha}( \underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{X}'\mathbf{y})\\
 \overline{\mathbf{V}}_{\boldsymbol\alpha} &=\left(\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}+\mathbf{X}'\mathbf{X}\right)^{-1} \\
-\overline{s} &= \underline{s}-\overline{\boldsymbol\alpha}\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}'+\underline{\boldsymbol\alpha}\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}'+\mathbf{y}'\mathbf{y}\\
+\overline{s} &= \underline{s}-\overline{\boldsymbol\alpha}'\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}+\underline{\boldsymbol\alpha}'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{y}'\mathbf{y}\\
 \overline{\nu} &= \underline{\nu}+T
 \end{align}
 ```
@@ -163,13 +164,13 @@ N       = 1
 y       = apply(matrix(rnorm(T * N), ncol = N), 2, cumsum)
 y       = as.matrix(y)
 p       = 1
-d       = 2
+d       = 1
 
 k    = p + d 
 
 T     = nrow(y)
 Y     = as.matrix(y[(p+1):T,])
-X     = cbind(rep(1,T - p),y[1:(T - p),])
+X     = cbind(rep(1, T - p), y[1:(T - p),])
 
 ```
 
@@ -181,7 +182,7 @@ Now, defining our priors for $\underline{\boldsymbol\alpha}$, $\underline{\mathb
 #| warning: false
 
 priors = list(
-  alpha   = as.matrix(c(0,0)),
+  alpha   = as.matrix(rep(0, k)),
   Sigma   = diag(2),
   S       = 1,
   nu      = 3
@@ -194,7 +195,7 @@ and computing the function for the posterior parameters:
 #| echo: true
 #| message: false
 #| warning: false
-posterior = function(y,priors){
+posterior = function(y, priors){
   Sigma.inv = t(X) %*% X + priors$Sigma
   Sigma     = solve(Sigma.inv)
   alpha     = Sigma %*% (t(X) %*% Y + solve(priors$Sigma) %*% priors$alpha)
@@ -202,7 +203,7 @@ posterior = function(y,priors){
                      - t(alpha) %*% Sigma.inv %*% alpha)
   nu        = T + priors$nu 
   
-  return   (list(
+  return(list(
     Sigma  = Sigma,
     alpha  = alpha,
     S      = S,
@@ -210,7 +211,7 @@ posterior = function(y,priors){
   ))
 }
 
-post = posterior(y=y,priors=priors)
+post = posterior(y = y, priors = priors)
 ```
 
 We are then able to do the estimation of our parameters using the Gibbs sampler provided below.
@@ -219,18 +220,18 @@ We are then able to do the estimation of our parameters using the Gibbs sampler 
 #| echo: true
 #| message: false
 #| warning: false
-posterior.draws = function(S,posterior){
-  Sigma2.posterior  = as.matrix(posterior$S/rchisq(S,posterior$nu))
+posterior.draws = function(S, posterior){
+  Sigma2.posterior      = as.matrix(posterior$S / rchisq(S, posterior$nu))
   alpha.posterior       = simplify2array(
-    lapply(1:S,function(i){
-      mvtnorm::rmvnorm(1,mean=posterior$alpha,sigma=Sigma2.posterior[i,]*posterior$Sigma)
+    lapply(1:S, function(i){
+      mvtnorm::rmvnorm(1, mean = posterior$alpha, sigma = Sigma2.posterior[i,] * posterior$Sigma)
     })
   )
-  output = cbind(t(alpha.posterior[1,,]),Sigma2.posterior)
+  output = cbind(t(alpha.posterior[1,,]), Sigma2.posterior)
   return(output)
 }
 
-draws = posterior.draws(S=1000,posterior=post)
+draws = posterior.draws(S = 1000, posterior = post)
 ```
 
 
