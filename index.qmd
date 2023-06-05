@@ -1,6 +1,6 @@
 ---
 title: "Bayesian Autoregressions"
-authors:
+author:
   - name: Tomasz Woźniak
     url: https://github.com/donotdespair
     orcid: 0000-0003-2212-2378
@@ -8,10 +8,7 @@ authors:
   - name: Ray Gomez
   - name: Thomas Kronholm Møller
   - name: Hanwen Zhang
-
-
 execute:
-  
   echo: false
 citation: 
   issued: 2023-05-25
