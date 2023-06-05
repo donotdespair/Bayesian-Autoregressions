@@ -1,0 +1,195 @@
+---
+title: "Bayesian Autoregressions"
+author:
+  - name: "Tomasz Woźniak"
+    affiliation: University of Melbourne
+    url: https://github.com/donotdespair
+    orcid: 0000-0003-2212-2378
+  - name: "Filippo Dell'Andrea"
+execute:
+  
+  echo: false
+citation: 
+  issued: 2023-05-25
+  url: https://donotdespair.github.io/Bayesian-Autoregressions/
+  doi: 10.26188/23255657
+bibliography: references.bib
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+> **Abstract.** We present the basics of Bayesian estimation and
+> inference for autoregressive models. The range of topics includes the
+> natural conjugate analysis using normal-inverted-gamma 2 prior
+> distribution and its extensions focusing on hierarchical modelling,
+> conditional heteroskedasticity, and Student-t error terms. We focus on
+> forecasting and sampling from the predictive density.
+>
+> **Keywords.** Autoregressions, Bayesian Inference, Forecasting,
+> Heteroskedasticity, Hierarchical Modelling, Natural Conjugacy,
+> Shrinkage Prior
+
+# Autoregressions
+
+Autoregressions are \alpha popular class of linear models that are the
+most useful for time series persistence analysis and forecasting
+\alpha random variable's unknown future values. The simplicity of their
+formulation, estimation, and range of applications in which they occur
+useful decides on their continued employment.
+
+## The AR($p$) model
+
+The model is set for \alpha univariate time series whose observation at
+time $t$ is denoted by $y_t$. It includes \alpha $d$-vector $d_t$ of
+deterministic terms and $p$ lags of the dependent variable on the
+right-hand side of the model equation. It is complemented by error term
+$u_t$ that, in this note, is zero-mean normally distributed with
+variance $\sigma^2I_T^2$. Then the model equations are: \begin{align}
+y_t &= \alpha_d' d_t + \alpha_1 y_{t-1} + \dots + \alpha_p y_{t-p} + u_t\\
+u_t\mid d_t, y_{t-1}, \dots, y_{t-p} &\sim\mathcal{N}\left(0, \sigma^2I_T^2\right)
+\end{align} where $\alpha_d$ is \alpha $d$-vector of coefficients on
+deterministic terms, and parameters $\alpha_1,\dots,\alpha_p$ are
+autoregressive slopes.
+
+## Matrix notation for the model
+
+To simplify the notation and the derivations introduce matrix notation
+for the model. Let $T$ be the available sample size for the variable
+$y$. Define \alpha $T$-vector of zeros, $\mathbf{0}_T$, the identity
+matrix of order $T$, $\mathbf{I}_T$, $T\times1$ vectors: \begin{align}
+\mathbf{y} = \begin{bmatrix} y_1\\ \vdots \\ y_T\end{bmatrix}, \quad
+\text{ and }\quad
+\mathbf{u} = \begin{bmatrix} u_1\\ \vdots \\ u_T\end{bmatrix},
+\end{align} \alpha $k\times1$ vector
+$\mathbf{x}_t = \begin{bmatrix}d_t' & y_{t-1}&\dots& y_{t-} \end{bmatrix}'$,
+where $k=d+p$, and \alpha $T\times k$ matrix collecting the explanatory
+variables: \begin{align}
+\mathbf{X} = \begin{bmatrix} \mathbf{x}_1'\\ \vdots \\ \mathbf{x}_T'\end{bmatrix}.
+\end{align} Collect the parameters of the conditional mean equation in
+\alpha $k$-vector: \begin{align}
+\boldsymbol\alpha = \begin{bmatrix} \alpha_d'& \alpha_1 & \dots & \alpha_p\end{bmatrix}'.
+\end{align}
+
+Then the model can be written in \alpha concise notation as:
+\begin{align}
+\mathbf{y} &= \mathbf{X} \boldsymbol\alpha + \mathbf{u}\\
+\mathbf{u}\mid \mathbf{X} &\sim\mathcal{N}_T\left(\mathbf{0}_T, \sigma^2I_T^2\mathbf{I}_T\right).
+\end{align}
+
+## Likelihood function
+
+The model equations imply the predictive density of the data vector
+$\mathbf{y}$. To see this, consider the model equation as \alpha linear
+transformation of \alpha normal vector $\mathbf{u}$. Therefore, the data
+vector follows \alpha multivariate normal distribution given by:
+\begin{align}
+\mathbf{y}\mid \mathbf{X}, \boldsymbol\alpha, \sigma^2I_T^2 &\sim\mathcal{N}_T\left(\mathbf{X} \boldsymbol\alpha, \sigma^2I_T^2\mathbf{I}_T\right).
+\end{align}
+
+This distribution determines the shape of the likelihood function that
+is defined as the sampling data density: \begin{align}
+L(\boldsymbol\alpha,\sigma^2I_T^2|\mathbf{y}, \mathbf{X})\equiv p\left(\mathbf{y}\mid \mathbf{X}, \boldsymbol\alpha, \sigma^2I_T^2 \right).
+\end{align}
+
+The likelihood function that for the sake of the estimation of the
+parameters, and after plugging in data in place of matrices $\mathbf{y}$
+and $\mathbf{X}$, is considered \alpha function of parameters
+$\boldsymbol\alpha$ and $\sigma^2I_T^2$ is given by: \begin{align}
+L(\boldsymbol\alpha,\sigma^2I_T^2|\mathbf{y}, \mathbf{X}) = 
+(2\pi)^{-\frac{T}{2}}\left(\sigma^2I_T^2\right)^{-\frac{T}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2I_T^2}(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)'(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)\right\}.
+\end{align}
+# Natural-Conjugate Analysis
+
+## Normal-inverted gamma 2 prior
+
+## Normal-inverted gamma 2 posterior
+
+## Sampling draws from the posterior
+
+# Hierarchical Prior Analysis
+
+## Estimating autoregressive prior shrinkage
+
+### Inverted gamma 2 scale mixture of normal
+
+### Gamma scale mixture of normal
+
+## Estimating error term variance prior scale
+
+In this section, we estimate the error term variance prior scale
+$\underline{s}_{\sigma^2}$ that follows a Gamma distribution $G(\underline{s}_s,\underline{a}_s)$ with shape $\underline{s}_s$ and scale $\underline{a}_s$ that follow a probability density function equal to:
+$$p(\underline{s}_{\sigma^2})=\Gamma(\underline{s}_s)^{-1}\underline{a}_s^{-\underline{s}_s}\underline{s}_{\sigma^2}^{\underline{s}_s-1}exp\left\{-\frac{\underline{s}_{\sigma^2}}{\underline{a}_s}\right\}$$
+In order to find our full conditional posterior of $\underline{s}_{\sigma^2}$ we need to follow these computations:
+\begin{gather}
+p(\underline{s}_{\sigma^2}|y,X,\alpha,\sigma^2) \propto 
+L(y|X,\alpha,\sigma^2) \times p(\alpha|\sigma^2) \times p(\sigma^2|\underline{s}_{\sigma^2}) \times p(\underline{s}_{\sigma^2}) \propto\\
+p(\sigma^2|\underline{s}_{\sigma^2}) \times p(\underline{s}_{\sigma^2}) \propto\\
+\Gamma(\frac{\underline{\nu}}{2})^{-1}
+(\frac{\underline{s}_{\sigma^2}}{2})^{\frac{\underline{\nu}}{2}}{\sigma^{2}}^{-\frac{\underline{\nu}+2}{2}}
+exp\left\{-\frac{1}{2}\frac{\underline{s}_{\sigma^2}}{\sigma^2}\right\}
+\Gamma(\underline{s}_s)^{-1}\underline{a}_s^{-\underline{s}_s}\underline{s}_{\sigma^2}^{\underline{s}_s-1}exp\left\{\frac{-\underline{s}_{\sigma^2}}{2\sigma^2\underline{a}_s[\underline{a}_s+\underline{s}_{\sigma^2}]^{-1}}\right\}\propto\\
+\underline{s}_{\sigma^2}^{\frac{\underline{\nu}+2\underline{s}_s-2}{2}}exp\left\{-\frac{\underline{s}_{\sigma^2}}{2\sigma^2\underline{a}_s[\underline{a}_s+\underline{s}_{\sigma^2}]^{-1}} \right\}
+\end{gather} from which we recognise a Gamma function $G(\bar{\underline{s}_s}, \bar{\underline{a}_s})$ with parameters:
+\begin{gather}
+\bar{\underline{s}_s}=\frac{\underline{\nu}+2\underline{s}_s}{2}\\
+\bar{\underline{a}_s}=2\sigma^2\underline{a}_s[\underline{a}_s+\underline{s}_{\sigma^2}]^{-1}
+\end{gather}
+
+In order to reach our analytical solutions we use a Monte Carlo Markov
+Chain (MCMC) method, namely the Gibbs Sampler procedure. We generate
+random draws from the joint posterior distribution and we update them at
+each iteration to compute our posterior distribution parameters. In our
+case we exploit the following procedure: Initialize $\underline{s}_{\sigma^2}$ at
+$\underline{s}_{\sigma^2}^{(0)}$
+
+At each iteration s:
+
+1.  Draw $(\alpha,\sigma^2)^{(s)} \sim p(\alpha,\sigma^2\| y,X, \alpha^{(s-1)}, \underline{s}_{\sigma^2}^{(s)}{\sigma^2}^{(s-1)})$
+2.  Draw $\underline{s}_{\sigma^2}^{(s)} \sim p(\underline{s}_{\sigma^2}|y,X,\alpha,\sigma^2)$
+
+Repeat steps 1 and 2 for $(S_1 + S_2)$ times. Discard the first $S_1$
+repetitions. Return the output as
+$\left \{ \alpha^{(s)}, \sigma^{2(s)} \right \}^{S2}_{s=S1+1}$.
+
+```{r}
+#| echo: true 
+#| message: false
+#| warning: false
+#| code-fold: true
+#| code-summary: "R code to sample from the gamma distribution"
+  #values taken from previous sections, udpate later
+  nu = 1
+  Sigma = 10
+  #define the priors
+  s.prior.s  <- 0.01
+  a.prior.s  <- 1
+  #set the first value of s.sigma
+  s.sigma=matrix(NA,1,1)
+  s.sigma[1] <- 1
+  #define the posteriors
+  s.bar.s <- (nu+2*s.prior.s)/2
+  a.bar.s <- 2*Sigma*a.prior.s*(a.prior.s+s.sigma[1])
+  #sample from the gamma function with rgamma function
+  s.sigma <- rgamma(1, shape = s.bar.s, scale = a.bar.s)
+```
+
+## Dummy observation prior
+
+# Model Extensions
+
+## Student-$t$ error term
+
+## Estimating autoregressions after 2020
+
+## Stochastic volatility heteroskedasticity
+
+# Forecasting
+
+## Conditional predictive density
+
+## Algorithm to sample from the predictive density
+
+## Sampler implementation in R
+
+# References {.unnumbered}
