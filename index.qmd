@@ -112,6 +112,68 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 ## Estimating autoregressive prior shrinkage
 
 ### Inverted gamma 2 scale mixture of normal
+Given the scalar scale follows an inverted gamma 2 distribution: 
+\begin{align}
+\kappa_{\boldsymbol\alpha} \sim \mathcal{IG}2 (s,\nu)
+\end{align}
+
+We have priors as: 
+\begin{gather*}
+\boldsymbol\alpha | \sigma^2, \kappa_{\boldsymbol\alpha} \sim \mathcal{N}_{k}(\underline{\boldsymbol\alpha}, \sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}} _{\boldsymbol\alpha}) \\ 
+\\ \sigma^2 \sim \mathcal{IG}2(\underline{s},\underline{\nu}) \\
+\\ p(\boldsymbol\alpha, \sigma^2) = p(\boldsymbol\alpha | \sigma^2, \kappa_{\boldsymbol\alpha}) p(\sigma^2) p(\kappa_{\boldsymbol\alpha}) \\ 
+\end{gather*}
+
+Then, the joint distribution of $(\boldsymbol\alpha,\sigma^2)$ would follow a normal-inverted gamma 2 distribution: 
+\begin{align*}
+p(\boldsymbol\alpha,\sigma^2) = \mathcal{NIG}2_N(\underline{\boldsymbol\alpha},\kappa_{\boldsymbol\alpha} \underline{\mathbf{V}} _{\boldsymbol\alpha}, \underline{s},\underline{\nu})
+\end{align*}
+
+A **Gibbs Sampler** can be applied using the following steps: 
+
+Initialize $\kappa_{\boldsymbol\alpha}$ at $\kappa_{\boldsymbol\alpha}^{(0)}$. 
+
+| At each iteration s: 
+
+|     Step 1. Draw $(\boldsymbol\alpha,\sigma^2)^{(s)} \sim p(\boldsymbol\alpha,\sigma^2|\mathbf{X},\mathbf{y},\kappa_{\boldsymbol\alpha}^{(s-1)}) = \mathcal{NIG}2(\bar{\boldsymbol\alpha},\bar{\mathbf{V}},\bar{s},\bar{\nu})$. 
+
+|     Step 2. Draw $\kappa_{\boldsymbol\alpha}^{(s)} \sim p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},\boldsymbol\alpha,\sigma^2) = \mathcal{IG}2(\bar{s},\bar{\nu})$.
+
+Repeat step 1 and 2 for $(S_1+S_2)$ times. 
+
+Discard the first $S_1$. 
+
+The **full conditional posterior** of $\kappa_{\boldsymbol\alpha}$ is: 
+\begin{gather*}
+ p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},\boldsymbol\alpha,\sigma^2) = L(\mathbf{y}|\mathbf{X},\boldsymbol\alpha,\sigma^2) \times p(\kappa_{\boldsymbol\alpha}) \times p(\boldsymbol\alpha|\sigma^2,\kappa_{\boldsymbol\alpha}) \times p(\sigma^2) \\
+
+\\ \propto p(\kappa_{\boldsymbol\alpha})\times p(\boldsymbol\alpha|\sigma^2,\kappa_{\boldsymbol\alpha}) \\
+
+\\ \propto (\kappa_{\boldsymbol\alpha})^{-\frac{\nu+2}{2}} exp \left\{ -\frac{1}{2}\frac{s}{\kappa_{\boldsymbol\alpha}} \right\} 
+\times det(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}} _{\boldsymbol\alpha})^{-\frac{1}{2}} exp \left\{ -\frac{1}{2} (\mathbf{X}-\underline{\boldsymbol\alpha})^{'}(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}} _{\boldsymbol\alpha})^{-1} (\mathbf{X}-\underline{\boldsymbol\alpha})\right\} \\ 
+
+\\ \propto  (\kappa_{\boldsymbol\alpha})^{-\frac{\nu+2+k}{2}} exp \left\{ -\frac{1}{2}\frac{s}{\kappa_{\boldsymbol\alpha}} \right\} exp \left\{ -\frac{1}{2}\frac{1}{\kappa_{\boldsymbol\alpha}} (\mathbf{X}-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{V}_{\alpha})^{-1} (\mathbf{X}-\underline{\boldsymbol\alpha})\right\}
+\end{gather*}
+
+which we recognize a kernel of inverted gamma 2 distribution with parameters as:
+
+\begin{gather*}
+\bar{s} = s + (\mathbf{X}-\underline{\boldsymbol\alpha})^{'} \sigma^{-2} (\underline{V}_{\alpha})^{-1} (\mathbf{X}-\underline{\boldsymbol\alpha}) \\
+\\ \bar{\nu} = \nu + k 
+\end{gather*}
+
+
+To sample from the $\mathcal{IG}2(s,\nu)$ distribution, the following code can be used:
+
+```{r}
+#| echo: true
+# Set parameters of IG2 distribution 
+s <- 1 
+nu <- 1  
+# Draw one sample from IG2 distribution 
+sample <- s / rchisq(1, df=nu)
+```
+
 
 ### Gamma scale mixture of normal
 
