@@ -6,8 +6,6 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Tomasz Woźniak">
-<meta name="author" content="Ray Gomez">
 
 <title>Macroeconometrics Students Present - Bayesian Autoregressions</title>
 <style>
@@ -173,6 +171,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </ul></li>
   <li><a href="#natural-conjugate-analysis" id="toc-natural-conjugate-analysis" class="nav-link" data-scroll-target="#natural-conjugate-analysis">Natural-Conjugate Analysis</a>
   <ul class="collapse">
+  <li><a href="#likelihood-as-normal-inverted-gamma-2" id="toc-likelihood-as-normal-inverted-gamma-2" class="nav-link" data-scroll-target="#likelihood-as-normal-inverted-gamma-2">Likelihood as normal-inverted gamma 2</a></li>
   <li><a href="#normal-inverted-gamma-2-prior" id="toc-normal-inverted-gamma-2-prior" class="nav-link" data-scroll-target="#normal-inverted-gamma-2-prior">Normal-inverted gamma 2 prior</a></li>
   <li><a href="#normal-inverted-gamma-2-posterior" id="toc-normal-inverted-gamma-2-posterior" class="nav-link" data-scroll-target="#normal-inverted-gamma-2-posterior">Normal-inverted gamma 2 posterior</a></li>
   <li><a href="#sampling-draws-from-the-posterior" id="toc-sampling-draws-from-the-posterior" class="nav-link" data-scroll-target="#sampling-draws-from-the-posterior">Sampling draws from the posterior</a></li>
@@ -215,26 +214,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 
 
-<div class="quarto-title-meta-author">
-  <div class="quarto-title-meta-heading">Authors</div>
-  <div class="quarto-title-meta-heading">Affiliation</div>
-  
-    <div class="quarto-title-meta-contents">
-    <a href="https://github.com/donotdespair">Tomasz Woźniak</a> <a href="https://orcid.org/0000-0003-2212-2378" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a>
-  </div>
-    <div class="quarto-title-meta-contents">
-        <p class="affiliation">
-            University of Melbourne
-          </p>
-      </div>
-      <div class="quarto-title-meta-contents">
-    Ray Gomez 
-  </div>
-    </div>
 
 <div class="quarto-title-meta">
 
-      
+    <div>
+    <div class="quarto-title-meta-heading">Authors</div>
+    <div class="quarto-title-meta-contents">
+             <p>Tomasz Woźniak <a href="https://orcid.org/0000-0003-2212-2378" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+             <p>Thomas Kronholm Møller </p>
+             <p>Jonas Loopers Davidsen </p>
+             <p>Ray Gomez </p>
+          </div>
+  </div>
+    
   
     
   </div>
@@ -288,14 +280,121 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 </section>
 <section id="natural-conjugate-analysis" class="level1">
 <h1>Natural-Conjugate Analysis</h1>
+<blockquote class="blockquote">
+<p><strong>Authors:</strong> Thomas Kronholm Møller &amp; Jonas Loopers Davidsen</p>
+</blockquote>
+<section id="likelihood-as-normal-inverted-gamma-2" class="level2">
+<h2 class="anchored" data-anchor-id="likelihood-as-normal-inverted-gamma-2">Likelihood as normal-inverted gamma 2</h2>
+<p>In order to facilitate deriving the posterior distribution, the likelihood function can be rewritten to a <span class="math inline">\(\mathcal{NIG}2\)</span>-distribution given by:</p>
+<span class="math display">\[\begin{align}
+L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) &amp;\propto \left(\sigma^2\right)^{-\frac{T-(k+2)+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right)'\mathbf{X}'\mathbf{X}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right) \right\}\\
+&amp;\qquad\times\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right) \right\},
+\end{align}\]</span>
+<p>where <span class="math inline">\(\boldsymbol{\hat{\alpha}} = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{y}\)</span> in the maximum likelihood estimator of <span class="math inline">\(\boldsymbol\alpha\)</span>. It is now quite straight forward to identify the <span class="math inline">\(\mathcal{NIG}2\)</span>-kernel. By remembering that the <span class="math inline">\(\mathcal{NIG}2\)</span>-distribution is characterized by its four moments, we get the following outcome:</p>
+<span class="math display">\[\begin{align}
+L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) = \mathcal{NIG}2\left(\mu=\boldsymbol{\hat{\alpha}},\Sigma=\left(\mathbf{X}'\mathbf{X}\right)^{-1},s=\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right),\nu=T-k-2\right)
+\end{align}\]</span>
+</section>
 <section id="normal-inverted-gamma-2-prior" class="level2">
 <h2 class="anchored" data-anchor-id="normal-inverted-gamma-2-prior">Normal-inverted gamma 2 prior</h2>
+<p>The prior distribution of the natural conjugate is determined by the form of the distribution of the parameters implied by the likelihood function discussed above. The priors for the Normal-inverse gamma 2 distribution can thus be written as:</p>
+<span class="math display">\[\begin{align}
+p(\boldsymbol\alpha,\sigma^2) &amp;= p(\boldsymbol\alpha|\sigma^2)p(\sigma^2)\\
+      p(\boldsymbol\alpha|\sigma^2) &amp;= \mathcal{N}(\underline{\boldsymbol\alpha},\sigma^2\underline{\mathbf{V}}^2_{\boldsymbol\alpha})\\
+      p(\sigma^2) &amp; = \mathcal{IG}2(\underline{s},\underline{\nu})
+\end{align}\]</span>
+<p>Using the distributions above, we can write the kernel of the <span class="math inline">\(\mathcal{NIG}2\)</span> prior as:</p>
+<span class="math display">\[\begin{align}
+\mathcal{NIG}2_{k}(\underline{\boldsymbol\alpha},\underline{\mathbf{V}}_{\boldsymbol\alpha}, \underline{s}, \underline{\nu}) \propto (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\frac{1}{\underline{\mathbf{V}}_{\boldsymbol\alpha}}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
+\end{align}\]</span>
 </section>
 <section id="normal-inverted-gamma-2-posterior" class="level2">
 <h2 class="anchored" data-anchor-id="normal-inverted-gamma-2-posterior">Normal-inverted gamma 2 posterior</h2>
+<p>The product of the prior distribution and the likelihood function as introduced above gives the posterior distribution given by:</p>
+<span class="math display">\[\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) \propto L(\mathbf{y}|\mathbf{X}, \boldsymbol\alpha, \sigma^2)p(\boldsymbol\alpha,\sigma^2) =  L(\mathbf{y}|\mathbf{X}, \boldsymbol\alpha, \sigma^2)p( \boldsymbol\alpha| \sigma^2)p(\sigma^2)
+\end{align}\]</span>
+<p>Now plugging in the expressions for the likelihood and the prior distribution:</p>
+<span class="math display">\[\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &amp;\propto \left(\sigma^2\right)^{-\frac{T-(k-2)+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right)'\mathbf{X}'\mathbf{X}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right) \right\}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right) \right\} \\
+&amp;\times (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'\underline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
+\end{align}\]</span>
+<p>By collecting all terms and simplifying the expressions, the joint posterior distribution can be derived to be:</p>
+<span class="math display">\[\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &amp;\propto (\sigma^2)^{-\frac{T+\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2} (\boldsymbol\alpha-\overline{\boldsymbol\alpha})'\overline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\overline{\boldsymbol\alpha})\right\} \times \exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\underline{s}-\overline{\boldsymbol\alpha}'\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}+\underline{\boldsymbol\alpha}'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{y}'\mathbf{y}\right)\right\}
+\\&amp;= (\sigma^2)^{\frac{\overline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2} (\boldsymbol\alpha-\overline{\boldsymbol\alpha})'\overline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\overline{\boldsymbol\alpha})\right\} \times \exp\left\{-\frac{1}{2}\frac{\overline{s}}{\sigma^2}\right\}
+\end{align}\]</span>
+<p>This now fully defines the joint posterior distribution as is it is in a normal inverse gamma 2 form with its corresponding four moments:</p>
+<span class="math display">\[\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &amp;= \mathcal{NIG}2_{k}\left(\overline{\boldsymbol\alpha},\overline{\mathbf{V}}_{\boldsymbol\alpha},\overline{s},\overline{\nu}\right)\\
+\overline{\boldsymbol\alpha} &amp;= \overline{\mathbf{V}}_{\boldsymbol\alpha}( \underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{X}'\mathbf{y})\\
+\overline{\mathbf{V}}_{\boldsymbol\alpha} &amp;=\left(\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}+\mathbf{X}'\mathbf{X}\right)^{-1} \\
+\overline{s} &amp;= \underline{s}-\overline{\boldsymbol\alpha}'\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}+\underline{\boldsymbol\alpha}'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{y}'\mathbf{y}\\
+\overline{\nu} &amp;= \underline{\nu}+T
+\end{align}\]</span>
 </section>
 <section id="sampling-draws-from-the-posterior" class="level2">
 <h2 class="anchored" data-anchor-id="sampling-draws-from-the-posterior">Sampling draws from the posterior</h2>
+<p>We start by generating a random walk, which can be used to validate that our estimation is indeed correct.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>T       <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>N       <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>y       <span class="ot">=</span> <span class="fu">apply</span>(<span class="fu">matrix</span>(<span class="fu">rnorm</span>(T <span class="sc">*</span> N), <span class="at">ncol =</span> N), <span class="dv">2</span>, cumsum)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>y       <span class="ot">=</span> <span class="fu">as.matrix</span>(y)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>p       <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>d       <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>k    <span class="ot">=</span> p <span class="sc">+</span> d </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>T     <span class="ot">=</span> <span class="fu">nrow</span>(y)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>Y     <span class="ot">=</span> <span class="fu">as.matrix</span>(y[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>T,])</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>X     <span class="ot">=</span> <span class="fu">cbind</span>(<span class="fu">rep</span>(<span class="dv">1</span>, T <span class="sc">-</span> p), y[<span class="dv">1</span><span class="sc">:</span>(T <span class="sc">-</span> p),])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, defining our priors for <span class="math inline">\(\underline{\boldsymbol\alpha}\)</span>, <span class="math inline">\(\underline{\mathbf{V}}_{\boldsymbol\alpha}\)</span>, <span class="math inline">\(\underline{s}\)</span> and <span class="math inline">\(\underline{\nu}\)</span>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>priors <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha   =</span> <span class="fu">as.matrix</span>(<span class="fu">rep</span>(<span class="dv">0</span>, k)),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Sigma   =</span> <span class="fu">diag</span>(<span class="dv">2</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">S       =</span> <span class="dv">1</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">nu      =</span> <span class="dv">3</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>and computing the function for the posterior parameters:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>posterior <span class="ot">=</span> <span class="cf">function</span>(y, priors){</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  Sigma.inv <span class="ot">=</span> <span class="fu">t</span>(X) <span class="sc">%*%</span> X <span class="sc">+</span> priors<span class="sc">$</span>Sigma</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  Sigma     <span class="ot">=</span> <span class="fu">solve</span>(Sigma.inv)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  alpha     <span class="ot">=</span> Sigma <span class="sc">%*%</span> (<span class="fu">t</span>(X) <span class="sc">%*%</span> Y <span class="sc">+</span> <span class="fu">solve</span>(priors<span class="sc">$</span>Sigma) <span class="sc">%*%</span> priors<span class="sc">$</span>alpha)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  S         <span class="ot">=</span> <span class="fu">as.numeric</span>(<span class="fu">t</span>(Y) <span class="sc">%*%</span> Y <span class="sc">+</span> priors<span class="sc">$</span>S <span class="sc">+</span> <span class="fu">t</span>(priors<span class="sc">$</span>alpha) <span class="sc">%*%</span> <span class="fu">solve</span>(priors<span class="sc">$</span>Sigma) <span class="sc">%*%</span> priors<span class="sc">$</span>alpha </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                     <span class="sc">-</span> <span class="fu">t</span>(alpha) <span class="sc">%*%</span> Sigma.inv <span class="sc">%*%</span> alpha)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  nu        <span class="ot">=</span> T <span class="sc">+</span> priors<span class="sc">$</span>nu </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sigma  =</span> Sigma,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha  =</span> alpha,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">S      =</span> S,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">nu     =</span> nu</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>post <span class="ot">=</span> <span class="fu">posterior</span>(<span class="at">y =</span> y, <span class="at">priors =</span> priors)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We are then able to do the estimation of our parameters using the Gibbs sampler provided below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>posterior.draws <span class="ot">=</span> <span class="cf">function</span>(S, posterior){</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  Sigma2.posterior      <span class="ot">=</span> <span class="fu">as.matrix</span>(posterior<span class="sc">$</span>S <span class="sc">/</span> <span class="fu">rchisq</span>(S, posterior<span class="sc">$</span>nu))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  alpha.posterior       <span class="ot">=</span> <span class="fu">simplify2array</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>S, <span class="cf">function</span>(i){</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> posterior<span class="sc">$</span>alpha, <span class="at">sigma =</span> Sigma2.posterior[i,] <span class="sc">*</span> posterior<span class="sc">$</span>Sigma)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  output <span class="ot">=</span> <span class="fu">cbind</span>(<span class="fu">t</span>(alpha.posterior[<span class="dv">1</span>,,]), Sigma2.posterior)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(output)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>draws <span class="ot">=</span> <span class="fu">posterior.draws</span>(<span class="at">S =</span> <span class="dv">1000</span>, <span class="at">posterior =</span> post)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 </section>
 <section id="hierarchical-prior-analysis" class="level1">
@@ -333,79 +432,79 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 <li>Initialize <span class="math inline">\(\boldsymbol\theta\)</span> at the posterior mode which is can be located via numerical optimization. We executed this in <code>R</code> through the following function, <code>c.posterior.mode</code>. This function takes in data representing matrix <span class="math inline">\(\textbf{y}\)</span> and returns values for <span class="math inline">\(\boldsymbol\theta\)</span> that minimize its negative log-posterior, as well as the corresponding Hessian.</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>c.posterior.mode <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">p=</span><span class="dv">4</span>, <span class="at">k1=</span><span class="dv">1</span>, <span class="at">k2=</span><span class="dv">100</span>, <span class="at">start_date=</span><span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>)){</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  v.neglogPost <span class="ot">&lt;-</span> <span class="cf">function</span>(theta){</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    N <span class="ot">=</span> <span class="fu">ncol</span>(data)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    K <span class="ot">=</span> <span class="dv">1</span> <span class="sc">+</span> p<span class="sc">*</span>N</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    Y       <span class="ot">=</span> <span class="fu">ts</span>(data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data),], <span class="at">start=</span>start_date, <span class="at">frequency=</span><span class="dv">4</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    T <span class="ot">=</span> <span class="fu">nrow</span>(Y)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    X       <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">1</span>,T,<span class="dv">1</span>)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># nrow(X)</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p){</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      X     <span class="ot">=</span> <span class="fu">cbind</span>(X,data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data)<span class="sc">-</span>i,])</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate MLE for prior </span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="do">############################################################</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    A.hat       <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>X)<span class="sc">%*%</span><span class="fu">t</span>(X)<span class="sc">%*%</span>Y</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    Sigma.hat   <span class="ot">=</span> <span class="fu">t</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">%*%</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">/</span><span class="fu">nrow</span>(Y)</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Specify prior distribution</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="do">############################################################</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    kappa<span class="fl">.1</span>     <span class="ot">=</span> k1</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    kappa<span class="fl">.2</span>     <span class="ot">=</span> k2</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    kappa<span class="fl">.3</span>     <span class="ot">=</span> <span class="dv">1</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    A.prior     <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="fu">nrow</span>(A.hat),<span class="fu">ncol</span>(A.hat))</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    A.prior[<span class="dv">2</span><span class="sc">:</span>(N<span class="sc">+</span><span class="dv">1</span>),] <span class="ot">=</span> kappa<span class="fl">.3</span><span class="sc">*</span><span class="fu">diag</span>(N)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    V.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">c</span>(kappa<span class="fl">.2</span>,kappa<span class="fl">.1</span><span class="sc">*</span>((<span class="dv">1</span><span class="sc">:</span>p)<span class="sc">^</span>(<span class="sc">-</span><span class="dv">2</span>))<span class="sc">%x%</span><span class="fu">rep</span>(<span class="dv">1</span>,N)))</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    S.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">diag</span>(Sigma.hat))</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    nu.prior    <span class="ot">=</span> N<span class="sc">+</span><span class="dv">1</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    vec <span class="ot">&lt;-</span> theta[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">12</span>){</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>      vec <span class="ot">&lt;-</span> <span class="fu">c</span>(vec, <span class="dv">1</span> <span class="sc">+</span> (theta[<span class="dv">3</span>]<span class="sc">-</span><span class="dv">1</span>)<span class="sc">*</span>theta[<span class="dv">4</span>]<span class="sc">^</span>(i<span class="dv">-3</span>))</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    }  </span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    V <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">ts</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(Y)<span class="sc">-</span><span class="dv">12</span>), <span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>), <span class="at">frequency =</span> <span class="dv">4</span>) , vec)    </span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    Y.tilde <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span>V)<span class="sc">%*%</span>Y</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    X.tilde <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span>V)<span class="sc">%*%</span>X</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    A.tilde.hat <span class="ot">&lt;-</span> <span class="fu">solve</span>((<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>X.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)))<span class="sc">%*%</span>(<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>Y.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)<span class="sc">%*%</span>A.prior)</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    epsilon.tilde <span class="ot">&lt;-</span>Y.tilde <span class="sc">-</span> X.tilde<span class="sc">%*%</span>A.tilde.hat</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Log-likelihood      </span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    logL <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="fu">prod</span>(V<span class="sc">^</span>(<span class="sc">-</span>N)))<span class="sc">+</span>(<span class="sc">-</span>N<span class="sc">/</span><span class="dv">2</span>)<span class="sc">*</span><span class="fu">log</span>(<span class="fu">det</span>(<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>X.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)))<span class="sc">+</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>            (<span class="sc">-</span>(T<span class="sc">-</span>p<span class="sc">+</span>nu.prior)<span class="sc">/</span><span class="dv">2</span>)<span class="sc">*</span><span class="fu">log</span>(<span class="fu">det</span>(S.prior <span class="sc">+</span><span class="fu">t</span>(epsilon.tilde)<span class="sc">%*%</span>epsilon.tilde <span class="sc">+</span> </span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>            <span class="fu">t</span>(A.tilde.hat<span class="sc">-</span>A.prior)<span class="sc">%*%</span><span class="fu">solve</span>(V.prior)<span class="sc">%*%</span>(A.tilde.hat<span class="sc">-</span>A.prior)))</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Pareto(1,1) and Beta(3,1.5) priors </span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    pareto.a<span class="ot">=</span><span class="dv">1</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    pareto.b<span class="ot">=</span><span class="dv">1</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    beta.a<span class="ot">=</span><span class="dv">3</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    beta.b<span class="ot">=</span><span class="fl">1.5</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    beta.cons <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span><span class="fu">beta</span>(beta.a,beta.b)</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Log-prior</span></span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    logP <span class="ot">&lt;-</span> <span class="fu">log</span>((pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">1</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    (pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">2</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    (pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">3</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>    beta.cons<span class="sc">*</span>theta[<span class="dv">4</span>]<span class="sc">^</span>(beta.a<span class="dv">-1</span>)<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>theta[<span class="dv">4</span>])<span class="sc">^</span>(beta.b<span class="dv">-1</span>))</span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># negative log-posterior</span></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    neglogPost <span class="ot">&lt;-</span> <span class="sc">-</span>(logL<span class="sc">+</span>logP)</span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(neglogPost)</span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>   </span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>  <span class="co"># numerically minimize the negative log-likelihood</span></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>  post.maximizer <span class="ot">&lt;-</span> <span class="fu">optim</span>(<span class="at">par=</span><span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">50</span>, <span class="fl">0.5</span>), <span class="at">fn=</span>v.neglogPost, <span class="at">method=</span><span class="st">"L-BFGS-B"</span>, </span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>                          <span class="at">lower=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="fl">0.0001</span>),</span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>                          <span class="at">upper=</span><span class="fu">c</span>(<span class="dv">100</span>,<span class="dv">100</span>,<span class="dv">100</span>,<span class="fl">0.99999</span>), <span class="at">hessian =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">maximizer=</span>post.maximizer<span class="sc">$</span>par, <span class="at">hessian=</span>post.maximizer<span class="sc">$</span>hessian))</span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>c.posterior.mode <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">p=</span><span class="dv">4</span>, <span class="at">k1=</span><span class="dv">1</span>, <span class="at">k2=</span><span class="dv">100</span>, <span class="at">start_date=</span><span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>)){</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  v.neglogPost <span class="ot">&lt;-</span> <span class="cf">function</span>(theta){</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    N <span class="ot">=</span> <span class="fu">ncol</span>(data)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    K <span class="ot">=</span> <span class="dv">1</span> <span class="sc">+</span> p<span class="sc">*</span>N</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    Y       <span class="ot">=</span> <span class="fu">ts</span>(data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data),], <span class="at">start=</span>start_date, <span class="at">frequency=</span><span class="dv">4</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    T <span class="ot">=</span> <span class="fu">nrow</span>(Y)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    X       <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">1</span>,T,<span class="dv">1</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># nrow(X)</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p){</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      X     <span class="ot">=</span> <span class="fu">cbind</span>(X,data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data)<span class="sc">-</span>i,])</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate MLE for prior </span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="do">############################################################</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    A.hat       <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>X)<span class="sc">%*%</span><span class="fu">t</span>(X)<span class="sc">%*%</span>Y</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    Sigma.hat   <span class="ot">=</span> <span class="fu">t</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">%*%</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">/</span><span class="fu">nrow</span>(Y)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Specify prior distribution</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="do">############################################################</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    kappa<span class="fl">.1</span>     <span class="ot">=</span> k1</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    kappa<span class="fl">.2</span>     <span class="ot">=</span> k2</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    kappa<span class="fl">.3</span>     <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    A.prior     <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="fu">nrow</span>(A.hat),<span class="fu">ncol</span>(A.hat))</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    A.prior[<span class="dv">2</span><span class="sc">:</span>(N<span class="sc">+</span><span class="dv">1</span>),] <span class="ot">=</span> kappa<span class="fl">.3</span><span class="sc">*</span><span class="fu">diag</span>(N)</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    V.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">c</span>(kappa<span class="fl">.2</span>,kappa<span class="fl">.1</span><span class="sc">*</span>((<span class="dv">1</span><span class="sc">:</span>p)<span class="sc">^</span>(<span class="sc">-</span><span class="dv">2</span>))<span class="sc">%x%</span><span class="fu">rep</span>(<span class="dv">1</span>,N)))</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    S.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">diag</span>(Sigma.hat))</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    nu.prior    <span class="ot">=</span> N<span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    vec <span class="ot">&lt;-</span> theta[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">12</span>){</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>      vec <span class="ot">&lt;-</span> <span class="fu">c</span>(vec, <span class="dv">1</span> <span class="sc">+</span> (theta[<span class="dv">3</span>]<span class="sc">-</span><span class="dv">1</span>)<span class="sc">*</span>theta[<span class="dv">4</span>]<span class="sc">^</span>(i<span class="dv">-3</span>))</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    }  </span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    V <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">ts</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(Y)<span class="sc">-</span><span class="dv">12</span>), <span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>), <span class="at">frequency =</span> <span class="dv">4</span>) , vec)    </span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    Y.tilde <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span>V)<span class="sc">%*%</span>Y</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    X.tilde <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span>V)<span class="sc">%*%</span>X</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>    A.tilde.hat <span class="ot">&lt;-</span> <span class="fu">solve</span>((<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>X.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)))<span class="sc">%*%</span>(<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>Y.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)<span class="sc">%*%</span>A.prior)</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    epsilon.tilde <span class="ot">&lt;-</span>Y.tilde <span class="sc">-</span> X.tilde<span class="sc">%*%</span>A.tilde.hat</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Log-likelihood      </span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    logL <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="fu">prod</span>(V<span class="sc">^</span>(<span class="sc">-</span>N)))<span class="sc">+</span>(<span class="sc">-</span>N<span class="sc">/</span><span class="dv">2</span>)<span class="sc">*</span><span class="fu">log</span>(<span class="fu">det</span>(<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>X.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)))<span class="sc">+</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>            (<span class="sc">-</span>(T<span class="sc">-</span>p<span class="sc">+</span>nu.prior)<span class="sc">/</span><span class="dv">2</span>)<span class="sc">*</span><span class="fu">log</span>(<span class="fu">det</span>(S.prior <span class="sc">+</span><span class="fu">t</span>(epsilon.tilde)<span class="sc">%*%</span>epsilon.tilde <span class="sc">+</span> </span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>            <span class="fu">t</span>(A.tilde.hat<span class="sc">-</span>A.prior)<span class="sc">%*%</span><span class="fu">solve</span>(V.prior)<span class="sc">%*%</span>(A.tilde.hat<span class="sc">-</span>A.prior)))</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Pareto(1,1) and Beta(3,1.5) priors </span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    pareto.a<span class="ot">=</span><span class="dv">1</span></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    pareto.b<span class="ot">=</span><span class="dv">1</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    beta.a<span class="ot">=</span><span class="dv">3</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    beta.b<span class="ot">=</span><span class="fl">1.5</span></span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>    beta.cons <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span><span class="fu">beta</span>(beta.a,beta.b)</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Log-prior</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    logP <span class="ot">&lt;-</span> <span class="fu">log</span>((pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">1</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>    (pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">2</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    (pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">3</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    beta.cons<span class="sc">*</span>theta[<span class="dv">4</span>]<span class="sc">^</span>(beta.a<span class="dv">-1</span>)<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>theta[<span class="dv">4</span>])<span class="sc">^</span>(beta.b<span class="dv">-1</span>))</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>    <span class="co"># negative log-posterior</span></span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>    neglogPost <span class="ot">&lt;-</span> <span class="sc">-</span>(logL<span class="sc">+</span>logP)</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(neglogPost)</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>  <span class="co"># numerically minimize the negative log-likelihood</span></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>  post.maximizer <span class="ot">&lt;-</span> <span class="fu">optim</span>(<span class="at">par=</span><span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">50</span>, <span class="dv">50</span>, <span class="fl">0.5</span>), <span class="at">fn=</span>v.neglogPost, <span class="at">method=</span><span class="st">"L-BFGS-B"</span>, </span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>                          <span class="at">lower=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="fl">0.0001</span>),</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>                          <span class="at">upper=</span><span class="fu">c</span>(<span class="dv">100</span>,<span class="dv">100</span>,<span class="dv">100</span>,<span class="fl">0.99999</span>), <span class="at">hessian =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">maximizer=</span>post.maximizer<span class="sc">$</span>par, <span class="at">hessian=</span>post.maximizer<span class="sc">$</span>hessian))</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ol start="2" type="1">
 <li><p>Draw candidate <span class="math inline">\(\boldsymbol\theta^{*}\)</span> from <span class="math inline">\(N_4(\boldsymbol\theta^{(s-1)},cW)\)</span>, where <span class="math inline">\(W\)</span> is the inverse Hessian of the negative log posterior of <span class="math inline">\(\boldsymbol\theta\)</span> at the mode, which is also calculated computationally, and <span class="math inline">\(c\)</span> is a scaling factor.</p></li>
@@ -424,117 +523,117 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 <p><span class="math display">\[\textbf{c}^{(s)}=[1\quad...\quad1 \quad \bar{c}_0^{(s)}\quad \bar{c}_1^{(s)}\quad \bar{c}_2^{(s)}\quad 1+(\bar{c}_2^{(s)}-1)\rho^{(s)}\quad 1+(\bar{c}_2^{(s)}-1)\rho^{(s)2}\quad...]'\]</span></p>
 <p>Steps 2 to 4 are implemented via the function, <code>mh.mcmc</code> which takes in data, the posterior mode of <span class="math inline">\(\boldsymbol\theta\)</span>, and the inverse Hessian from <code>c.posterior.mode</code> and returns the draws of <span class="math inline">\(\boldsymbol\theta\)</span>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(coda)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>mh.mcmc <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">p=</span><span class="dv">1</span>, <span class="at">S.mh =</span> <span class="dv">1000</span>, c, <span class="at">W =</span> <span class="fu">diag</span>(<span class="dv">4</span>), theta.init,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">k1 =</span> <span class="dv">1</span>, <span class="at">k2 =</span> <span class="dv">100</span>, <span class="at">start_date =</span> <span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>)){</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a> <span class="co"># N = no. of variables</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="fu">ncol</span>(data)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># p = no. of lags</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  K <span class="ot">=</span> <span class="dv">1</span> <span class="sc">+</span> p<span class="sc">*</span>N</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># forecast horizon</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># h       = 8</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  Y       <span class="ot">=</span> <span class="fu">ts</span>(data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data),], <span class="at">start=</span>start_date, <span class="at">frequency=</span><span class="dv">4</span>)</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  T <span class="ot">=</span> <span class="fu">nrow</span>(Y)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  X       <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">1</span>,T,<span class="dv">1</span>)</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># nrow(X)</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p){</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    X     <span class="ot">=</span> <span class="fu">cbind</span>(X,data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data)<span class="sc">-</span>i,])</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate MLE for prior </span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  A.hat       <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>X)<span class="sc">%*%</span><span class="fu">t</span>(X)<span class="sc">%*%</span>Y</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  Sigma.hat   <span class="ot">=</span> <span class="fu">t</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">%*%</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">/</span><span class="fu">nrow</span>(Y)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Specify prior distribution</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.1</span>     <span class="ot">=</span> k1</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.2</span>     <span class="ot">=</span> k2</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.3</span>     <span class="ot">=</span> <span class="dv">1</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>  A.prior     <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="fu">nrow</span>(A.hat),<span class="fu">ncol</span>(A.hat))</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>  A.prior[<span class="dv">2</span><span class="sc">:</span>(N<span class="sc">+</span><span class="dv">1</span>),] <span class="ot">=</span> kappa<span class="fl">.3</span><span class="sc">*</span><span class="fu">diag</span>(N)</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>  V.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">c</span>(kappa<span class="fl">.2</span>,kappa<span class="fl">.1</span><span class="sc">*</span>((<span class="dv">1</span><span class="sc">:</span>p)<span class="sc">^</span>(<span class="sc">-</span><span class="dv">2</span>))<span class="sc">%x%</span><span class="fu">rep</span>(<span class="dv">1</span>,N)))</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>  S.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">diag</span>(Sigma.hat))</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  nu.prior    <span class="ot">=</span> N<span class="sc">+</span><span class="dv">1</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Metropolis-Hastings </span></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>  <span class="do">###########################################################</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># v0, v1, v2, rho</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>  Theta <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,S.mh,<span class="dv">4</span>)</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>  theta_old <span class="ot">&lt;-</span> theta.init</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S.mh){</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    covid.vec <span class="ot">&lt;-</span> <span class="cf">function</span>(theta){</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>      vec <span class="ot">&lt;-</span> theta[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">12</span>){</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>        vec <span class="ot">&lt;-</span> <span class="fu">c</span>(vec, <span class="dv">1</span> <span class="sc">+</span> (theta[<span class="dv">3</span>]<span class="sc">-</span><span class="dv">1</span>)<span class="sc">*</span>theta[<span class="dv">4</span>]<span class="sc">^</span>(i<span class="dv">-3</span>))</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(vec)</span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Covid volatility likelihood kernel</span></span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    v.logL <span class="ot">&lt;-</span> <span class="cf">function</span>(V){</span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>      Y.tilde <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span>V)<span class="sc">%*%</span>Y</span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>      X.tilde <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span>V)<span class="sc">%*%</span>X</span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>      A.tilde.hat <span class="ot">&lt;-</span> <span class="fu">solve</span>((<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>X.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)))<span class="sc">%*%</span>(<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>Y.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)<span class="sc">%*%</span>A.prior)</span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>      epsilon.tilde <span class="ot">&lt;-</span>Y.tilde <span class="sc">-</span> X.tilde<span class="sc">%*%</span>A.tilde.hat</span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>      logL <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="fu">prod</span>(V<span class="sc">^</span>(<span class="sc">-</span>N)))<span class="sc">+</span>(<span class="sc">-</span>N<span class="sc">/</span><span class="dv">2</span>)<span class="sc">*</span><span class="fu">log</span>(<span class="fu">det</span>(<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>X.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)))<span class="sc">+</span></span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>              (<span class="sc">-</span>(T<span class="sc">-</span>p<span class="sc">+</span>nu.prior)<span class="sc">/</span><span class="dv">2</span>)<span class="sc">*</span><span class="fu">log</span>(<span class="fu">det</span>(S.prior <span class="sc">+</span><span class="fu">t</span>(epsilon.tilde)<span class="sc">%*%</span>epsilon.tilde <span class="sc">+</span> </span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>              <span class="fu">t</span>(A.tilde.hat<span class="sc">-</span>A.prior)<span class="sc">%*%</span><span class="fu">solve</span>(V.prior)<span class="sc">%*%</span>(A.tilde.hat<span class="sc">-</span>A.prior)))</span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(logL)</span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Covid volatility prior</span></span>
-<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    v.logP <span class="ot">&lt;-</span> <span class="cf">function</span>(theta, <span class="at">pareto.a=</span><span class="dv">1</span>, <span class="at">pareto.b=</span><span class="dv">1</span>, <span class="at">beta.a=</span><span class="dv">3</span>, <span class="at">beta.b=</span><span class="fl">1.5</span>){</span>
-<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>      beta.cons <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span><span class="fu">beta</span>(beta.a,beta.b)</span>
-<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>      logP <span class="ot">&lt;-</span> <span class="fu">log</span>((pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">1</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
-<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>      (pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">2</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
-<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>      (pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">3</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
-<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>       beta.cons<span class="sc">*</span>theta[<span class="dv">4</span>]<span class="sc">^</span>(beta.a<span class="dv">-1</span>)<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>theta[<span class="dv">4</span>])<span class="sc">^</span>(beta.b<span class="dv">-1</span>))</span>
-<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(logP)</span>
-<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>    v_ones <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(Y)<span class="sc">-</span><span class="dv">12</span>), <span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>), <span class="at">frequency =</span> <span class="dv">4</span>) </span>
-<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>    V.old <span class="ot">&lt;-</span> <span class="fu">c</span>(v_ones, <span class="fu">covid.vec</span>(theta_old))    </span>
-<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>    <span class="co"># New candidate parameters values</span></span>
-<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>    theta_new <span class="ot">&lt;-</span> <span class="fu">mvrnorm</span>(<span class="dv">1</span>, theta_old, c<span class="sc">*</span>W)</span>
-<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>    V.new <span class="ot">&lt;-</span> <span class="fu">c</span>(v_ones, <span class="fu">covid.vec</span>(theta_new))</span>
-<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate posteriors </span></span>
-<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>    v.logpost_old <span class="ot">&lt;-</span> <span class="fu">v.logL</span>(V.old)<span class="sc">+</span><span class="fu">v.logP</span>(theta_old)</span>
-<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>    v.logpost_new <span class="ot">&lt;-</span> <span class="fu">v.logL</span>(V.new)<span class="sc">+</span><span class="fu">v.logP</span>(theta_new)</span>
-<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Posterior ratio</span></span>
-<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>    post.ratio <span class="ot">&lt;-</span> <span class="fu">exp</span>(v.logpost_new<span class="sc">-</span>v.logpost_old)</span>
-<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Acceptance/rejection alpha</span></span>
-<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>    alpha <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="dv">1</span>, post.ratio)</span>
-<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>    u_star <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">1</span>)</span>
-<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (alpha <span class="sc">&gt;</span> u_star){</span>
-<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>      Theta[s,] <span class="ot">&lt;-</span> theta_new</span>
-<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {Theta[s,] <span class="ot">&lt;-</span> theta_old}</span>
-<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>    theta_old <span class="ot">&lt;-</span> Theta[s,]  </span>
-<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(Theta) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"c0"</span>, <span class="st">"c1"</span> , <span class="st">"c2"</span>, <span class="st">"rho"</span>)</span>
-<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>  re <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">Theta=</span>Theta, </span>
-<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>             <span class="at">AcceptRate =</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">rejectionRate</span>(<span class="fu">as.mcmc</span>(Theta[,<span class="dv">1</span>])))</span>
-<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(re)</span>
-<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(coda)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>mh.mcmc <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">p=</span><span class="dv">1</span>, <span class="at">S.mh =</span> <span class="dv">1000</span>, c, <span class="at">W =</span> <span class="fu">diag</span>(<span class="dv">4</span>), theta.init,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">k1 =</span> <span class="dv">1</span>, <span class="at">k2 =</span> <span class="dv">100</span>, <span class="at">start_date =</span> <span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>)){</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a> <span class="co"># N = no. of variables</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="fu">ncol</span>(data)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># p = no. of lags</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  K <span class="ot">=</span> <span class="dv">1</span> <span class="sc">+</span> p<span class="sc">*</span>N</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># forecast horizon</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># h       = 8</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  Y       <span class="ot">=</span> <span class="fu">ts</span>(data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data),], <span class="at">start=</span>start_date, <span class="at">frequency=</span><span class="dv">4</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  T <span class="ot">=</span> <span class="fu">nrow</span>(Y)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  X       <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">1</span>,T,<span class="dv">1</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># nrow(X)</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p){</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    X     <span class="ot">=</span> <span class="fu">cbind</span>(X,data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data)<span class="sc">-</span>i,])</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate MLE for prior </span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  A.hat       <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>X)<span class="sc">%*%</span><span class="fu">t</span>(X)<span class="sc">%*%</span>Y</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  Sigma.hat   <span class="ot">=</span> <span class="fu">t</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">%*%</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">/</span><span class="fu">nrow</span>(Y)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Specify prior distribution</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.1</span>     <span class="ot">=</span> k1</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.2</span>     <span class="ot">=</span> k2</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.3</span>     <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  A.prior     <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="fu">nrow</span>(A.hat),<span class="fu">ncol</span>(A.hat))</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  A.prior[<span class="dv">2</span><span class="sc">:</span>(N<span class="sc">+</span><span class="dv">1</span>),] <span class="ot">=</span> kappa<span class="fl">.3</span><span class="sc">*</span><span class="fu">diag</span>(N)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  V.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">c</span>(kappa<span class="fl">.2</span>,kappa<span class="fl">.1</span><span class="sc">*</span>((<span class="dv">1</span><span class="sc">:</span>p)<span class="sc">^</span>(<span class="sc">-</span><span class="dv">2</span>))<span class="sc">%x%</span><span class="fu">rep</span>(<span class="dv">1</span>,N)))</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>  S.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">diag</span>(Sigma.hat))</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  nu.prior    <span class="ot">=</span> N<span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Metropolis-Hastings </span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>  <span class="do">###########################################################</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># v0, v1, v2, rho</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>  Theta <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,S.mh,<span class="dv">4</span>)</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  theta_old <span class="ot">&lt;-</span> theta.init</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S.mh){</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>    covid.vec <span class="ot">&lt;-</span> <span class="cf">function</span>(theta){</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>      vec <span class="ot">&lt;-</span> theta[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">12</span>){</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>        vec <span class="ot">&lt;-</span> <span class="fu">c</span>(vec, <span class="dv">1</span> <span class="sc">+</span> (theta[<span class="dv">3</span>]<span class="sc">-</span><span class="dv">1</span>)<span class="sc">*</span>theta[<span class="dv">4</span>]<span class="sc">^</span>(i<span class="dv">-3</span>))</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(vec)</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Covid volatility likelihood kernel</span></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>    v.logL <span class="ot">&lt;-</span> <span class="cf">function</span>(V){</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>      Y.tilde <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span>V)<span class="sc">%*%</span>Y</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>      X.tilde <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span>V)<span class="sc">%*%</span>X</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>      A.tilde.hat <span class="ot">&lt;-</span> <span class="fu">solve</span>((<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>X.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)))<span class="sc">%*%</span>(<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>Y.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)<span class="sc">%*%</span>A.prior)</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>      epsilon.tilde <span class="ot">&lt;-</span>Y.tilde <span class="sc">-</span> X.tilde<span class="sc">%*%</span>A.tilde.hat</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>      logL <span class="ot">&lt;-</span> <span class="fu">log</span>(<span class="fu">prod</span>(V<span class="sc">^</span>(<span class="sc">-</span>N)))<span class="sc">+</span>(<span class="sc">-</span>N<span class="sc">/</span><span class="dv">2</span>)<span class="sc">*</span><span class="fu">log</span>(<span class="fu">det</span>(<span class="fu">t</span>(X.tilde)<span class="sc">%*%</span>X.tilde<span class="sc">+</span><span class="fu">solve</span>(V.prior)))<span class="sc">+</span></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>              (<span class="sc">-</span>(T<span class="sc">-</span>p<span class="sc">+</span>nu.prior)<span class="sc">/</span><span class="dv">2</span>)<span class="sc">*</span><span class="fu">log</span>(<span class="fu">det</span>(S.prior <span class="sc">+</span><span class="fu">t</span>(epsilon.tilde)<span class="sc">%*%</span>epsilon.tilde <span class="sc">+</span> </span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>              <span class="fu">t</span>(A.tilde.hat<span class="sc">-</span>A.prior)<span class="sc">%*%</span><span class="fu">solve</span>(V.prior)<span class="sc">%*%</span>(A.tilde.hat<span class="sc">-</span>A.prior)))</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(logL)</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Covid volatility prior</span></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>    v.logP <span class="ot">&lt;-</span> <span class="cf">function</span>(theta, <span class="at">pareto.a=</span><span class="dv">1</span>, <span class="at">pareto.b=</span><span class="dv">1</span>, <span class="at">beta.a=</span><span class="dv">3</span>, <span class="at">beta.b=</span><span class="fl">1.5</span>){</span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>      beta.cons <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">/</span><span class="fu">beta</span>(beta.a,beta.b)</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>      logP <span class="ot">&lt;-</span> <span class="fu">log</span>((pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">1</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>      (pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">2</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>      (pareto.a<span class="sc">*</span>pareto.b<span class="sc">^</span>pareto.a)<span class="sc">/</span>(theta[<span class="dv">3</span>]<span class="sc">^</span>(pareto.a<span class="sc">+</span><span class="dv">1</span>))<span class="sc">*</span></span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>       beta.cons<span class="sc">*</span>theta[<span class="dv">4</span>]<span class="sc">^</span>(beta.a<span class="dv">-1</span>)<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>theta[<span class="dv">4</span>])<span class="sc">^</span>(beta.b<span class="dv">-1</span>))</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(logP)</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>    v_ones <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(Y)<span class="sc">-</span><span class="dv">12</span>), <span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>), <span class="at">frequency =</span> <span class="dv">4</span>) </span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>    V.old <span class="ot">&lt;-</span> <span class="fu">c</span>(v_ones, <span class="fu">covid.vec</span>(theta_old))    </span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>    <span class="co"># New candidate parameters values</span></span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>    theta_new <span class="ot">&lt;-</span> <span class="fu">mvrnorm</span>(<span class="dv">1</span>, theta_old, c<span class="sc">*</span>W)</span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>    V.new <span class="ot">&lt;-</span> <span class="fu">c</span>(v_ones, <span class="fu">covid.vec</span>(theta_new))</span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate posteriors </span></span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>    v.logpost_old <span class="ot">&lt;-</span> <span class="fu">v.logL</span>(V.old)<span class="sc">+</span><span class="fu">v.logP</span>(theta_old)</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>    v.logpost_new <span class="ot">&lt;-</span> <span class="fu">v.logL</span>(V.new)<span class="sc">+</span><span class="fu">v.logP</span>(theta_new)</span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Posterior ratio</span></span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>    post.ratio <span class="ot">&lt;-</span> <span class="fu">exp</span>(v.logpost_new<span class="sc">-</span>v.logpost_old)</span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Acceptance/rejection alpha</span></span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>    alpha <span class="ot">&lt;-</span> <span class="fu">min</span>(<span class="dv">1</span>, post.ratio)</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>    u_star <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">1</span>)</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (alpha <span class="sc">&gt;</span> u_star){</span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>      Theta[s,] <span class="ot">&lt;-</span> theta_new</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {Theta[s,] <span class="ot">&lt;-</span> theta_old}</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>    theta_old <span class="ot">&lt;-</span> Theta[s,]  </span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">colnames</span>(Theta) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"c0"</span>, <span class="st">"c1"</span> , <span class="st">"c2"</span>, <span class="st">"rho"</span>)</span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>  re <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">Theta=</span>Theta, </span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>             <span class="at">AcceptRate =</span> <span class="dv">1</span> <span class="sc">-</span> <span class="fu">rejectionRate</span>(<span class="fu">as.mcmc</span>(Theta[,<span class="dv">1</span>])))</span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(re)</span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ol start="5" type="1">
 <li>These <span class="math inline">\(\boldsymbol\theta\)</span> draws, are then used to draw <span class="math inline">\(\boldsymbol{\alpha}\)</span> and <span class="math inline">\(\sigma^2\)</span> from the following posterior distribution:</li>
@@ -543,76 +642,76 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 <p><span class="math display">\[\bar{\mathbf{V}}=(\mathbf{X}'\text{diag}(\textbf{c}^2)^{-1}\mathbf{X}+\underline{\mathbf{V}}^{-1})^{-1}\]</span> <span class="math display">\[\bar{\boldsymbol{\alpha}}=\bar{\mathbf{V}}(\mathbf{X}'\text{diag}(\textbf{c}^2)^{-1}\mathbf{y}+\underline{\mathbf{V}}^{-1}\underline{\boldsymbol{\alpha}})\]</span> <span class="math display">\[\bar{\nu}=T+\underline{\nu}\]</span> <span class="math display">\[\bar{s}=\underline{s}+\mathbf{y}'\text{diag}(\textbf{c}^2)^{-1}\mathbf{y}+\underline{\boldsymbol{\alpha}}'\underline{\mathbf{V}}^{-1}\underline{\boldsymbol{\alpha}}-\bar{\boldsymbol{\alpha}}'\bar{\mathbf{V}}^{-1}\bar{\boldsymbol{\alpha}}\]</span></p>
 <p>This sampling is implemented via the function <code>covid.est</code> below:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>covid.est <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">p=</span><span class="dv">4</span>, <span class="at">S=</span><span class="dv">100</span>, <span class="at">k1=</span><span class="dv">1</span>, <span class="at">k2=</span><span class="dv">100</span>, <span class="at">start_date =</span> <span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>), Theta.mh){</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="fu">ncol</span>(data)</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  K <span class="ot">=</span> <span class="dv">1</span> <span class="sc">+</span> p<span class="sc">*</span>N</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  Y       <span class="ot">=</span> <span class="fu">ts</span>(data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data),], <span class="at">start=</span>start_date, <span class="at">frequency=</span><span class="dv">4</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  T <span class="ot">=</span> <span class="fu">nrow</span>(Y)</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  X       <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">1</span>,T,<span class="dv">1</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p){</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    X     <span class="ot">=</span> <span class="fu">cbind</span>(X,data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data)<span class="sc">-</span>i,])</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  covid.vec <span class="ot">&lt;-</span> <span class="cf">function</span>(theta){</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    vec <span class="ot">&lt;-</span> theta[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">12</span>){</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>      vec <span class="ot">&lt;-</span> <span class="fu">c</span>(vec, <span class="dv">1</span> <span class="sc">+</span> (theta[<span class="dv">3</span>]<span class="sc">-</span><span class="dv">1</span>)<span class="sc">*</span>theta[<span class="dv">4</span>]<span class="sc">^</span>(i<span class="dv">-3</span>))</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(vec)</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  diagV.sqinv <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(<span class="fu">nrow</span>(Y),<span class="fu">nrow</span>(Y),S))</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    v_ones <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(Y)<span class="sc">-</span><span class="dv">12</span>), <span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>), <span class="at">frequency =</span> <span class="dv">4</span>) </span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    diagV.sqinv[,,s] <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="fu">c</span>(v_ones, <span class="fu">covid.vec</span>(Theta.mh[s,]))<span class="sc">^</span>(<span class="sc">-</span><span class="dv">2</span>))</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate MLE for prior </span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  A.hat       <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>X)<span class="sc">%*%</span><span class="fu">t</span>(X)<span class="sc">%*%</span>Y</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  Sigma.hat   <span class="ot">=</span> <span class="fu">t</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">%*%</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">/</span><span class="fu">nrow</span>(Y)</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Specify prior distribution</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.1</span>     <span class="ot">=</span> k1</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.2</span>     <span class="ot">=</span> k2</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.3</span>     <span class="ot">=</span> <span class="dv">1</span></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>  A.prior     <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="fu">nrow</span>(A.hat),<span class="fu">ncol</span>(A.hat))</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>  A.prior[<span class="dv">2</span><span class="sc">:</span>(N<span class="sc">+</span><span class="dv">1</span>),] <span class="ot">=</span> kappa<span class="fl">.3</span><span class="sc">*</span><span class="fu">diag</span>(N)</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>  V.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">c</span>(kappa<span class="fl">.2</span>,kappa<span class="fl">.1</span><span class="sc">*</span>((<span class="dv">1</span><span class="sc">:</span>p)<span class="sc">^</span>(<span class="sc">-</span><span class="dv">2</span>))<span class="sc">%x%</span><span class="fu">rep</span>(<span class="dv">1</span>,N)))</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>  S.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">diag</span>(Sigma.hat))</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>  nu.prior    <span class="ot">=</span> N<span class="sc">+</span><span class="dv">1</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Posterior draws </span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior   <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,S))</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>  A.posterior       <span class="ot">=</span> <span class="fu">array</span> (<span class="cn">NA</span>,<span class="fu">c</span>(K,N,S))</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    V.bar.inv   <span class="ot">=</span> <span class="fu">t</span>(X)<span class="sc">%*%</span>diagV.sqinv[,,s]<span class="sc">%*%</span>X <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    V.bar       <span class="ot">=</span> <span class="fu">solve</span>(V.bar.inv)</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    A.bar       <span class="ot">=</span> V.bar<span class="sc">%*%</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>diagV.sqinv[,,s]<span class="sc">%*%</span>Y <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))<span class="sc">%*%</span>A.prior)</span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    nu.bar      <span class="ot">=</span> <span class="fu">nrow</span>(Y) <span class="sc">+</span> nu.prior</span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    S.bar       <span class="ot">=</span> S.prior <span class="sc">+</span> <span class="fu">t</span>(Y)<span class="sc">%*%</span>diagV.sqinv[,,s]<span class="sc">%*%</span>Y <span class="sc">+</span> <span class="fu">t</span>(A.prior)<span class="sc">%*%</span><span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))<span class="sc">%*%</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>                  A.prior <span class="sc">-</span> <span class="fu">t</span>(A.bar)<span class="sc">%*%</span>V.bar.inv<span class="sc">%*%</span>A.bar</span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    S.bar.inv   <span class="ot">=</span> <span class="fu">solve</span>(S.bar)</span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    L                 <span class="ot">=</span> <span class="fu">t</span>(<span class="fu">chol</span>(V.bar))</span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="co"># RF posterior draws</span></span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior[,,s] <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">rWishart</span>(<span class="dv">1</span>, <span class="at">df=</span>nu.bar, <span class="at">Sigma=</span>S.bar.inv)[,,<span class="dv">1</span>])</span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    cholSigma.s     <span class="ot">=</span> <span class="fu">chol</span>(Sigma.posterior[,,s])</span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    A.posterior[,,s]       <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">mvrnorm</span>(<span class="dv">1</span>,<span class="fu">as.vector</span>(A.bar), Sigma.posterior[,,s]<span class="sc">%x%</span>V.bar),<span class="at">ncol=</span>N)</span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    A.posterior[,,s]<span class="ot">=</span> A.bar <span class="sc">+</span> L<span class="sc">%*%</span>A.posterior[,,s]<span class="sc">%*%</span>cholSigma.s</span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>  re <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">"A.posterior"</span><span class="ot">=</span>A.posterior, <span class="st">"Sigma.posterior"</span><span class="ot">=</span>Sigma.posterior, <span class="st">"Theta"</span><span class="ot">=</span> Theta.mh)</span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(re)</span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>covid.est <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">p=</span><span class="dv">4</span>, <span class="at">S=</span><span class="dv">100</span>, <span class="at">k1=</span><span class="dv">1</span>, <span class="at">k2=</span><span class="dv">100</span>, <span class="at">start_date =</span> <span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>), Theta.mh){</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="fu">ncol</span>(data)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  K <span class="ot">=</span> <span class="dv">1</span> <span class="sc">+</span> p<span class="sc">*</span>N</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  Y       <span class="ot">=</span> <span class="fu">ts</span>(data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data),], <span class="at">start=</span>start_date, <span class="at">frequency=</span><span class="dv">4</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  T <span class="ot">=</span> <span class="fu">nrow</span>(Y)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  X       <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">1</span>,T,<span class="dv">1</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p){</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    X     <span class="ot">=</span> <span class="fu">cbind</span>(X,data[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(data)<span class="sc">-</span>i,])</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  covid.vec <span class="ot">&lt;-</span> <span class="cf">function</span>(theta){</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    vec <span class="ot">&lt;-</span> theta[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">4</span><span class="sc">:</span><span class="dv">12</span>){</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>      vec <span class="ot">&lt;-</span> <span class="fu">c</span>(vec, <span class="dv">1</span> <span class="sc">+</span> (theta[<span class="dv">3</span>]<span class="sc">-</span><span class="dv">1</span>)<span class="sc">*</span>theta[<span class="dv">4</span>]<span class="sc">^</span>(i<span class="dv">-3</span>))</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(vec)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  diagV.sqinv <span class="ot">&lt;-</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(<span class="fu">nrow</span>(Y),<span class="fu">nrow</span>(Y),S))</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    v_ones <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">nrow</span>(Y)<span class="sc">-</span><span class="dv">12</span>), <span class="fu">c</span>(<span class="dv">1991</span>,<span class="dv">1</span>), <span class="at">frequency =</span> <span class="dv">4</span>) </span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    diagV.sqinv[,,s] <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="fu">c</span>(v_ones, <span class="fu">covid.vec</span>(Theta.mh[s,]))<span class="sc">^</span>(<span class="sc">-</span><span class="dv">2</span>))</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate MLE for prior </span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  A.hat       <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>X)<span class="sc">%*%</span><span class="fu">t</span>(X)<span class="sc">%*%</span>Y</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  Sigma.hat   <span class="ot">=</span> <span class="fu">t</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">%*%</span>(Y<span class="sc">-</span>X<span class="sc">%*%</span>A.hat)<span class="sc">/</span><span class="fu">nrow</span>(Y)</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Specify prior distribution</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.1</span>     <span class="ot">=</span> k1</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.2</span>     <span class="ot">=</span> k2</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>  kappa<span class="fl">.3</span>     <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>  A.prior     <span class="ot">=</span> <span class="fu">matrix</span>(<span class="dv">0</span>,<span class="fu">nrow</span>(A.hat),<span class="fu">ncol</span>(A.hat))</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  A.prior[<span class="dv">2</span><span class="sc">:</span>(N<span class="sc">+</span><span class="dv">1</span>),] <span class="ot">=</span> kappa<span class="fl">.3</span><span class="sc">*</span><span class="fu">diag</span>(N)</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>  V.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">c</span>(kappa<span class="fl">.2</span>,kappa<span class="fl">.1</span><span class="sc">*</span>((<span class="dv">1</span><span class="sc">:</span>p)<span class="sc">^</span>(<span class="sc">-</span><span class="dv">2</span>))<span class="sc">%x%</span><span class="fu">rep</span>(<span class="dv">1</span>,N)))</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>  S.prior     <span class="ot">=</span> <span class="fu">diag</span>(<span class="fu">diag</span>(Sigma.hat))</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>  nu.prior    <span class="ot">=</span> N<span class="sc">+</span><span class="dv">1</span></span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Posterior draws </span></span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>  <span class="do">############################################################</span></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior   <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(N,N,S))</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>  A.posterior       <span class="ot">=</span> <span class="fu">array</span> (<span class="cn">NA</span>,<span class="fu">c</span>(K,N,S))</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>    V.bar.inv   <span class="ot">=</span> <span class="fu">t</span>(X)<span class="sc">%*%</span>diagV.sqinv[,,s]<span class="sc">%*%</span>X <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>    V.bar       <span class="ot">=</span> <span class="fu">solve</span>(V.bar.inv)</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    A.bar       <span class="ot">=</span> V.bar<span class="sc">%*%</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span>diagV.sqinv[,,s]<span class="sc">%*%</span>Y <span class="sc">+</span> <span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))<span class="sc">%*%</span>A.prior)</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>    nu.bar      <span class="ot">=</span> <span class="fu">nrow</span>(Y) <span class="sc">+</span> nu.prior</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>    S.bar       <span class="ot">=</span> S.prior <span class="sc">+</span> <span class="fu">t</span>(Y)<span class="sc">%*%</span>diagV.sqinv[,,s]<span class="sc">%*%</span>Y <span class="sc">+</span> <span class="fu">t</span>(A.prior)<span class="sc">%*%</span><span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(V.prior))<span class="sc">%*%</span></span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>                  A.prior <span class="sc">-</span> <span class="fu">t</span>(A.bar)<span class="sc">%*%</span>V.bar.inv<span class="sc">%*%</span>A.bar</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>    S.bar.inv   <span class="ot">=</span> <span class="fu">solve</span>(S.bar)</span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a>    L                 <span class="ot">=</span> <span class="fu">t</span>(<span class="fu">chol</span>(V.bar))</span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>    <span class="co"># RF posterior draws</span></span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior[,,s] <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">rWishart</span>(<span class="dv">1</span>, <span class="at">df=</span>nu.bar, <span class="at">Sigma=</span>S.bar.inv)[,,<span class="dv">1</span>])</span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>    cholSigma.s     <span class="ot">=</span> <span class="fu">chol</span>(Sigma.posterior[,,s])</span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>    A.posterior[,,s]       <span class="ot">=</span> <span class="fu">matrix</span>(<span class="fu">mvrnorm</span>(<span class="dv">1</span>,<span class="fu">as.vector</span>(A.bar), Sigma.posterior[,,s]<span class="sc">%x%</span>V.bar),<span class="at">ncol=</span>N)</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a>    A.posterior[,,s]<span class="ot">=</span> A.bar <span class="sc">+</span> L<span class="sc">%*%</span>A.posterior[,,s]<span class="sc">%*%</span>cholSigma.s</span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a>  re <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">"A.posterior"</span><span class="ot">=</span>A.posterior, <span class="st">"Sigma.posterior"</span><span class="ot">=</span>Sigma.posterior, <span class="st">"Theta"</span><span class="ot">=</span> Theta.mh)</span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(re)</span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -638,17 +737,16 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{woźniak2023,
-  author = {Tomasz Woźniak and Ray Gomez},
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{2023,
+  author = {},
   title = {Bayesian {Autoregressions}},
   date = {2023-05-25},
   url = {https://donotdespair.github.io/Bayesian-Autoregressions/},
   doi = {10.26188/23255657},
   langid = {en}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-woźniak2023" class="csl-entry quarto-appendix-citeas" role="doc-biblioentry">
-Tomasz Woźniak, and Ray Gomez. 2023. <span>“Bayesian
-Autoregressions.”</span> May 25, 2023. <a href="https://doi.org/10.26188/23255657">https://doi.org/10.26188/23255657</a>.
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-2023" class="csl-entry quarto-appendix-citeas" role="doc-biblioentry">
+<span>“Bayesian Autoregressions.”</span> 2023. May 25, 2023. <a href="https://doi.org/10.26188/23255657">https://doi.org/10.26188/23255657</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
