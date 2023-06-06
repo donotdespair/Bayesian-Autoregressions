@@ -8,6 +8,8 @@ author:
   - name: Ray Gomez
   - name: Thomas Kronholm Møller
   - name: Hanwen Zhang
+  - name: Yobin Timilsena
+    url: https://github.com/yobin-tim
 execute:
   echo: false
 citation: 
@@ -327,6 +329,113 @@ sample <- s / rchisq(1, df = nu)
 
 
 ### Gamma scale mixture of normal
+
+> Contributor: Yobin Timilsena
+
+Alternatively, the scalar scale $\kappa_\alpha$ that premultiplies the covariance matrix of the normal prior for vector $\alpha$ can be assumed to have a hierarchical prior with a gamma distribution:
+$$
+\kappa_\alpha|\underline s_\kappa, \underline a_\kappa \sim \mathcal{G}(\underline s_\kappa, \underline a_\kappa)
+$$
+The following code creates a list `kappa.priors` to store priors on $\kappa_\alpha$.
+```{r kappa priors for gamma scale mixture of normal, echo=TRUE}
+kappa.priors = list(
+  a = 1,
+  s = .1
+)
+```
+
+
+Given the likelihood and priors above, we can obtain the **full conditional posterior** of $\kappa_\alpha$ as
+$$
+\begin{align*}
+    p(\kappa_{\boldsymbol\alpha} | \bf y, \bf X, \boldsymbol\alpha, \sigma^2) & \propto p(\kappa_{\boldsymbol\alpha} | \underline s_{\boldsymbol\kappa}, \underline a_{\boldsymbol\kappa}) \cdot p(\boldsymbol\alpha | \kappa_{\boldsymbol\alpha}, \sigma^2)\\
+    & (\kappa_{\boldsymbol\alpha})^{\underline a_{\boldsymbol\kappa} - 1} \exp \left\{  - \frac{\kappa_{\boldsymbol\alpha}}{\underline s_{\boldsymbol\kappa}} \right\} \cdot \det(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\bf V}_{\boldsymbol\alpha})^{-\frac{1}{2}} exp \left\{ -\frac{1}{2} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'}(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}  \\
+    & \propto (\kappa_{\boldsymbol\alpha})^{\underline a_{\boldsymbol\kappa} - 1} \exp \left\{  - \frac{\kappa_{\boldsymbol\alpha}}{\underline s_{\boldsymbol\kappa}} \right\} \cdot (\sigma^2)^{-\frac{K}{2}} (\kappa_{\boldsymbol\alpha})^{-\frac{K}{2}} \det(\underline{\bf V}_{\boldsymbol\alpha})^{-\frac{1}{2}} exp \left\{ -\frac{1}{2 \kappa_{\boldsymbol\alpha}} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}  \\
+    & \propto (\kappa_{\boldsymbol\alpha})^{\underline a_{\boldsymbol\kappa} - \frac{K}{2} - 1} \exp \left\{  -\frac{1}{2} \left( (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \cdot \frac{1}{\kappa_{\boldsymbol\alpha}} + \frac{2}{\underline s_{\boldsymbol\kappa}} \kappa_{\boldsymbol\alpha} \right) \right\} 
+\end{align*}
+$$
+which is a kernel for a Generalised Inverse Gaussian distribution with parameters:
+$$
+\begin{align*}
+    & \lambda = \underline a_{\boldsymbol\kappa} - \frac{K}{2}\\
+    & \chi = (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \\
+    & \Psi = \frac{2}{\underline s_{\boldsymbol\kappa}}
+\end{align*}
+$$
+Hence, the **full-conditional posterior** distribution of $\kappa_\alpha$ follows a  Generalised Inverse Gaussian distribution.
+$$
+\kappa_{\boldsymbol\alpha} | \bf y, \bf X, {\boldsymbol\alpha}, \sigma^2 \sim \mathcal{GIG}(\lambda, \chi, \Psi)
+$$
+Given the full conditional posterior of both $\kappa_\alpha$ and $(\boldsymbol\alpha, \sigma^2)$, we can implement the **Gibbs Sampler** with the following steps:
+
+- Initialise $\kappa_\alpha^{(0)}$.
+- At each iteration $s$:
+  - Step 1: Draw $(\boldsymbol\alpha,\sigma^2)^{(s)} \sim p(\boldsymbol\alpha,\sigma^2|\mathbf{X},\mathbf{y},\kappa_{\boldsymbol\alpha}^{(s-1)}) = \mathcal{NIG}2(\overline{\boldsymbol\alpha},\overline{\mathbf{V}},\overline{s},\overline{\nu})$. 
+  - Step 2. Draw $\kappa_{\boldsymbol\alpha}^{(s)} \sim p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},(\boldsymbol\alpha,\sigma^2)^{(s)}) = \mathcal{GIG}(\lambda, \chi, \Psi)$.
+
+The `Gamma.sampler` function below implements the Gibbs Sampler using the aforementioned algorithm.
+```{r sample from a gamma distributed scalar scale, echo=TRUE}
+Gamma.sampler = function(S, posterior, priors, kappa.priors){
+  set.seed(12345)
+  S.burnin = 100
+  S.total = S + S.burnin
+  
+  #create matrices to store posterior draws
+  alpha.posterior  = array(NA,c(k,1,S.total))
+  kappa.posterior  = array(NA,c(1,S.total))
+  #initial value for kappa
+  kappa.posterior[1] = 10
+  
+  # Draw sigma^2 from IG2 outside the loop as it does not update iteratively 
+  Sigma2.posterior = posterior$S / rchisq(n=S.total,df=posterior$nu)
+  
+  for (i in 1:(S.total)) {
+    # Plug in current kappa to update Sigma (or V in slides)
+    prior.Sigma.inv = solve(kappa.posterior[i] * priors$Sigma)
+    Sigma.inv = t(X) %*% X + prior.Sigma.inv
+    Sigma = solve(Sigma.inv)
+    
+    # Draw alpha from normal dist using sigma^2 and updated var-covar matrix Sigma
+    
+    alpha.posterior[,,i]  = t(mvtnorm::rmvnorm(n=1, mean = posterior$alpha, sigma = Sigma2.posterior[i] * Sigma))
+    
+    # Update parameters for kappa posterior
+    lambda = kappa.priors$a - k/2
+    chi    = t(alpha.posterior[,,i] - priors$alpha) %*% solve(Sigma2.posterior[i] * priors$Sigma) %*% (alpha.posterior[,,i] - priors$alpha)
+    Psi    = 2 / kappa.priors$s
+    
+    # Draw next period value for kappa from GIG distribution
+    if (i != S.total){
+      kappa.posterior[i+1] = GIGrvg::rgig(n=1, lambda = lambda, chi = chi, psi = Psi)
+    }
+  }
+  
+  # save output as a list 
+  list(
+    alpha.posterior = alpha.posterior[,,((S.burnin+1):S.total)],
+    Sigma2.posterior = Sigma2.posterior[((S.burnin+1):S.total)],
+    kappa.posterior = kappa.posterior[((S.burnin+1):S.total)]
+  )
+}
+GammaScale.draws = Gamma.sampler(S = 1000, post, priors, kappa.priors)
+```
+
+I compute and display the posterior means for $({\boldsymbol\alpha, \sigma^2, \kappa_{\boldsymbol\alpha}})$.
+```{r compute and display alpha posterior mean, echo=TRUE}
+alpha.posterior.mean = rowMeans(GammaScale.draws$alpha.posterior)
+alpha.posterior.mean
+```
+
+```{r compute and display sigmasq posterior mean, echo=TRUE}
+Sigma2.posterior.mean = mean(GammaScale.draws$Sigma2.posterior)
+Sigma2.posterior.mean
+```
+
+```{r compute and display kappa posterior mean, echo=TRUE}
+kappa.posterior.mean = mean(GammaScale.draws$kappa.posterior)
+kappa.posterior.mean
+```
+
 
 ## Estimating error term variance prior scale
 
