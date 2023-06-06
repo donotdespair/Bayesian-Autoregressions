@@ -5,10 +5,10 @@ author:
     url: https://github.com/donotdespair
     orcid: 0000-0003-2212-2378
   - name: Jonas Loopers Davidsen
+  - name: Filippo Dell'Andrea
   - name: Ray Gomez
   - name: Thomas Kronholm Møller
   - name: Hanwen Zhang
-  - name: Filippo Dell'Andrea
 execute:
   echo: false
 citation: 
@@ -332,60 +332,62 @@ sample <- s / rchisq(1, df = nu)
 ## Estimating error term variance prior scale
 
 In this section, we estimate the error term variance prior scale
-$\underline{s}_{\sigma^2}$ that follows a Gamma distribution $G(\underline{s}_s,\underline{a}_s)$ with shape $\underline{s}_s$ and scale $\underline{a}_s$ that follow a probability density function equal to:
-$$p(\underline{s}_{\sigma^2})=\Gamma(\underline{s}_s)^{-1}\underline{a}_s^{-\underline{s}_s}\underline{s}_{\sigma^2}^{\underline{s}_s-1}exp\left\{-\frac{\underline{s}_{\sigma^2}}{\underline{a}_s}\right\}$$
-In order to find our full conditional posterior of $\underline{s}_{\sigma^2}$ we need to follow these computations:
+$\underline{s}$ that follows a Gamma distribution $G(\underline{s}_s,\underline{a}_s)$ with scale $\underline{s}_s$ shape $\underline{a}_s$ that follow a probability density function equal to:
+$$p(\underline{s})=\Gamma(\underline{a}_s)^{-1}\underline{s}_s^{-\underline{a}_s}\underline{s}^{\underline{a}_s-1}\exp\left\{-\frac{\underline{s}}{\underline{s}_s}\right\}$$
+In order to find our full conditional posterior of $\underline{s}$ write out its kernel as:
+\begin{align}
+p(\underline{s}|y,X,\alpha,\sigma^2) &\propto 
+L(y|X,\alpha,\sigma^2) \times p(\alpha|\sigma^2) \times p(\sigma^2|\underline{s}) \times p(\underline{s})\\
+&\propto p(\sigma^2|\underline{s}) \times p(\underline{s})\\
+&\propto \underline{s}^{\frac{\underline{\nu}}{2}}
+\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
+\underline{s}^{\underline{a}_s-1}\exp\left\{-\frac{\underline{s}}{\underline{s}_s}\right\}\\
+&\propto
+\underline{s}^{\frac{\underline{\nu}}{2}+\underline{a}_s-1}\exp\left\{-\frac{\underline{s}}{
+\left[\left(2\sigma^2\right)^{-1} + \underline{s}_s^{-1}\right]^{-1}
+} \right\}
+\end{align} 
+from which we recognise a Gamma function $G(\overline{a}_s, \overline{s}_s)$ with parameters:
 \begin{gather}
-p(\underline{s}_{\sigma^2}|y,X,\alpha,\sigma^2) \propto 
-L(y|X,\alpha,\sigma^2) \times p(\alpha|\sigma^2) \times p(\sigma^2|\underline{s}_{\sigma^2}) \times p(\underline{s}_{\sigma^2}) \propto\\
-p(\sigma^2|\underline{s}_{\sigma^2}) \times p(\underline{s}_{\sigma^2}) \propto\\
-\Gamma(\frac{\underline{\nu}}{2})^{-1}
-(\frac{\underline{s}_{\sigma^2}}{2})^{\frac{\underline{\nu}}{2}}{\sigma^{2}}^{-\frac{\underline{\nu}+2}{2}}
-exp\left\{-\frac{1}{2}\frac{\underline{s}_{\sigma^2}}{\sigma^2}\right\}
-\Gamma(\underline{s}_s)^{-1}\underline{a}_s^{-\underline{s}_s}\underline{s}_{\sigma^2}^{\underline{s}_s-1}exp\left\{\frac{-\underline{s}_{\sigma^2}}{2\sigma^2\underline{a}_s[\underline{a}_s+\underline{s}_{\sigma^2}]^{-1}}\right\}\propto\\
-\underline{s}_{\sigma^2}^{\frac{\underline{\nu}+2\underline{s}_s-2}{2}}exp\left\{-\frac{\underline{s}_{\sigma^2}}{2\sigma^2\underline{a}_s[\underline{a}_s+\underline{s}_{\sigma^2}]^{-1}} \right\}
-\end{gather} from which we recognise a Gamma function $G(\bar{\underline{s}_s}, \bar{\underline{a}_s})$ with parameters:
-\begin{gather}
-\bar{\underline{s}_s}=\frac{\underline{\nu}+2\underline{s}_s}{2}\\
-\bar{\underline{a}_s}=2\sigma^2\underline{a}_s[\underline{a}_s+\underline{s}_{\sigma^2}]^{-1}
+\overline{a}_s=\frac{\underline{\nu}}{2}+\underline{a}_s\\
+\overline{s}_s=\left[\left(2\sigma^2\right)^{-1} + \underline{s}_s^{-1}\right]^{-1}
 \end{gather}
 
-In order to reach our analytical solutions we use a Monte Carlo Markov
-Chain (MCMC) method, namely the Gibbs Sampler procedure. We generate
+In order to obtain a sample from the posterior distribution we use  a Gibbs sampler. We generate
 random draws from the joint posterior distribution and we update them at
-each iteration to compute our posterior distribution parameters. In our
-case we exploit the following procedure: Initialize $\underline{s}_{\sigma^2}$ at
-$\underline{s}_{\sigma^2}^{(0)}$
+each iteration. In this case we exploit the following procedure: 
+
+
+Initialize $\underline{s}$ at $\underline{s}^{(0)}$
 
 At each iteration s:
 
-1.  Draw $(\alpha,\sigma^2)^{(s)} \sim p(\alpha,\sigma^2\| y,X, \alpha^{(s-1)}, \underline{s}_{\sigma^2}^{(s)}{\sigma^2}^{(s-1)})$
-2.  Draw $\underline{s}_{\sigma^2}^{(s)} \sim p(\underline{s}_{\sigma^2}|y,X,\alpha,\sigma^2)$
+1.  Draw $(\boldsymbol\alpha,\sigma^2)^{(s)} \sim p\left(\boldsymbol\alpha,\sigma^2 \mid \mathbf{y},\mathbf{X}, \boldsymbol\alpha^{(s-1)}, {\sigma^2}^{(s-1)}, \underline{s}^{(s)}\right)$
+2.  Draw $\underline{s}^{(s)} \sim p(\underline{s}\mid\mathbf{y},\mathbf{X},\boldsymbol\alpha,\sigma^2)$
 
 Repeat steps 1 and 2 for $(S_1 + S_2)$ times. Discard the first $S_1$
 repetitions. Return the output as
-$\left \{ \alpha^{(s)}, \sigma^{2(s)} \right \}^{S2}_{s=S1+1}$.
+$\left \{ \boldsymbol\alpha^{(s)}, \sigma^{2(s)}, \underline{s}^{(s)}\right \}^{S_1+S_2}_{s=S_1+1}$.
+
+The following script illustrates sampling from the full conditional posterior distribution of $\underline{s}$.
 
 ```{r}
 #| echo: true 
 #| message: false
 #| warning: false
-#| code-fold: true
-#| code-summary: "R code to sample from the gamma distribution"
-  #values taken from previous sections, udpate later
-  nu = 1
-  Sigma = 10
-  #define the priors
-  s.prior.s  <- 0.01
-  a.prior.s  <- 1
-  #set the first value of s.sigma
-  s.sigma=matrix(NA,1,1)
-  s.sigma[1] <- 1
-  #define the posteriors
-  s.bar.s <- (nu+2*s.prior.s)/2
-  a.bar.s <- 2*Sigma*a.prior.s*(a.prior.s+s.sigma[1])
-  #sample from the gamma function with rgamma function
-  s.sigma <- rgamma(1, shape = s.bar.s, scale = a.bar.s)
+nu = 1
+sigma2 = 10
+
+# define the prior hyper-parameters
+s.prior.s  <- 0.01
+a.prior.s  <- 1
+
+#define the posteriors
+a.bar.s <- (nu / 2) + s.prior.s
+s.bar.s <- 1 / (1/(2 * sigma2) + (1 / s.prior.s))
+
+#sample from the gamma distribution using rgamma function
+s.sigma <- rgamma(1, shape = a.bar.s, scale = s.bar.s)
 ```
 ## Dummy observation prior
 
