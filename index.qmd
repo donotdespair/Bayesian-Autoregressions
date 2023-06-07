@@ -332,11 +332,11 @@ sample <- s / rchisq(1, df = nu)
 
 > Contributor: Yobin Timilsena
 
-Alternatively, the scalar scale $\kappa_\alpha$ that premultiplies the covariance matrix of the normal prior for vector $\alpha$ can be assumed to have a hierarchical prior with a gamma distribution:
+Alternatively, the scalar scale $\kappa_{\boldsymbol\alpha}$ that premultiplies the covariance matrix of the normal prior for vector $\boldsymbol\alpha$ can be assumed to have a hierarchical prior with a gamma distribution:
 $$
-\kappa_\alpha|\underline s_\kappa, \underline a_\kappa \sim \mathcal{G}(\underline s_\kappa, \underline a_\kappa)
+\kappa_{\boldsymbol\alpha}|\underline s_\kappa, \underline a_\kappa \sim \mathcal{G}(\underline s_\kappa, \underline a_\kappa)
 $$
-The following code creates a list `kappa.priors` to store priors on $\kappa_\alpha$.
+The following code creates a list `kappa.priors` to store priors on $\kappa_\boldsymbol\alpha$.
 ```{r kappa priors for gamma scale mixture of normal, echo=TRUE}
 kappa.priors = list(
   a = 1,
@@ -345,11 +345,11 @@ kappa.priors = list(
 ```
 
 
-Given the likelihood and priors above, we can obtain the **full conditional posterior** of $\kappa_\alpha$ as
+Given the likelihood and priors above, we can obtain the **full conditional posterior** of $\kappa_\boldsymbol\alpha$ as
 $$
 \begin{align*}
     p(\kappa_{\boldsymbol\alpha} | \bf y, \bf X, \boldsymbol\alpha, \sigma^2) & \propto p(\kappa_{\boldsymbol\alpha} | \underline s_{\boldsymbol\kappa}, \underline a_{\boldsymbol\kappa}) \cdot p(\boldsymbol\alpha | \kappa_{\boldsymbol\alpha}, \sigma^2)\\
-    & (\kappa_{\boldsymbol\alpha})^{\underline a_{\boldsymbol\kappa} - 1} \exp \left\{  - \frac{\kappa_{\boldsymbol\alpha}}{\underline s_{\boldsymbol\kappa}} \right\} \cdot \det(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\bf V}_{\boldsymbol\alpha})^{-\frac{1}{2}} exp \left\{ -\frac{1}{2} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'}(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}  \\
+    &\qquad\times (\kappa_{\boldsymbol\alpha})^{\underline a_{\boldsymbol\kappa} - 1} \exp \left\{  - \frac{\kappa_{\boldsymbol\alpha}}{\underline s_{\boldsymbol\kappa}} \right\} \cdot \det(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\bf V}_{\boldsymbol\alpha})^{-\frac{1}{2}} exp \left\{ -\frac{1}{2} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'}(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}  \\
     & \propto (\kappa_{\boldsymbol\alpha})^{\underline a_{\boldsymbol\kappa} - 1} \exp \left\{  - \frac{\kappa_{\boldsymbol\alpha}}{\underline s_{\boldsymbol\kappa}} \right\} \cdot (\sigma^2)^{-\frac{K}{2}} (\kappa_{\boldsymbol\alpha})^{-\frac{K}{2}} \det(\underline{\bf V}_{\boldsymbol\alpha})^{-\frac{1}{2}} exp \left\{ -\frac{1}{2 \kappa_{\boldsymbol\alpha}} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}  \\
     & \propto (\kappa_{\boldsymbol\alpha})^{\underline a_{\boldsymbol\kappa} - \frac{K}{2} - 1} \exp \left\{  -\frac{1}{2} \left( (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \cdot \frac{1}{\kappa_{\boldsymbol\alpha}} + \frac{2}{\underline s_{\boldsymbol\kappa}} \kappa_{\boldsymbol\alpha} \right) \right\} 
 \end{align*}
@@ -357,14 +357,14 @@ $$
 which is a kernel for a Generalised Inverse Gaussian distribution with parameters:
 $$
 \begin{align*}
-    & \lambda = \underline a_{\boldsymbol\kappa} - \frac{K}{2}\\
-    & \chi = (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \\
-    & \Psi = \frac{2}{\underline s_{\boldsymbol\kappa}}
+    & \overline\lambda = \underline a_{\boldsymbol\kappa} - \frac{K}{2}\\
+    & \overline\chi = (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \\
+    & \overline\Psi = \frac{2}{\underline s_{\boldsymbol\kappa}}
 \end{align*}
 $$
 Hence, the **full-conditional posterior** distribution of $\kappa_\alpha$ follows a  Generalised Inverse Gaussian distribution.
 $$
-\kappa_{\boldsymbol\alpha} | \bf y, \bf X, {\boldsymbol\alpha}, \sigma^2 \sim \mathcal{GIG}(\lambda, \chi, \Psi)
+\kappa_{\boldsymbol\alpha} | \bf y, \bf X, {\boldsymbol\alpha}, \sigma^2 \sim \mathcal{GIG}(\overline\lambda, \overline\chi, \overline\Psi)
 $$
 Given the full conditional posterior of both $\kappa_\alpha$ and $(\boldsymbol\alpha, \sigma^2)$, we can implement the **Gibbs Sampler** with the following steps:
 
