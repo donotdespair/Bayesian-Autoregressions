@@ -5,12 +5,17 @@ author:
     url: https://github.com/donotdespair
     orcid: 0000-0003-2212-2378
   - name: Jonas Loopers Davidsen
+    url: https://github.com/jonasld23
   - name: Filippo Dell'Andrea
+    url: https://github.com/IoTiFeelo
   - name: Ray Gomez
+    url: https://github.com/rayccg
   - name: Thomas Kronholm Møller
-  - name: Hanwen Zhang
+    url: https://github.com/ThomasKronhol
   - name: Yobin Timilsena
     url: https://github.com/yobin-tim
+  - name: Hanwen Zhang
+    url: https://github.com/hanwenzhang0317
 execute:
   echo: false
 citation: 
