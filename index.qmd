@@ -505,6 +505,45 @@ s.sigma <- rgamma(1, shape = a.bar.s, scale = s.bar.s)
 ```
 ## Dummy observation prior
 
+
+In this extended model I augment the system using the 'sum of coefficients' and 'dummy initial observation' prior. The sum of coefficients prior takes the average of the lagged values and adds them to the basic equation. This is because these values are assumed to be a good forecast of future observations.
+
+The 'dummy initial observation' prior adds a single dummy observation such that all values are set equal to the averages of intial conditions, up to a scaling factor.
+
+
+```{R}
+
+
+dummy.obvs.prior <- function(data, p = 1, lambda_3 = 1, lambda_4 = 1){
+  
+  N = ncol(data)
+  M = (N*p)+1
+  data = y
+  
+  if(N>1){
+    in.obvs.Y <- matrix(data[1:p,], ncol = N)
+    y.bar     = colMeans(in.obvs.Y)
+    
+    Y_star    = rbind(diag(y.bar)/lambda_3, y.bar/lambda_4)
+    X_star    = as.matrix(c(rep(0, N), 1/lambda_4))}
+  else{
+    Y_star    = (y.bar/lambda_4)
+    X_star    = as.matrix(c(rep(0, N), 1/lambda_4))
+    
+  }
+  
+  X_star  = cbind(Y_star, X_star)
+  
+  ext.data <- list(YN = Y_star, XN = X_star)
+  
+  return(ext.data)
+  
+  
+}
+
+
+```
+
 # Model Extensions
 
 ## Student-$t$ error term
