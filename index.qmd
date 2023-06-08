@@ -516,10 +516,10 @@ The 'dummy initial observation' prior adds a single dummy observation such that 
 #| 
 dummy.obvs.prior <- function(data, p = 1, lambda_3 = 1, lambda_4 = 1){
   
+  N = 1
   M = p+1
   
-  in.obvs.Y <- as.matrix(data[1:p,])
-  y.bar     = colMeans(in.obvs.Y)
+  y.bar     = colMeans( data[1:p])
   
   Y_star    = (y.bar/lambda_4)
   X_star    = matrix(c(rep(0, N), 1/lambda_4), nrow = 1)
