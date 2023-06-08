@@ -514,15 +514,15 @@ The 'dummy initial observation' prior adds a single dummy observation such that 
 ```{r}
 #| echo: true 
 #| 
-dummy.obvs.prior <- function(data, p = 1, lambda_3 = 1, lambda_4 = 1){
+dummy.obvs.prior <- function(data, p = 1, lambda = 1){
   
   N = 1
   M = p+1
   
   y.bar     = colMeans( data[1:p])
   
-  Y_star    = (y.bar/lambda_4)
-  X_star    = matrix(c(rep(0, N), 1/lambda_4), nrow = 1)
+  Y_star    = (y.bar/lambda)
+  X_star    = matrix(c(rep(0, N), 1/lambda), nrow = 1)
   
   X_star  = cbind(Y_star, X_star)
   
