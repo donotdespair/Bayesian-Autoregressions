@@ -285,12 +285,12 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) = \mathcal{NIG}2\left(\mu=\
 <p>The prior distribution of the natural conjugate is determined by the form of the distribution of the parameters implied by the likelihood function discussed above. The priors for the Normal-inverse gamma 2 distribution can thus be written as:</p>
 <span class="math display">\[\begin{align}
 p(\boldsymbol\alpha,\sigma^2) &amp;= p(\boldsymbol\alpha|\sigma^2)p(\sigma^2)\\
-      p(\boldsymbol\alpha|\sigma^2) &amp;= \mathcal{N}(\underline{\boldsymbol\alpha},\sigma^2\underline{\mathbf{V}}^2_{\boldsymbol\alpha})\\
+      p(\boldsymbol\alpha|\sigma^2) &amp;= \mathcal{N}(\underline{\boldsymbol\alpha},\sigma^2\underline{\mathbf{V}}_{\boldsymbol\alpha})\\
       p(\sigma^2) &amp; = \mathcal{IG}2(\underline{s},\underline{\nu})
 \end{align}\]</span>
 <p>Using the distributions above, we can write the kernel of the <span class="math inline">\(\mathcal{NIG}2\)</span> prior as:</p>
 <span class="math display">\[\begin{align}
-\mathcal{NIG}2_{k}(\underline{\boldsymbol\alpha},\underline{\mathbf{V}}_{\boldsymbol\alpha}, \underline{s}, \underline{\nu}) \propto (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\frac{1}{\underline{\mathbf{V}}_{\boldsymbol\alpha}}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
+\mathcal{NIG}2_{k}(\underline{\boldsymbol\alpha},\underline{\mathbf{V}}_{\boldsymbol\alpha}, \underline{s}, \underline{\nu}) \propto (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
 \end{align}\]</span>
 </section>
 <section id="normal-inverted-gamma-2-posterior" class="level2">
@@ -394,7 +394,7 @@ p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &amp;= \mathcal{NIG}2_{k}\le
 <p>We have priors as: <span class="math display">\[\begin{align}
 \boldsymbol\alpha | \sigma^2, \kappa_{\boldsymbol\alpha} &amp;\sim \mathcal{N}_{k}(\underline{\boldsymbol\alpha}, \sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}} _{\boldsymbol\alpha}) \\
 \\ \sigma^2 &amp;\sim \mathcal{IG}2(\underline{s},\underline{\nu}) \\
-\\ p(\boldsymbol\alpha, \sigma^2) &amp;= p(\boldsymbol\alpha | \sigma^2, \kappa_{\boldsymbol\alpha}) p(\sigma^2) p(\kappa_{\boldsymbol\alpha})
+\\ p(\boldsymbol\alpha, \sigma^2, \kappa_{\boldsymbol\alpha}) &amp;= p(\boldsymbol\alpha | \sigma^2, \kappa_{\boldsymbol\alpha}) p(\sigma^2) p(\kappa_{\boldsymbol\alpha})
 \end{align}\]</span></p>
 <p>Then, the joint distribution of <span class="math inline">\((\boldsymbol\alpha,\sigma^2)\)</span> given <span class="math inline">\(\kappa_{\boldsymbol\alpha}\)</span> would follow a normal-inverted gamma 2 distribution: <span class="math display">\[\begin{align*}
 p\left(\boldsymbol\alpha,\sigma^2 \mid \kappa_{\boldsymbol\alpha}\right) = \mathcal{NIG}2_N(\underline{\boldsymbol\alpha},\kappa_{\boldsymbol\alpha} \underline{\mathbf{V}} _{\boldsymbol\alpha}, \underline{s},\underline{\nu})
@@ -416,10 +416,10 @@ p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},\boldsymbol\alpha,\sigma^2) =
 \\ =  (\kappa_{\boldsymbol\alpha})^{-\frac{\nu+2+k}{2}} exp \left\{ -\frac{1}{2}\frac{s}{\kappa_{\boldsymbol\alpha}} \right\} exp \left\{ -\frac{1}{2}\frac{1}{\kappa_{\boldsymbol\alpha}} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}
 \end{gather*}\]</span></p>
 <p>in which we recognize a kernel of inverted gamma 2 distribution with parameters:</p>
-<p><span class="math display">\[\begin{gather*}
-\overline{s}_{\boldsymbol\alpha} = s + (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} \sigma^{-2} (\underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \\
-\\ \overline{\nu}_{\boldsymbol\alpha} = \nu + k
-\end{gather*}\]</span></p>
+<p><span class="math display">\[\begin{align}
+\overline{s}_{\boldsymbol\alpha} &amp;= s + (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} \sigma^{-2} \underline{\mathbf{V}}_{\boldsymbol\alpha}^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \\
+\overline{\nu}_{\boldsymbol\alpha} &amp;= \nu + k
+\end{align}\]</span></p>
 <p>To sample from the <span class="math inline">\(\mathcal{IG}2(s,\nu)\)</span> distribution, the following code can be used:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set parameters of IG2 distribution </span></span>
@@ -518,21 +518,21 @@ p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},\boldsymbol\alpha,\sigma^2) =
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean <span class="ot">=</span> <span class="fu">rowMeans</span>(GammaScale.draws<span class="sc">$</span>alpha.posterior)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.1410111 0.9930163</code></pre>
+<pre><code>[1] -0.3076010  0.9855342</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>Sigma2.posterior)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1.044021</code></pre>
+<pre><code>[1] 0.8437201</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>kappa.posterior)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.2457903</code></pre>
+<pre><code>[1] 0.2783067</code></pre>
 </div>
 </div>
 </section>
@@ -550,10 +550,10 @@ L(y|X,\alpha,\sigma^2) \times p(\alpha|\sigma^2) \times p(\sigma^2|\underline{s}
 \underline{s}^{\frac{\underline{\nu}}{2}+\underline{a}_s-1}\exp\left\{-\frac{\underline{s}}{
 \left[\left(2\sigma^2\right)^{-1} + \underline{s}_s^{-1}\right]^{-1}
 } \right\}
-\end{align}\]</span> from which we recognise a Gamma function <span class="math inline">\(G(\overline{a}_s, \overline{s}_s)\)</span> with parameters: <span class="math display">\[\begin{gather}
-\overline{a}_s=\frac{\underline{\nu}}{2}+\underline{a}_s\\
-\overline{s}_s=\left[\left(2\sigma^2\right)^{-1} + \underline{s}_s^{-1}\right]^{-1}
-\end{gather}\]</span></p>
+\end{align}\]</span> from which we recognise a Gamma function <span class="math inline">\(G(\overline{a}_s, \overline{s}_s)\)</span> with parameters: <span class="math display">\[\begin{align}
+\overline{a}_s&amp;=\frac{\underline{\nu}}{2}+\underline{a}_s\\
+\overline{s}_s&amp;=\left[\left(2\sigma^2\right)^{-1} + \underline{s}_s^{-1}\right]^{-1}
+\end{align}\]</span></p>
 <p>In order to obtain a sample from the posterior distribution we use a Gibbs sampler. We generate random draws from the joint posterior distribution and we update them at each iteration. In this case we exploit the following procedure:</p>
 <p>Initialize <span class="math inline">\(\underline{s}\)</span> at <span class="math inline">\(\underline{s}^{(0)}\)</span></p>
 <p>At each iteration s:</p>
