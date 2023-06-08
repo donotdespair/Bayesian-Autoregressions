@@ -136,7 +136,7 @@ The prior distribution of the natural conjugate is determined by the form of the
 ```{=tex}
 \begin{align}
 p(\boldsymbol\alpha,\sigma^2) &= p(\boldsymbol\alpha|\sigma^2)p(\sigma^2)\\
-      p(\boldsymbol\alpha|\sigma^2) &= \mathcal{N}(\underline{\boldsymbol\alpha},\sigma^2\underline{\mathbf{V}}^2_{\boldsymbol\alpha})\\
+      p(\boldsymbol\alpha|\sigma^2) &= \mathcal{N}(\underline{\boldsymbol\alpha},\sigma^2\underline{\mathbf{V}}_{\boldsymbol\alpha})\\
       p(\sigma^2) & = \mathcal{IG}2(\underline{s},\underline{\nu})
 \end{align}
 ```
@@ -144,7 +144,7 @@ Using the distributions above, we can write the kernel of the $\mathcal{NIG}2$ p
 
 ```{=tex}
 \begin{align}
-\mathcal{NIG}2_{k}(\underline{\boldsymbol\alpha},\underline{\mathbf{V}}_{\boldsymbol\alpha}, \underline{s}, \underline{\nu}) \propto (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\frac{1}{\underline{\mathbf{V}}_{\boldsymbol\alpha}}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
+\mathcal{NIG}2_{k}(\underline{\boldsymbol\alpha},\underline{\mathbf{V}}_{\boldsymbol\alpha}, \underline{s}, \underline{\nu}) \propto (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
 \end{align}
 ```
 ## Normal-inverted gamma 2 posterior
@@ -282,7 +282,7 @@ We have priors as:
 \begin{align}
 \boldsymbol\alpha | \sigma^2, \kappa_{\boldsymbol\alpha} &\sim \mathcal{N}_{k}(\underline{\boldsymbol\alpha}, \sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}} _{\boldsymbol\alpha}) \\ 
 \\ \sigma^2 &\sim \mathcal{IG}2(\underline{s},\underline{\nu}) \\
-\\ p(\boldsymbol\alpha, \sigma^2) &= p(\boldsymbol\alpha | \sigma^2, \kappa_{\boldsymbol\alpha}) p(\sigma^2) p(\kappa_{\boldsymbol\alpha})
+\\ p(\boldsymbol\alpha, \sigma^2, \kappa_{\boldsymbol\alpha}) &= p(\boldsymbol\alpha | \sigma^2, \kappa_{\boldsymbol\alpha}) p(\sigma^2) p(\kappa_{\boldsymbol\alpha})
 \end{align}
 
 Then, the joint distribution of $(\boldsymbol\alpha,\sigma^2)$ given $\kappa_{\boldsymbol\alpha}$ would follow a normal-inverted gamma 2 distribution: 
@@ -316,10 +316,10 @@ The **full conditional posterior** of $\kappa_{\boldsymbol\alpha}$ is:
 
 in which we recognize a kernel of inverted gamma 2 distribution with parameters:
 
-\begin{gather*}
-\overline{s}_{\boldsymbol\alpha} = s + (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} \sigma^{-2} (\underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \\
-\\ \overline{\nu}_{\boldsymbol\alpha} = \nu + k 
-\end{gather*}
+\begin{align}
+\overline{s}_{\boldsymbol\alpha} &= s + (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} \sigma^{-2} \underline{\mathbf{V}}_{\boldsymbol\alpha}^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \\
+\overline{\nu}_{\boldsymbol\alpha} &= \nu + k 
+\end{align}
 
 
 To sample from the $\mathcal{IG}2(s,\nu)$ distribution, the following code can be used:
@@ -462,10 +462,10 @@ L(y|X,\alpha,\sigma^2) \times p(\alpha|\sigma^2) \times p(\sigma^2|\underline{s}
 } \right\}
 \end{align} 
 from which we recognise a Gamma function $G(\overline{a}_s, \overline{s}_s)$ with parameters:
-\begin{gather}
-\overline{a}_s=\frac{\underline{\nu}}{2}+\underline{a}_s\\
-\overline{s}_s=\left[\left(2\sigma^2\right)^{-1} + \underline{s}_s^{-1}\right]^{-1}
-\end{gather}
+\begin{align}
+\overline{a}_s&=\frac{\underline{\nu}}{2}+\underline{a}_s\\
+\overline{s}_s&=\left[\left(2\sigma^2\right)^{-1} + \underline{s}_s^{-1}\right]^{-1}
+\end{align}
 
 In order to obtain a sample from the posterior distribution we use  a Gibbs sampler. We generate
 random draws from the joint posterior distribution and we update them at
