@@ -514,32 +514,40 @@ The 'dummy initial observation' prior adds a single dummy observation such that 
 ```{r}
 #| echo: true 
 #| 
-dummy.obvs.prior <- function(y, p, lambda){
+prior.ex <- function(data, p = 1, lambda_3 = 1, lambda_4 = 1){
   
   N = 1
-  M = p+1
+  M = p + 1
   
-  y.bar     = as.matrix(mean(y[1:p]))
+  y.bar     = mean(data[1:p])
+    
+  Y_star    = rbind((y.bar)/lambda_3, y.bar/lambda_4)
+  X_star    = as.matrix(c(rep(0, N), 1/lambda_4))
+  for (i in 1:p) {
+    X_star  = cbind(Y_star, X_star)
+  }
   
-  Y_star    = y.bar/lambda
-  X_star    = matrix(c(y.bar/lambda, 1/lambda), nrow = 1)
+  ext.data <- list(YN = Y_star, XN = X_star)
   
-  
-  YN = rbind(Y_star, Y)
-  XN = rbind(X_star, X)
-  
-  ext.data <- list(YN = YN, XN = XN)
   return(ext.data)
+  
+  
 }
 
-ext.data <- dummy.obvs.prior(y, p, lambda = 1)
+ext.data <- prior.ex(y, p = 5, lambda_3 = 1, lambda_4 = 1)
 
-Y_ext = ext.data$YN
-X_ext = ext.data$XN
+ext.data
 
 
 ```
 
+
+
+
+```{R}
+
+
+```
 # Model Extensions
 
 ## Student-$t$ error term
