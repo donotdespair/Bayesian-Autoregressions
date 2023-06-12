@@ -16,6 +16,8 @@ author:
     url: https://github.com/yobin-tim
   - name: Hanwen Zhang
     url: https://github.com/hanwenzhang0317
+  - name: Django Trueman-Greinke
+    url: https://github.com/DjangoTG
 execute:
   echo: false
 citation: 
@@ -508,7 +510,9 @@ s.sigma <- rgamma(1, shape = a.bar.s, scale = s.bar.s)
 
 In this extended model I augment the system using the 'sum of coefficients' and 'dummy initial observation' prior. The sum of coefficients prior takes the average of the lagged values and adds them to the basic equation. This is because these values are assumed to be a good forecast of future observations.
 
-The 'dummy initial observation' prior adds a single dummy observation such that all values are set equal to the averages of intial conditions, up to a scaling factor.
+The 'dummy initial observation' prior adds a single dummy observation such that all values are set equal to the averages of initial conditions, up to a scaling factor.
+
+_How to use X and Y to generate dummy observations_ "extends X and Y to accommodate priors"
 
 
 ```{r}
