@@ -16,6 +16,8 @@ author:
     url: https://github.com/yobin-tim
   - name: Hanwen Zhang
     url: https://github.com/hanwenzhang0317
+  - name: Nathan Huynh
+    url: https://github.com/nathanh93
 execute:
   echo: false
 citation: 
@@ -508,6 +510,10 @@ s.sigma <- rgamma(1, shape = a.bar.s, scale = s.bar.s)
 # Model Extensions
 
 ## Student-$t$ error term
+
+A possible extension to the model is to relax the assumption of normally distributed errors. By assuming a t-distribution for the errors we can better account for excess kurtosis in the data, also referred to as 'fat tails'. Such a specification lends itself well to estimating models on data commonly found to be leptokurtic, such as financial time series.
+
+
 
 ## Estimating autoregressions after 2020
 
