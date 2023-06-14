@@ -16,6 +16,8 @@ author:
     url: https://github.com/yobin-tim
   - name: Hanwen Zhang
     url: https://github.com/hanwenzhang0317
+  - name: Django Trueman-Greinke
+    url: https://github.com/DjangoTG
 execute:
   echo: false
 citation: 
@@ -505,6 +507,59 @@ s.sigma <- rgamma(1, shape = a.bar.s, scale = s.bar.s)
 ```
 ## Dummy observation prior
 
+
+In this extended model I augment the system using the 'sum of coefficients' and 'dummy initial observation' prior. The sum of coefficients prior takes the average of the lagged values and adds them to the basic equation. This is because these values are assumed to be a good forecast of future observations.
+
+The 'dummy initial observation' prior adds a single dummy observation such that all values are set equal to the averages of initial conditions, up to a scaling factor.
+
+In order to practically generate the additional rows the following steps should be taken.
+
+Firstly the average of lagged values needs to be calculated, $y.bar$. This is done by finding the mean of the first $p$ values in the data. Next, values of of the scaling factors need to be selected, typically values equal to 1 are chosen.
+
+Once this has been done, the rows can be created. In the univariate case this is simple, two rows are added to Y, the first equal to $y.bar$ divided by the first scaling factor, the second equal to $y.bar$ divided by the second scaling factor.
+
+Adding rows to X is slightly more complicated. The additional rows are as follows. The values in the first row, corresponding to the sum of coefficients, are all equal to $y.bar$ divided by the first scaling factor, except the last column, which is equal to zero. The values in the second row, corresponding to the dummy initial observation, are all equal to $y.bar$ divided by the second scaling factor, except the last column, which is equal to one.
+
+
+
+
+```{r}
+#| echo: true 
+#| 
+prior.ex <- function(data, p = 1, lambda_3 = 1, lambda_4 = 1){
+  
+  N = 1
+  M = p + 1
+  
+  y.bar     = mean(data[1:p])
+    
+  Y_star    = rbind((y.bar)/lambda_3, y.bar/lambda_4)
+  X_star    = as.matrix(c(rep(0, N), 1/lambda_4))
+  for (i in 1:p) {
+    X_star  = cbind(Y_star, X_star)
+  }
+  
+  ext.data <- list(YN = Y_star, XN = X_star)
+  
+  return(ext.data)
+  
+  
+}
+
+ext.data <- prior.ex(y, p = 5, lambda_3 = 1, lambda_4 = 1)
+
+ext.data
+
+
+```
+
+
+
+
+```{R}
+
+
+```
 # Model Extensions
 
 ## Student-$t$ error term
