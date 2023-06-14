@@ -18,6 +18,8 @@ author:
     url: https://github.com/DjangoTG
   - name: Hanwen Zhang
     url: https://github.com/hanwenzhang0317
+  - name: Manting Huang
+    url: https://github.com/mantihuang
 execute:
   echo: false
 citation: 
@@ -886,6 +888,56 @@ covid.est <- function(data, p=4, S=100, k1=1, k2=100, start_date = c(1991,1), Th
 ```
 
 ## Stochastic volatility heteroskedasticity
+
+### Model equations
+$$
+Y = X\beta + E
+$$
+$$
+E|X \sim N_T(0_t,diag(\sigma^2))
+$$
+$$
+\sigma^2 = (exp\{h_1\}, ... , exp\{h_t\})
+$$
+$h_t$ - follows a Stochastic Volatility process
+$$\beta \sim N(\underline{\beta},\underline{V}_{\beta})$$ 
+
+### Essential techniques 
+
+1. Auxiliary mixture @omori2007stochastic
+
+2. Precision sampler @chan2009efficient
+
+### Gibbs sampler
+
+1. Initialize the algorithm by proposing starting values for $h^{(0)},s^{(0)},\mu_0^{(0)},\alpha^{(0)},\sigma_v^{2(0)}$
+2. For each iteration i of the Gibbs sampling algorithm, draw
+$$
+h_{0}^{(i)} \sim N(\bar{h_0},\bar{\sigma}^2_h) 
+$$ 
+$$
+\sigma_v^{2(i)} \sim IG2(\bar{s},\bar{v})
+$$
+$$
+\mu_{0}^{(i)} \sim N(\bar{\mu_0},\bar{\sigma}^2_\mu) 
+$$
+$$
+\alpha^{(i)} \sim N(\bar{\alpha},\bar{\sigma}^2_\alpha) 
+$$
+$$
+s_t^{(i)}\sim Multinomial (\{m\}_{m=1}^{10}, \{Pr[s_t = m|\tilde{y}_t,h_t^{(i)}\}_{m=1}^{10})
+$$ 
+using inverse transform method 
+
+$$
+h^(i) \sim N_t(\bar{h},\bar{V}_h)
+$$
+using precision sampler
+3. Return a sample drawn from the posterior distribution:
+$$
+\{h^{(i)},s^{(i)},\mu_{0}^{(i)},\alpha^{(i)},h_0^{(i)}, \sigma_v^{2(i)}\}
+$$
+
 
 # Forecasting
 
