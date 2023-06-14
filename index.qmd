@@ -14,10 +14,10 @@ author:
     url: https://github.com/ThomasKronhol
   - name: Yobin Timilsena
     url: https://github.com/yobin-tim
-  - name: Hanwen Zhang
-    url: https://github.com/hanwenzhang0317
   - name: Django Trueman-Greinke
     url: https://github.com/DjangoTG
+  - name: Hanwen Zhang
+    url: https://github.com/hanwenzhang0317
 execute:
   echo: false
 citation: 
@@ -508,20 +508,19 @@ s.sigma <- rgamma(1, shape = a.bar.s, scale = s.bar.s)
 ## Dummy observation prior
 
 
-In this extended model I augment the system using the 'sum of coefficients' and 'dummy initial observation' prior. The sum of coefficients prior takes the average of the lagged values and adds them to the basic equation. This is because these values are assumed to be a good forecast of future observations.
+In this extended model, the system is augmented using the *sum of coefficients* and *dummy initial observation* prior. The idea for this way of setting a prior is to generate artificial new rows that augment data matrices $\bf y$ and $\bf X$. It is equivalent to assuming a normal-inverted gamma 2 prior whose parameters are determined by dummy observations augmenting the system.
 
-The 'dummy initial observation' prior adds a single dummy observation such that all values are set equal to the averages of initial conditions, up to a scaling factor.
+The *sum of coefficients* prior takes the average of the lagged values and adds them to the basic equation. This is because these values are assumed to be a good forecast of future observations. The *dummy initial observation* prior adds a single dummy observation such that all values are set equal to the averages of initial conditions, up to a scaling factor.
 
 In order to practically generate the additional rows the following steps should be taken.
 
-Firstly the average of lagged values needs to be calculated, $y.bar$. This is done by finding the mean of the first $p$ values in the data. Next, values of of the scaling factors need to be selected, typically values equal to 1 are chosen.
+Firstly, the average of lagged values needs to be calculated, `y.bar`. This is done by finding the mean of the first $p$ values in the data. Next, values of of the scaling factors need to be selected, where values equal to 1 are chosen typically.
 
-Once this has been done, the rows can be created. In the univariate case this is simple, two rows are added to Y, the first equal to $y.bar$ divided by the first scaling factor, the second equal to $y.bar$ divided by the second scaling factor.
+Once this has been done, the rows can be created. In the univariate case this is simple, two rows are added to vector $\bf y$, the first equal to `y.bar` divided by the first scaling factor, $\lambda_3$, the second equal to th same value divided by the second scaling factor, $\lambda_4$.
 
-Adding rows to X is slightly more complicated. The additional rows are as follows. The values in the first row, corresponding to the sum of coefficients, are all equal to $y.bar$ divided by the first scaling factor, except the last column, which is equal to zero. The values in the second row, corresponding to the dummy initial observation, are all equal to $y.bar$ divided by the second scaling factor, except the last column, which is equal to one.
+Adding rows to $\bf X$ is slightly more complicated. The additional rows are as follows. The values in the first row, corresponding to the sum of coefficients, are all equal to `y.bar` divided by $\lambda_3$, except the last column, which is equal to zero. The values in the second row, corresponding to the dummy initial observation, are all equal to `y.bar`, except the last column, which is equal to one, al of which are divided by $\lambda_4$.
 
-
-
+The following **R** function `prior.ex()` generates vectors and matrices by which $\bf y$ and $\bf X$ should be extended.
 
 ```{r}
 #| echo: true 
@@ -545,11 +544,6 @@ prior.ex <- function(data, p = 1, lambda_3 = 1, lambda_4 = 1){
   
   
 }
-
-ext.data <- prior.ex(y, p = 5, lambda_3 = 1, lambda_4 = 1)
-
-ext.data
-
 
 ```
 
