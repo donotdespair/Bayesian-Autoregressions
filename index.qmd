@@ -969,8 +969,10 @@ $$
 ### Gibbs sampler
 
 At each iteration s:
-   Sample $h^{S}$ from the distribution,
-   then Sample $\alpha^{S},\Sigma^{s}$ from the $P(A,\Sigma|Y,X,h) = MN (\bar{\alpha},\bar{V},\bar{S},\bar{\nu})$
+
+   1. Sample $h^{S}$ from the distribution,
+   2. then Sample $\alpha^{S},\Sigma^{s}$ from the $P(A,\Sigma|Y,X,h) = MN (\bar{\alpha},\bar{V},\bar{S},\bar{\nu})$
+   
 Return $\{\alpha^{S},\Sigma^{S},h^{S}]\}_{s=1}^S$
 
 Technics for sampling h is listed in the previous section.
