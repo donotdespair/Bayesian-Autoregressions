@@ -10,7 +10,7 @@ author:
     url: https://github.com/IoTiFeelo
   - name: Ray Gomez
     url: https://github.com/rayccg
-  - names: Xiaoman Guo
+  - name: Xiaoman Guo
     url: https://github.com/mandyxmg
   - name: Thomas Kronholm Møller
     url: https://github.com/ThomasKronhol
@@ -20,6 +20,7 @@ author:
     url: https://github.com/DjangoTG
   - name: Hanwen Zhang
     url: https://github.com/hanwenzhang0317
+    
 execute:
   echo: false
 citation: 
