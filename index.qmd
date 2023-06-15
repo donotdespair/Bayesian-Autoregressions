@@ -929,10 +929,29 @@ $$
 ### Essential techniques 
 
 #### Auxiliary mixture 
-@omori2007stochastic
+@omori2007stochastic propose to approximiate the log chi-squared distribution with one degree of dreedom by a amixture of ten normal distributions given by:
+$$
+log\chi^2_1 \approx \sum^{10}_{m=1}Pr[s_t=m]N(\mu_m, \sigma^2_m)
+$$ 
+where $x_t\in\{1,...,10\}$ is a discrete-valued random indicator of the mixture component and $\mu_m, \sigma^2_m, Pr(s_t=m)$ are predetermined.
+
+The conditional distribution of $\tilde{\epsilon_t}$ is given by
+$$
+\tilde{\epsilon_t}|s_t = m \sim N(\mu_m, \sigma^2_m)
+$$ 
+A simple stochastic volatility model is given by
+$$
+\begin{align*}
+\tilde{y} &= h + \tilde{\epsilon} \\
+Hh &= h_0e_{1.T}+\sigma_vv \\
+\tilde{\epsilon_t}|s &\sim N_T(\mu_s, diag(\sigma^2_s)) \\
+v &\sim N_T(0_T, I_T) \\
+\end{align*}
+$$ 
+
 
 #### Precision sampler 
-@chan2009efficient
+The full-conditional posterior distribution of the log-volatilities $h$ is a $T$-variate normal distribution with the precision matrix that is a tridiagonal matrix. Therefore, a computationally fast method of sampling from this full-conditional posterior distribution is by the precision sampler introduced by @chan2009efficient. The implementation in R requires using computer routines for tridiagonal matrices from package mgcv by @wood2020mgcv.
 
 
 1. Initialize the algorithm by proposing starting values for $h^{(0)},s^{(0)},\mu_0^{(0)},\boldsymbol\alpha^{(0)},\sigma_v^{2(0)}$
