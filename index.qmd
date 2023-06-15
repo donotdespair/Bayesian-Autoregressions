@@ -1012,7 +1012,8 @@ Following is the algorithm for the part above to sample draws from full conditio
 #| code-summary: "Show code"
 
 SVcommon.Gibbs.iteration = function(S,aux, priors){
-  # A single iteration of the Gibbs sampler for the SV component
+  
+
   #
   # aux is a list containing:
   #   Y - a TxN matrix
@@ -1031,12 +1032,14 @@ SVcommon.Gibbs.iteration = function(S,aux, priors){
   #   sigmav.s - a positive scalar
   #   sigmav.nu - a positive scalar
   #   HH - a TxT matrix
-  
-  
- 
+
   
   T             = dim(aux$Y)[1]
   N             = dim(aux$Y)[2]
+  K             = dim(X)[2]
+  
+
+    
   alpha.st      = c(1.92677,1.34744,0.73504,0.02266,0-0.85173,-1.97278,-3.46788,-5.55246,-8.68384,-14.65000)
   sigma.st      = c(0.11265,0.17788,0.26768,0.40611,0.62699,0.98583,1.57469,2.54498,4.16591,7.33342)
   pi.st         = c(0.00609,0.04775,0.13057,0.20674,0.22715,0.18842,0.12047,0.05591,0.01575,0.00115)
@@ -1047,6 +1050,32 @@ SVcommon.Gibbs.iteration = function(S,aux, priors){
   Y.tilde       = as.vector(log((Z + 0.0000001)^2))
   Ytilde.alpha  = as.matrix(Y.tilde - alpha.st[as.vector(aux$s)])
   
+    # Sampling A and Sigma
+  kappa.1     = 1
+  kappa.2     = 100
+  kappa.3     = 1
+
+  V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
+
+  nu.prior    = N+1
+  # normal-inverse Wishard posterior parameters
+  ############################################################
+  V.bar.inv   = t(aux$X)%*%diag(1/as.vector(aux$sigma2))%*%aux$X + diag(1/diag(V.prior))
+  V.bar       = solve(V.bar.inv)
+  A.bar       = V.bar%*%(t(aux$X)%*%aux$Y + diag(1/diag(V.prior))%*%aux$A)
+  nu.bar      = nrow(aux$Y) + nu.prior
+  S.bar       = aux$Sigma + t(aux$Y)%*%aux$Y + t(A.prior)%*%diag(1/diag(V.prior))%*%aux$A - t(A.bar)%*%V.bar.inv%*%A.bar
+  S.bar.inv   = solve(S.bar)
+  
+  # posterior draws 
+  ############################################################
+
+  Sigma.posterior.IW     = rWishart(1, df=nu.bar, Sigma=S.bar.inv)
+  Sigma.posterior.draw   = apply(Sigma.posterior.IW, 3 ,solve)
+  aux$Sigma              = array(Sigma.posterior.draw,c(N,N,1))
+  A.norm                 = array(rnorm(prod(c(K,N,1))),c(K,N,1))
+  L                      = t(chol(V.bar))
+  aux$A                  = A.bar + L%*%A.norm[,,1]%*%chol(aux$Sigma[,,1])
   # sampling initial condition
   ############################################################
   V.h0.bar      = 1/((1 / priors$h0.v) + (1 / aux$sigma.v2))
@@ -1088,50 +1117,33 @@ SVcommon.Gibbs.iteration = function(S,aux, priors){
   aux$H         = as.matrix(draw)
   aux$sigma2    = as.matrix(exp(draw))
   
+
+
   
-  
-  #### Draw A and Sigma   #### 
-  A.hat       = solve(t(X)%*%X)%*%t(X)%*%Y
-  Sigma.hat   = t(Y-X%*%A.hat)%*%(Y-X%*%A.hat)/nrow(Y)
-  
-  kappa.1     = 1
-  kappa.2     = 100
-  kappa.3     = 1
-  A.prior     = matrix(0,nrow(A.hat),ncol(A.hat))
-  A.prior[2:(N+1),] = kappa.3*diag(N)
-  V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
-  S.prior     = diag(diag(Sigma.hat))
-  nu.prior    = N+1
-  
-  # normal-inverse Wishard posterior parameters
-  ############################################################
-  V.bar.inv   = t(aux$X)%*%(1/diag(aux$sigma2))%*%aux$X + diag(1/diag(V.prior))
-  V.bar       = solve(V.bar.inv)
-  A.bar       = V.bar%*%(t(aux$X)%*%aux$Y + diag(1/diag(V.prior))%*%A.prior)
-  nu.bar      = nrow(aux$Y) + nu.prior
-  S.bar       = S.prior + t(aux$Y)%*%aux$Y + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.bar)%*%V.bar.inv%*%A.bar
-  S.bar.inv   = solve(S.bar)
-  
-  # posterior draws 
-  ############################################################
-  Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
-  Sigma.posterior   = apply(Sigma.posterior,3,solve)
-  Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
-  A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
-  B.posterior       = array(NA,c(N,N,S))
-  L                 = t(chol(V.bar))
-  B1.posterior = array(NA,c(N,(1+N*p),S))
+  posteriors      = list(
+    H           = matrix(NA,T,S),
+    sigma2      = matrix(NA,T,S),
+    s           = matrix(NA,T,S),
+    h0          = rep(NA,S),
+    sigma.v2    = rep(NA,S),
+    A           = array(NA, c(K,N,S)),
+    Sigma       = array(NA, c(N,N,S))
+  )
 
   for (s in 1:S){
-    cholSigma.s     = chol(Sigma.posterior[,,s])
-    B.posterior[,,s]= t(cholSigma.s)
-    A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%cholSigma.s
-    B1.posterior[,,s] =  B.posterior[,,s]%*%t(A.posterior[,,s])
+      posteriors$H[,s]             = aux$H
+      posteriors$sigma2[,s]        = aux$sigma2
+      posteriors$s[,s]             = aux$s
+      posteriors$h0[s]             = aux$h0
+      posteriors$sigma.v2[s]       = aux$sigma.v2
+      posteriors$A[,,s]            = aux$A
+      posteriors$Sigma[,,s]        = aux$Sigma
+      posteriors$A[,,s]            = aux$A
+      posteriors$Sigma[,,s]        = aux$Sigma
   }
   
-  return(list(A.posterior = A.posterior, B.posterior = B.posterior, Sigma.posterior = Sigma.posterior,B1.posterior = B1.posterior))
-          
 
+  return(posteriors)
 }
 
 
