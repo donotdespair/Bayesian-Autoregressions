@@ -10,6 +10,8 @@ author:
     url: https://github.com/IoTiFeelo
   - name: Ray Gomez
     url: https://github.com/rayccg
+  - names: Xiaoman Guo
+    url: https://github.com/mandyxmg
   - name: Thomas Kronholm Møller
     url: https://github.com/ThomasKronhol
   - name: Yobin Timilsena
@@ -891,8 +893,59 @@ covid.est <- function(data, p=4, S=100, k1=1, k2=100, start_date = c(1991,1), Th
 
 ## Conditional predictive density
 
+The Bayesian approach of the conditional predictive density is a combination of a conditional predictive density and the posterior distribution of the unknown parameters $\boldsymbol\alpha$ and $\sigma^{2}$. The one-period ahead conditional predictive density can be expressed as below. 
+
+\begin{align}
+p(y_{t+1} |x_{t+1},\bf y, \bf X) &= \int\int p(y_{t+1} |x_{t+1}, Y, X, \boldsymbol\alpha, \sigma^{2})p({\boldsymbol\alpha, \sigma^{2}bf y,\bf X)d{\boldsymbol\alpha d\sigma^{2}\\
+p(y_{t+1} |x_{t+1}, \bf y,\bf X, \boldsymbol\alpha, \sigma^{2}) &= \mathcal{N}( \alpha'_{d}d_{t+1|t} + \alpha_{1}y_{t}+\dots+\alpha_{p}y_{t-p+1}, \sigma^{2})\\
+p({\boldsymbol\alpha, \sigma^{2}|\bf y,\bf X) &= \mathcal{NIG}2(\overline{\boldsymbol\alpha}, \overline{\sigma^{2}}, \overline{S}, \overline{v}) \\
+\end{align}
+
+To sample the joint predictive density, we integrate out $\boldsymbol\alpha$ and $\sigma^{2}$. Below steps show how the one-period ahead joint predictive density can be obtained. 
+
+Sample draws from the posterior distribution $p({\boldsymbol\alpha, \sigma^{2}|\bf y,\bf X)$ and 
+
+Obtain $\left\{ \boldsymbol\alpha^{(s)},  \sigma^{2(s)} \right\}^{S}_{s=1}$
+
+Sample draws from $p(y_{t+1} |x_{t+1})$ that is specified as $y_{t+1} \sim \mathcal{N} (y_{t+1|t}(\boldsymbol\alpha^{(s)}), Var[y_{t+1|t}|\boldsymbol\alpha^{(s)},  \sigma^{2(s)}])$
+
+Obtain $\left\{ y_{t+1|t}^{(s)} \right\}^{S}_{s=1}$
+
+Characterise the predictive density using $\left\{ y_{t+1|t}^{(s)} \right\}^{S}_{s=1}$
+
+
 ## Algorithm to sample from the predictive density
 
 ## Sampler implementation in R
+
+```{r forecasting h step}
+#| echo: true
+#| message: false
+#| warning: false
+#| eval: false
+## Apply function when needed
+posterior.sample.draws = posterior.draws(S=50000, Y=Y, X=X)         # using the posterior function to draw alpha and sigma
+A.posterior.simu       = posterior.sample.draws$A.posterior         # obtain posterior alpha
+Sigma.posterior.simu   = posterior.sample.draws$Sigma.posterior     # obtain posterior sigma
+
+## forecasting setup
+h                      = 12                                         # specify the desired number of steps ahead
+S                      = 50000                                      # the number of sampling time, no greater than the simulation time in the posterior draw function
+Y.h                    = matrix(NA,h,S)                             # create empty matrix to store the h-step ahead Y 
+
+## sampling predictive density
+for (s in 1:S){
+  A.posterior.draw     = A.posterior.simu[,s]
+  Sigma.posterior.draw = Sigma.posterior.simu[,s]
+    x.Ti               = Y[(nrow(Y)-p+1):nrow(Y)]                   # the number of lags in Y
+    x.Ti               = x.Ti[p:1]
+  for (i in 1:h){
+    x.T                = c(d,as.vector(t(x.Ti)))                    # d refers to d row vector for the deterministic term data
+    Y.f                = rnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior.draw)
+      x.Ti             = rbind(Y.f,x.Ti[1:(p-1)])                   # refresh the initial data in Y
+    Y.h[i,s]           = Y.f
+  }
+}
+```
 
 # References {.unnumbered}
