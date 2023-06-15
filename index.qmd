@@ -895,19 +895,21 @@ covid.est <- function(data, p=4, S=100, k1=1, k2=100, start_date = c(1991,1), Th
 
 The Bayesian approach of the conditional predictive density is a combination of a conditional predictive density and the posterior distribution of the unknown parameters $\boldsymbol\alpha$ and $\sigma^{2}$. The one-period ahead conditional predictive density can be expressed as below. 
 
-\begin{align}
-p(y_{t+1} |x_{t+1},\bf y, \bf X) &= \int\int p(y_{t+1} |x_{t+1}, Y, X, \boldsymbol\alpha, \sigma^{2})p({\boldsymbol\alpha, \sigma^{2}bf y,\bf X)d{\boldsymbol\alpha d\sigma^{2}\\
-p(y_{t+1} |x_{t+1}, \bf y,\bf X, \boldsymbol\alpha, \sigma^{2}) &= \mathcal{N}( \alpha'_{d}d_{t+1|t} + \alpha_{1}y_{t}+\dots+\alpha_{p}y_{t-p+1}, \sigma^{2})\\
-p({\boldsymbol\alpha, \sigma^{2}|\bf y,\bf X) &= \mathcal{NIG}2(\overline{\boldsymbol\alpha}, \overline{\sigma^{2}}, \overline{S}, \overline{v}) \\
-\end{align}
+$$
+p(y_{t+1} |x_{t+1},\mathbf{y}, \mathbf{X}) = \int\int p(y_{t+1} |x_{t+1}, \mathbf{y}, \mathbf{X}, \boldsymbol\alpha, \sigma^{2})p(\boldsymbol\alpha, \sigma^{2}|\mathbf{y},\mathbf{X}) d\boldsymbol\alpha d\sigma^{2}$$
+
+$$p(y_{t+1} |x_{t+1}, \mathbf{y},\mathbf{X}, \boldsymbol\alpha, \sigma^{2}) = \mathcal{N}( \alpha'_{d}d_{t+1|t} + \alpha_{1}y_{t}+\dots+\alpha_{p}y_{t-p+1}, \sigma^{2})$$
+
+$$p(\boldsymbol\alpha, \sigma^{2}|\mathbf{y},\mathbf{X}) = \mathcal{NIG}2(\overline{\boldsymbol\alpha}, \overline{\sigma^{2}}, \overline{S}, \overline{v}) $$
+
 
 To sample the joint predictive density, we integrate out $\boldsymbol\alpha$ and $\sigma^{2}$. Below steps show how the one-period ahead joint predictive density can be obtained. 
 
-Sample draws from the posterior distribution $p({\boldsymbol\alpha, \sigma^{2}|\bf y,\bf X)$ and 
+Sample draws from the posterior distribution $p(\boldsymbol\alpha, \sigma^{2}|\bf y,\bf X)$ and 
 
 Obtain $\left\{ \boldsymbol\alpha^{(s)},  \sigma^{2(s)} \right\}^{S}_{s=1}$
 
-Sample draws from $p(y_{t+1} |x_{t+1})$ that is specified as $y_{t+1} \sim \mathcal{N} (y_{t+1|t}(\boldsymbol\alpha^{(s)}), Var[y_{t+1|t}|\boldsymbol\alpha^{(s)},  \sigma^{2(s)}])$
+For each draw of $\boldsymbol\alpha$ and $\sigma^{2}$ sample from $p(y_{t+1} |x_{t+1})$ that is specified as $y_{t+1} \sim \mathcal{N} (x_{t+1|t}\boldsymbol\alpha^{(s)},  \sigma^{2(s)})$
 
 Obtain $\left\{ y_{t+1|t}^{(s)} \right\}^{S}_{s=1}$
 
