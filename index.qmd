@@ -20,7 +20,7 @@ author:
     url: https://github.com/hanwenzhang0317
   - name: Manting Huang
     url: https://github.com/mantihuang
-    - name: Eungwon Lee
+  - name: Eungwon Lee
     url: https://github.com/eung1
 execute:
   echo: false
@@ -909,21 +909,21 @@ $h_t$ - follows a Stochastic Volatility process
 
 The likelihood function is then
 $$
-L(A,\Sigma|Y,X,h) = det(diag(h)^{-N/2}det(\Sigma)^{-T/2}\times exp\{  -1/2 [\Sigma ^ {-1} (Y-\alpha X)' diag(h)^{-1}(Y-\alpha X)] \}
+L(\alpha,\Sigma|Y,X,h) = det(diag(h)^{-N/2}det(\Sigma)^{-T/2}\times exp\{  -1/2 [\Sigma ^ {-1} (Y-\alpha X)' diag(h)^{-1}(Y-\alpha X)] \}
 $$
 The full conditional posterior distribution for $\alpha,\Sigma$ is given by
 $$
-P(A,\Sigma|Y,X,h) = MN (\bar{A},\bar{V},\bar{S},\bar{\nu})
+P(\alpha,\Sigma|Y,X,h) = MN (\bar{\alpha},\bar{V},\bar{S},\bar{\nu})
 $$
 where
 $$
 \bar{V}=(X'diag(h)^{-1}X+\underline{V}^{-1})^{-1}
 $$
 $$
-\bar{A}=\bar{V}(X'diag(h)^{-1}Y+\underline{V}^{-1}\underline{A})
+\bar{\alpha}=\bar{V}(X'diag(h)^{-1}Y+\underline{V}^{-1}\underline{\alpha})
 $$
 $$
-\bar{S}=\underline{V}+Y'diag(h)^{-1}Y+\underline{A'}\underline{V}^{-1}\underline{A}-\bar{A'}\bar{V}^{-1}\bar{A}
+\bar{S}=\underline{V}+Y'diag(h)^{-1}Y+\underline{\alpha'}\underline{V}^{-1}\underline{\alpha}-\bar{\alpha'}\bar{V}^{-1}\bar{\alpha}
 $$
 $$
 \bar{\nu}= T + \underline{\nu}
@@ -931,9 +931,12 @@ $$
 
 ### Essential techniques 
 
-1. Auxiliary mixture @omori2007stochastic
+#### Auxiliary mixture 
+@omori2007stochastic
 
-2. Precision sampler @chan2009efficient
+#### Precision sampler 
+@chan2009efficient
+
 
 1. Initialize the algorithm by proposing starting values for $h^{(0)},s^{(0)},\mu_0^{(0)},\alpha^{(0)},\sigma_v^{2(0)}$
 2. For each iteration i of the Gibbs sampling algorithm, draw
@@ -967,14 +970,17 @@ $$
 
 At each iteration s:
    Sample $h^{S}$ from the distribution,
-   then Sample $A^{S},\Sigma^{s}$ from the $P(A,\Sigma|Y,X,h) = MN (\bar{A},\bar{V},\bar{S},\bar{\nu})$
-Return $\{A^{S},\Sigma^{S},h^{S}]\}_{s=1}^S$
+   then Sample $\alpha^{S},\Sigma^{s}$ from the $P(A,\Sigma|Y,X,h) = MN (\bar{\alpha},\bar{V},\bar{S},\bar{\nu})$
+Return $\{\alpha^{S},\Sigma^{S},h^{S}]\}_{s=1}^S$
 
-Technices for sampling h is listed in the previous section.
+Technics for sampling h is listed in the previous section.
 
-###Code
+
+### Algorithm 
 
 ```{r, echo = TRUE}
+#| code-fold: true
+#| code-summary: "Show code"
 
 SVcommon.Gibbs.iteration = function(S,aux, priors){
   # A single iteration of the Gibbs sampler for the SV component
