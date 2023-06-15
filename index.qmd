@@ -893,24 +893,47 @@ covid.est <- function(data, p=4, S=100, k1=1, k2=100, start_date = c(1991,1), Th
 
 ### Model equations
 $$
-Y = X\beta + E
+Y = X\alpha + E
 $$
 $$
-E|X \sim N_T(0_t,diag(\sigma^2))
+E|X \sim MN(0_{T\times N},\Sigma,diag(h))
+$$
+
+$$
+h = (h_1,...,h_T)'
 $$
 $$
 \sigma^2 = (exp\{h_1\}, ... , exp\{h_t\})
 $$
 $h_t$ - follows a Stochastic Volatility process
-$$\beta \sim N(\underline{\beta},\underline{V}_{\beta})$$ 
+
+The likelihood function is then
+$$
+L(A,\Sigma|Y,X,h) = det(diag(h)^{-N/2}det(\Sigma)^{-T/2}\times exp\{  -1/2 [\Sigma ^ {-1} (Y-\alpha X)' diag(h)^{-1}(Y-\alpha X)] \}
+$$
+The full conditional posterior distribution for $\alpha,\Sigma$ is given by
+$$
+P(A,\Sigma|Y,X,h) = MN (\bar{A},\bar{V},\bar{S},\bar{\nu})
+$$
+where
+$$
+\bar{V}=(X'diag(h)^{-1}X+\underline{V}^{-1})^{-1}
+$$
+$$
+\bar{A}=\bar{V}(X'diag(h)^{-1}Y+\underline{V}^{-1}\underline{A})
+$$
+$$
+\bar{S}=\underline{V}+Y'diag(h)^{-1}Y+\underline{A'}\underline{V}^{-1}\underline{A}-\bar{A'}\bar{V}^{-1}\bar{A}
+$$
+$$
+\bar{\nu}= T + \underline{\nu}
+$$
 
 ### Essential techniques 
 
 1. Auxiliary mixture @omori2007stochastic
 
 2. Precision sampler @chan2009efficient
-
-### Gibbs sampler
 
 1. Initialize the algorithm by proposing starting values for $h^{(0)},s^{(0)},\mu_0^{(0)},\alpha^{(0)},\sigma_v^{2(0)}$
 2. For each iteration i of the Gibbs sampling algorithm, draw
@@ -940,7 +963,17 @@ $$
 \{h^{(i)},s^{(i)},\mu_{0}^{(i)},\alpha^{(i)},h_0^{(i)}, \sigma_v^{2(i)}\}
 $$
 
+### Gibbs sampler
+
+At each iteration s:
+   Sample $h^{S}$ from the distribution,
+   then Sample $A^{S},\Sigma^{s}$ from the $P(A,\Sigma|Y,X,h) = MN (\bar{A},\bar{V},\bar{S},\bar{\nu})$
+Return $\{A^{S},\Sigma^{S},h^{S}]\}_{s=1}^S$
+
+Technices for sampling h is listed in the previous section.
+
 ###Code
+
 ```{r, echo = TRUE}
 
 SVcommon.Gibbs.iteration = function(S,aux, priors){
