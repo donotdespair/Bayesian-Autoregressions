@@ -970,15 +970,23 @@ $$
 
 At each iteration s:
 
-   1. Sample $h^{S}$ from the distribution,
-   2. then Sample $\alpha^{S},\Sigma^{s}$ from the $P(A,\Sigma|Y,X,h) = MN (\bar{\alpha},\bar{V},\bar{S},\bar{\nu})$
+   Step 1. Sample $h^{S}$ from the distribution $P(h|Y,X,A, \Sigma)$
+   Step 2. Sample $\alpha^{S},\Sigma^{s}$ from the $P(A,\Sigma|Y,X,h) = MN (\bar{\alpha},\bar{V},\bar{S},\bar{\nu})$
    
 Return $\{\alpha^{S},\Sigma^{S},h^{S}]\}_{s=1}^S$
 
 Technics for sampling h is listed in the previous section.
 
+Then it follows that 
+$\bar{V} = (X'diag(h)^{-1}X + \underline{V}^{-1})^{-1}$
+$\bar{A} = \bar{V}(X'diag(h)^{-1}Y + \underline{V}^{-1}\underline{A})^{-1}$
+$\bar{S} = \underline{S} + Y'diag(h)^{-1}Y + \underline{A}'\underline{V}^{-1}\underline{A} - \bar{A}'\bar{V}^{-1}\bar{A}$
+$\bar{\nu}=T + \underline{\nu}$.
+
 
 ### Algorithm 
+
+Following is the algorithm for the part above to sample draws from full conditional posterior distribution. For each iteration, it draws h from a corresponding distribution and then using h, and then draws A and sigma from a multivariate normal distribution.
 
 ```{r, echo = TRUE}
 #| code-fold: true
@@ -1063,7 +1071,7 @@ SVcommon.Gibbs.iteration = function(S,aux, priors){
   
   
   
-  #### Draw A and Sigma
+  #### Draw A and Sigma   #### 
   A.hat       = solve(t(X)%*%X)%*%t(X)%*%Y
   Sigma.hat   = t(Y-X%*%A.hat)%*%(Y-X%*%A.hat)/nrow(Y)
   
@@ -1075,6 +1083,7 @@ SVcommon.Gibbs.iteration = function(S,aux, priors){
   V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
   S.prior     = diag(diag(Sigma.hat))
   nu.prior    = N+1
+  
   # normal-inverse Wishard posterior parameters
   ############################################################
   V.bar.inv   = t(aux$X)%*%(1/diag(aux$sigma2))%*%aux$X + diag(1/diag(V.prior))
