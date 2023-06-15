@@ -939,6 +939,132 @@ using precision sampler
 $$
 \{h^{(i)},s^{(i)},\mu_{0}^{(i)},\alpha^{(i)},h_0^{(i)}, \sigma_v^{2(i)}\}
 $$
+```{r, echo = TRUE}
+
+SVcommon.Gibbs.iteration = function(S,aux, priors){
+  # A single iteration of the Gibbs sampler for the SV component
+  #
+  # aux is a list containing:
+  #   Y - a TxN matrix
+  #   X - a TxK matrix
+  #   H - a Tx1 matrix
+  #   h0 - a scalar
+  #   sigma.v2 - a scalar
+  #   s - a Tx1 matrix
+  #   A - a KxN matrix
+  #   Sigma - an NxN matrix
+  #   sigma2 - a Tx1 matrix
+  #
+  # priors is a list containing:
+  #   h0.v - a positive scalar
+  #   h0.m - a scalar
+  #   sigmav.s - a positive scalar
+  #   sigmav.nu - a positive scalar
+  #   HH - a TxT matrix
+  
+  
+ 
+  
+  T             = dim(aux$Y)[1]
+  N             = dim(aux$Y)[2]
+  alpha.st      = c(1.92677,1.34744,0.73504,0.02266,0-0.85173,-1.97278,-3.46788,-5.55246,-8.68384,-14.65000)
+  sigma.st      = c(0.11265,0.17788,0.26768,0.40611,0.62699,0.98583,1.57469,2.54498,4.16591,7.33342)
+  pi.st         = c(0.00609,0.04775,0.13057,0.20674,0.22715,0.18842,0.12047,0.05591,0.01575,0.00115)
+  
+
+  Lambda        = solve(chol(aux$Sigma))
+  Z             = rowSums( ( aux$Y - aux$X %*% aux$A ) %*% Lambda ) / sqrt(N)
+  Y.tilde       = as.vector(log((Z + 0.0000001)^2))
+  Ytilde.alpha  = as.matrix(Y.tilde - alpha.st[as.vector(aux$s)])
+  
+  # sampling initial condition
+  ############################################################
+  V.h0.bar      = 1/((1 / priors$h0.v) + (1 / aux$sigma.v2))
+  m.h0.bar      = V.h0.bar*((priors$h0.m / priors$h0.v) + (aux$H[1] / aux$sigma.v2))
+  h0.draw       = rnorm(1, mean = m.h0.bar, sd = sqrt(V.h0.bar))
+  aux$h0        = h0.draw
+  
+  # sampling sigma.v2
+  ############################################################
+  sigma.v2.s    = priors$sigmav.s + sum(c(aux$H[1] - aux$h0, diff(aux$H))^2)
+  sigma.v2.draw = sigma.v2.s / rchisq(1, priors$sigmav.nu + T)
+  aux$sigma.v2  = sigma.v2.draw
+  
+  # sampling auxiliary states
+  ############################################################
+  Pr.tmp        = simplify2array(lapply(1:10,function(x){
+    dnorm(Y.tilde, mean = as.vector(aux$H + alpha.st[x]), sd = sqrt(sigma.st[x]), log = TRUE) + log(pi.st[x])
+  }))
+  Pr            = t(apply(Pr.tmp, 1, function(x){exp(x - max(x)) / sum(exp(x - max(x)))}))
+  s.cum         = t(apply(Pr, 1, cumsum))
+  r             = matrix(rep(runif(T), 10), ncol = 10)
+  ss            = apply(s.cum < r, 1, sum) + 1
+  aux$s         = as.matrix(ss)
+  
+  
+  # sampling log-volatilities using functions for tridiagonal precision matrix
+  ############################################################
+  Sigma.s.inv   = diag(1 / sigma.st[as.vector(aux$s)])
+  D.inv         = Sigma.s.inv + (1 / aux$sigma.v2) * priors$HH
+  b             = as.matrix(Ytilde.alpha / sigma.st[as.vector(aux$s)] + (aux$h0/aux$sigma.v2)*diag(T)[,1])
+  lead.diag     = diag(D.inv)
+  sub.diag      = mgcv::sdiag(D.inv, -1)
+  D.chol        = mgcv::trichol(ld = lead.diag, sd = sub.diag)
+  D.L           = diag(D.chol$ld)
+  mgcv::sdiag(D.L,-1) = D.chol$sd
+  x             = as.matrix(rnorm(T))
+  a             = forwardsolve(D.L, b)
+  draw          = backsolve(t(D.L), a + x)
+  aux$H         = as.matrix(draw)
+  aux$sigma2    = as.matrix(exp(draw))
+  
+  
+  
+  #### Draw A and Sigma
+  A.hat       = solve(t(X)%*%X)%*%t(X)%*%Y
+  Sigma.hat   = t(Y-X%*%A.hat)%*%(Y-X%*%A.hat)/nrow(Y)
+  
+  kappa.1     = 1
+  kappa.2     = 100
+  kappa.3     = 1
+  A.prior     = matrix(0,nrow(A.hat),ncol(A.hat))
+  A.prior[2:(N+1),] = kappa.3*diag(N)
+  V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
+  S.prior     = diag(diag(Sigma.hat))
+  nu.prior    = N+1
+  # normal-inverse Wishard posterior parameters
+  ############################################################
+  V.bar.inv   = t(aux$X)%*%(1/diag(aux$sigma2))%*%aux$X + diag(1/diag(V.prior))
+  V.bar       = solve(V.bar.inv)
+  A.bar       = V.bar%*%(t(aux$X)%*%aux$Y + diag(1/diag(V.prior))%*%A.prior)
+  nu.bar      = nrow(aux$Y) + nu.prior
+  S.bar       = S.prior + t(aux$Y)%*%aux$Y + t(A.prior)%*%diag(1/diag(V.prior))%*%A.prior - t(A.bar)%*%V.bar.inv%*%A.bar
+  S.bar.inv   = solve(S.bar)
+  
+  # posterior draws 
+  ############################################################
+  Sigma.posterior   = rWishart(S, df=nu.bar, Sigma=S.bar.inv)
+  Sigma.posterior   = apply(Sigma.posterior,3,solve)
+  Sigma.posterior   = array(Sigma.posterior,c(N,N,S))
+  A.posterior       = array(rnorm(prod(c(dim(A.bar),S))),c(dim(A.bar),S))
+  B.posterior       = array(NA,c(N,N,S))
+  L                 = t(chol(V.bar))
+  B1.posterior = array(NA,c(N,(1+N*p),S))
+
+  for (s in 1:S){
+    cholSigma.s     = chol(Sigma.posterior[,,s])
+    B.posterior[,,s]= t(cholSigma.s)
+    A.posterior[,,s]= A.bar + L%*%A.posterior[,,s]%*%cholSigma.s
+    B1.posterior[,,s] =  B.posterior[,,s]%*%t(A.posterior[,,s])
+  }
+  
+  return(list(A.posterior = A.posterior, B.posterior = B.posterior, Sigma.posterior = Sigma.posterior,B1.posterior = B1.posterior))
+          
+
+}
+
+
+```
 
 
 # Forecasting
