@@ -513,6 +513,39 @@ s.sigma <- rgamma(1, shape = a.bar.s, scale = s.bar.s)
 
 A possible extension to the model is to relax the assumption of normally distributed errors. By assuming a t-distribution for the errors we can better account for excess kurtosis in the data, also referred to as 'fat tails'. Such a specification lends itself well to estimating models on data commonly found to be leptokurtic, such as financial time series.
 
+$$ u_t \sim \mathcal{t}(0,\Sigma,\nu) $$
+
+
+#### Scale Mixture of Normals Representation of the T Distribution
+
+Implementation of t-distributed errors can be achieved by representing the t-distribution as a 'scale mixture of normal distributions'. 
+
+If,
+$$
+\begin{align*}
+  x|\lambda &\sim \mathcal{N}(0, \lambda\sigma^2) \\
+  \lambda &\sim \mathcal{IG2}(s, \nu)
+\end{align*}
+$$
+then
+$$ x \sim t(0, s, \sigma^2, \nu) $$
+This result can be derived by expressing the joint distribution of $x$ and $\lambda$ as
+$$ p(x,\lambda) = p(x|\lambda) p(\lambda) $$
+and then intergrating with respect to $\lambda$
+
+$$ \int p(x|\lambda) p(\lambda) d\lambda $$
+
+This integration produces a density function which is proportional to the distribution for a Student-t distribution with $nu$ degrees of freedom. Hence, $x\sim t_\nu$.
+
+#### Likelihood and Posteriors under Student-t errors
+
+Implementing the scale mixture specification, the conditional distribution of $y$ now takes the following form
+
+$$ \boldsymbol{y}|\boldsymbol{X},\boldsymbol{\alpha},\sigma^2,\lambda \sim \mathcal{N_T}(\boldsymbol{X}\boldsymbol{\alpha}, \sigma^2\lambda I_T) $$
+
+
+
+
 
 
 ## Estimating autoregressions after 2020
