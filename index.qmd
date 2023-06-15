@@ -939,6 +939,8 @@ using precision sampler
 $$
 \{h^{(i)},s^{(i)},\mu_{0}^{(i)},\alpha^{(i)},h_0^{(i)}, \sigma_v^{2(i)}\}
 $$
+
+###Code
 ```{r, echo = TRUE}
 
 SVcommon.Gibbs.iteration = function(S,aux, priors){
