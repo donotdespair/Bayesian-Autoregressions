@@ -20,6 +20,8 @@ author:
     url: https://github.com/hanwenzhang0317
   - name: Manting Huang
     url: https://github.com/mantihuang
+    - name: Eungwon Lee
+    url: https://github.com/eung1
 execute:
   echo: false
 citation: 
