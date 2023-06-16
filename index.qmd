@@ -12,6 +12,8 @@ author:
     url: https://github.com/rayccg
   - name: Xiaoman Guo
     url: https://github.com/mandyxmg
+  - name: Nathan Huynh
+    url: https://github.com/nathanh93
   - name: Thomas Kronholm Møller
     url: https://github.com/ThomasKronhol
   - name: Yobin Timilsena
@@ -20,7 +22,6 @@ author:
     url: https://github.com/DjangoTG
   - name: Hanwen Zhang
     url: https://github.com/hanwenzhang0317
-    
 execute:
   echo: false
 citation: 
@@ -560,6 +561,156 @@ prior.ex <- function(data, p = 1, lambda_3 = 1, lambda_4 = 1){
 # Model Extensions
 
 ## Student-$t$ error term
+
+A possible extension to the model is to relax the assumption of normally distributed errors. By assuming a t-distribution for the errors we can better account for excess kurtosis in the data, also referred to as 'fat tails'. Such a specification lends itself well to estimating models on data commonly found to be leptokurtic, such as financial time series.
+
+$$ u_t \sim \mathcal{t}(0,\Sigma,\nu) $$
+
+
+#### Scale Mixture of Normals Representation of the $t$ Distribution
+
+Implementation of t-distributed errors can be achieved by representing the t-distribution as a 'scale mixture of normal distributions'. 
+
+If,
+$$
+\begin{align*}
+  x|\lambda &\sim \mathcal{N}(0, \lambda\sigma^2) \\
+  \lambda &\sim \mathcal{IG2}(s, \nu)
+\end{align*}
+$$
+then
+$$ x \sim t(0, s, \sigma^2, \nu) $$
+This result can be derived by expressing the joint distribution of $x$ and $\lambda$ as
+$$ p(x,\lambda) = p(x|\lambda) p(\lambda) $$
+and then intergrating with respect to $\lambda$
+
+$$ \int_0^\infty p(x|\lambda) p(\lambda) d\lambda $$
+
+This integration produces a density function which is proportional to the distribution for a Student-t distribution with $\nu$ degrees of freedom. Hence, $x\sim t_\nu$.
+
+#### Likelihood and Posteriors under Student-t errors
+
+Implementing the scale mixture specification, the conditional distribution of $y$ now takes the following form
+
+$$ \boldsymbol{y}|\boldsymbol{X},\boldsymbol{\alpha},\sigma^2,\lambda \sim \mathcal{N_T}(\boldsymbol{X}\boldsymbol{\alpha}, \sigma^2\lambda I_T) $$
+
+The likelihood under this specification now becomes
+
+$$ L(\boldsymbol{\alpha}, \sigma^2, \lambda | \boldsymbol{y}, \boldsymbol{X}) = (2\pi)^{-\frac{T}{2}} (\sigma^2)^{-\frac{T}{2}} \det(\lambda I_T)^{-\frac{1}{2}}
+exp(-\frac{1}{2}\frac{1}{\sigma^2}(\boldsymbol{y - X\alpha})'(\lambda I_T)^{-1}(\boldsymbol{y - X\alpha}))$$
+
+As before, we can derive the full conditional posteriors of the parameters by multiplying the likelihood and the priors. The natural conjugacy of $\boldsymbol\alpha$ and $\sigma^2$ are preserved under this specification and therefore the joint posterior is given by
+
+$$ p(\boldsymbol{\alpha}, \sigma^2|\boldsymbol{y, X}, \lambda) \propto L(\boldsymbol{\alpha}, \sigma^2, \lambda | \boldsymbol{y}, \boldsymbol{X}) p(\boldsymbol{\alpha}, \sigma^2) $$
+
+Expanding and rearranging the resulting expression allows the posterior to be expressed in the form of a Normal Inverse Gamma 2 with the following moments
+
+$$\begin{align*}
+p(\boldsymbol{\alpha}, \sigma^2|\boldsymbol{\mathbf{y}, \mathbf{X}}, \lambda) &= \mathcal{NIG2}(\boldsymbol{\overline\alpha, \overline V_\alpha}, \overline s, \overline \nu) \\
+\overline{\boldsymbol\alpha} &= \overline{\mathbf{V}}_{\boldsymbol\alpha}( \underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{X}'(\lambda I_T)^{-1}\mathbf{y})\\
+\overline{\mathbf{V}}_{\boldsymbol\alpha} &=\left(\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}+\mathbf{X}'(\lambda I_T)^{-1}\mathbf{X}\right)^{-1} \\
+\overline{s} &= \underline{s}+\overline{\boldsymbol\alpha}'\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}+\underline{\boldsymbol\alpha}'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{y}'(\lambda I_T)^{-1}\mathbf{y}\\
+\overline{\nu} &= \underline{\nu}+T
+\end{align*}$$
+
+The full conditional for $\lambda$ is also derived in a similar manner, with the posterior distribution taking the form of an Inverse Gamma 2
+
+$$\begin{align*}
+p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &\propto L(\boldsymbol{\alpha}, \sigma^2, \lambda | \mathbf{y, X})p(\lambda) \\
+&\propto (\sigma^2)^{-\frac{T}{2}}\det(\lambda I_T)^{-\frac{1}{2}}\exp(-\frac{1}{2}\frac{1}{\sigma^2}(\mathbf{y - X\alpha})'(\lambda I_T)^{-1}(\mathbf{y - X\alpha})) \\
+&\times \lambda^{-\frac{\underline \nu_\lambda +2}{2}}\exp(-\frac{1}{2}\frac{\underline s_\lambda}{\lambda})
+\end{align*}$$
+
+Rearranging the above to express in the form of $\mathcal{IG2}$
+
+$$\begin{align*}
+p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &= \mathcal{IG2}(\overline s_\lambda, \overline \nu_\lambda) \\
+\overline s_\lambda &= \frac{1}{\sigma^2}(\mathbf{y - X\boldsymbol\alpha})'(\mathbf{y - X\boldsymbol\alpha}) + \underline s_\lambda \\
+\overline \nu_\lambda &= T + \underline \nu_\lambda
+\end{align*}$$
+
+
+
+#### Gibbs Sampler Code for t-distributed errors
+
+Now that we have the full conditionals for all of the parameters we can incorporate them into the Gibbs Sampler routine in order to draw a sample from the posterior densities.
+
+The routine proceeds as follows:
+
+Initialize lambda based on priors for $\underline s_\lambda$ and $\underline \nu_\lambda$.
+
+At each iteration s:
+
+1.    Draw $\sigma^{2(s)}$ from the $\mathcal{IG2}(\overline S, \overline\nu)$ distribution
+2.    Draw $\mathbf{\alpha^{(s)}}$ from the $\mathcal{N}(\boldsymbol{\overline \alpha}, \sigma^{2(s)} \overline V)$ distribution
+3.    Draw $\lambda^{(s)}$ from $\mathcal{IG2}(\overline s_\lambda, \overline\nu_\lambda)$
+
+The sampling routine is implemented via the following function in R and the results of applying the sampler to the artificial random walk data are displayed. For the purposes of this simulation a relatively large prior for the degrees of freedom parameter is chosen, which communicates our prior belief that the data should follow a random walk.
+
+```{r}
+#| echo: true 
+#| message: false
+#| warning: false
+
+TDist.Gibbs.sampler = function(S, Y, X, priors){
+  # A function to sample from the full conditionals of alpha, sigma and lambda
+  #
+  # priors: a list containing the usual priors for alpha, Sigma, S and nu
+  # as well as additional priors for lambda hyper-parameters lambda_s and lambda_nu.
+  
+  A.prior = priors$alpha
+  A_V.gprior = priors$Sigma
+  Sigma_s.prior = priors$S
+  Sigma_v.prior = priors$nu
+  lambda_s.prior = priors$lambda_s
+  lambda_v.prior = priors$lambda_nu
+  
+  lambda.draw = lambda_s.prior/rchisq(1, lambda_v.prior)
+  
+  Sigma.posterior.draws = array(NA, c(1,1,S))
+  A.posterior.draws = array(NA, c(k,1,S))
+  lambda.posterior.draws = rep(NA,S)
+  for (s in 1:S){
+    
+    lambda.gprior.diag = diag(lambda.draw, nrow(Y))
+    
+    A_V.posterior     = solve(t(X)%*%diag(1/diag(lambda.gprior.diag))%*%X + solve(A_V.gprior))
+    A.posterior       = A_V.posterior%*%(t(X)%*%diag(1/diag(lambda.gprior.diag))%*%Y + solve(A_V.gprior)%*%A.prior)
+    Sigma_s.posterior = t(Y)%*%diag(1/diag(lambda.gprior.diag))%*%Y + t(A.prior)%*%solve(A_V.gprior)%*%A.prior + Sigma_s.prior - t(A.posterior)%*%solve(A_V.posterior)%*%A.posterior
+    Sigma_v.posterior = nrow(Y) + Sigma_v.prior
+    
+    #Sigma.inv.draw      = rWishart(1, Sigma_v.posterior, solve(Sigma_s.posterior))[,,1]
+    #Sigma.posterior.draws[,,s] = solve(Sigma.inv.draw)
+    
+    Sigma.posterior.draws[,,s] = Sigma_s.posterior/ rchisq(1, df=Sigma_v.posterior)
+    Sigma.inv.draw = solve(Sigma.posterior.draws[,,s])
+    
+    A.posterior.draws[,,s] = matrix(mvtnorm::rmvnorm(1, mean=as.vector(A.posterior), sigma=Sigma.posterior.draws[,,s]%x%A_V.posterior), ncol=2)
+    
+    lambda_s.posterior = sum(diag(Sigma.inv.draw%*%t(Y - X%*%A.posterior.draws[,,s])%*%(Y - X%*%A.posterior.draws[,,s]))) + lambda_s.prior
+    lambda_v.posterior = nrow(Y)*2 + lambda_v.prior
+    
+    lambda.draw = lambda_s.posterior / rchisq(1, lambda_v.posterior)
+    lambda.posterior.draws[s] = lambda.draw
+  }
+  return(list(A.posterior.draws, Sigma.posterior.draws, lambda.posterior.draws))
+}
+
+tdist.res = TDist.Gibbs.sampler(1000, Y, X, c(priors, list(lambda_s=30, lambda_nu=30)))
+
+#Alpha posterior mean:
+round(apply(tdist.res[[1]], 1:2, mean),2)
+
+#Sigma posterior mean:
+round(mean(tdist.res[[2]]),2)
+
+#Lambda posterior mean:
+round(mean(tdist.res[[3]]),2)
+
+```
+
+
+
 
 ## Estimating autoregressions after 2020
 
