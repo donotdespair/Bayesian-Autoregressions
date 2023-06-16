@@ -903,6 +903,12 @@ $$
 \boldsymbol\sigma^2 = (\exp\{h_1\}, ... , \exp\{h_t\})
 $$
 $h_t$ - follows a Stochastic Volatility process
+$$
+\begin{align*}
+h_t &= h_{t-1}+\sigma_vv_t \\
+v_t &\sim N(0,1)
+\end{align*}
+$$
 
 The likelihood function is then
 $$
