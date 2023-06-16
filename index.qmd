@@ -10,14 +10,18 @@ author:
     url: https://github.com/IoTiFeelo
   - name: Ray Gomez
     url: https://github.com/rayccg
+  - name: Xiaoman Guo
+    url: https://github.com/mandyxmg
+    - name: Nathan Huynh
+    url: https://github.com/nathanh93
   - name: Thomas Kronholm Møller
     url: https://github.com/ThomasKronhol
   - name: Yobin Timilsena
     url: https://github.com/yobin-tim
+  - name: Django Trueman-Greinke
+    url: https://github.com/DjangoTG
   - name: Hanwen Zhang
     url: https://github.com/hanwenzhang0317
-  - name: Nathan Huynh
-    url: https://github.com/nathanh93
 execute:
   echo: false
 citation: 
@@ -507,6 +511,53 @@ s.sigma <- rgamma(1, shape = a.bar.s, scale = s.bar.s)
 ```
 ## Dummy observation prior
 
+
+In this extended model, the system is augmented using the *sum of coefficients* and *dummy initial observation* prior. The idea for this way of setting a prior is to generate artificial new rows that augment data matrices $\bf y$ and $\bf X$. It is equivalent to assuming a normal-inverted gamma 2 prior whose parameters are determined by dummy observations augmenting the system.
+
+The *sum of coefficients* prior takes the average of the lagged values and adds them to the basic equation. This is because these values are assumed to be a good forecast of future observations. The *dummy initial observation* prior adds a single dummy observation such that all values are set equal to the averages of initial conditions, up to a scaling factor.
+
+In order to practically generate the additional rows the following steps should be taken.
+
+Firstly, the average of lagged values needs to be calculated, `y.bar`. This is done by finding the mean of the first $p$ values in the data. Next, values of of the scaling factors need to be selected, where values equal to 1 are chosen typically.
+
+Once this has been done, the rows can be created. In the univariate case this is simple, two rows are added to vector $\bf y$, the first equal to `y.bar` divided by the first scaling factor, $\lambda_3$, the second equal to th same value divided by the second scaling factor, $\lambda_4$.
+
+Adding rows to $\bf X$ is slightly more complicated. The additional rows are as follows. The values in the first row, corresponding to the sum of coefficients, are all equal to `y.bar` divided by $\lambda_3$, except the last column, which is equal to zero. The values in the second row, corresponding to the dummy initial observation, are all equal to `y.bar`, except the last column, which is equal to one, al of which are divided by $\lambda_4$.
+
+The following **R** function `prior.ex()` generates vectors and matrices by which $\bf y$ and $\bf X$ should be extended.
+
+```{r}
+#| echo: true 
+#| 
+prior.ex <- function(data, p = 1, lambda_3 = 1, lambda_4 = 1){
+  
+  N = 1
+  M = p + 1
+  
+  y.bar     = mean(data[1:p])
+    
+  Y_star    = rbind((y.bar)/lambda_3, y.bar/lambda_4)
+  X_star    = as.matrix(c(rep(0, N), 1/lambda_4))
+  for (i in 1:p) {
+    X_star  = cbind(Y_star, X_star)
+  }
+  
+  ext.data <- list(YN = Y_star, XN = X_star)
+  
+  return(ext.data)
+  
+  
+}
+
+```
+
+
+
+
+```{R}
+
+
+```
 # Model Extensions
 
 ## Student-$t$ error term
@@ -994,8 +1045,61 @@ covid.est <- function(data, p=4, S=100, k1=1, k2=100, start_date = c(1991,1), Th
 
 ## Conditional predictive density
 
+The Bayesian approach of the conditional predictive density is a combination of a conditional predictive density and the posterior distribution of the unknown parameters $\boldsymbol\alpha$ and $\sigma^{2}$. The one-period ahead conditional predictive density can be expressed as below. 
+
+$$
+p(y_{t+1} |x_{t+1},\mathbf{y}, \mathbf{X}) = \int\int p(y_{t+1} |x_{t+1}, \mathbf{y}, \mathbf{X}, \boldsymbol\alpha, \sigma^{2})p(\boldsymbol\alpha, \sigma^{2}|\mathbf{y},\mathbf{X}) d\boldsymbol\alpha d\sigma^{2}$$
+
+$$p(y_{t+1} |x_{t+1}, \mathbf{y},\mathbf{X}, \boldsymbol\alpha, \sigma^{2}) = \mathcal{N}( \alpha'_{d}d_{t+1|t} + \alpha_{1}y_{t}+\dots+\alpha_{p}y_{t-p+1}, \sigma^{2})$$
+
+$$p(\boldsymbol\alpha, \sigma^{2}|\mathbf{y},\mathbf{X}) = \mathcal{NIG}2(\overline{\boldsymbol\alpha}, \overline{\sigma^{2}}, \overline{S}, \overline{v}) $$
+
+
+To sample the joint predictive density, we integrate out $\boldsymbol\alpha$ and $\sigma^{2}$. Below steps show how the one-period ahead joint predictive density can be obtained. 
+
+Sample draws from the posterior distribution $p(\boldsymbol\alpha, \sigma^{2}|\bf y,\bf X)$ and 
+
+Obtain $\left\{ \boldsymbol\alpha^{(s)},  \sigma^{2(s)} \right\}^{S}_{s=1}$
+
+For each draw of $\boldsymbol\alpha$ and $\sigma^{2}$ sample from $p(y_{t+1} |x_{t+1})$ that is specified as $y_{t+1} \sim \mathcal{N} (x_{t+1|t}\boldsymbol\alpha^{(s)},  \sigma^{2(s)})$
+
+Obtain $\left\{ y_{t+1|t}^{(s)} \right\}^{S}_{s=1}$
+
+Characterise the predictive density using $\left\{ y_{t+1|t}^{(s)} \right\}^{S}_{s=1}$
+
+
 ## Algorithm to sample from the predictive density
 
 ## Sampler implementation in R
+
+```{r forecasting h step}
+#| echo: true
+#| message: false
+#| warning: false
+#| eval: false
+## Apply function when needed
+posterior.sample.draws = posterior.draws(S=50000, Y=Y, X=X)         # using the posterior function to draw alpha and sigma
+A.posterior.simu       = posterior.sample.draws$A.posterior         # obtain posterior alpha
+Sigma.posterior.simu   = posterior.sample.draws$Sigma.posterior     # obtain posterior sigma
+
+## forecasting setup
+h                      = 12                                         # specify the desired number of steps ahead
+S                      = 50000                                      # the number of sampling time, no greater than the simulation time in the posterior draw function
+Y.h                    = matrix(NA,h,S)                             # create empty matrix to store the h-step ahead Y 
+
+## sampling predictive density
+for (s in 1:S){
+  A.posterior.draw     = A.posterior.simu[,s]
+  Sigma.posterior.draw = Sigma.posterior.simu[,s]
+    x.Ti               = Y[(nrow(Y)-p+1):nrow(Y)]                   # the number of lags in Y
+    x.Ti               = x.Ti[p:1]
+  for (i in 1:h){
+    x.T                = c(d,as.vector(t(x.Ti)))                    # d refers to d row vector for the deterministic term data
+    Y.f                = rnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior.draw)
+      x.Ti             = rbind(Y.f,x.Ti[1:(p-1)])                   # refresh the initial data in Y
+    Y.h[i,s]           = Y.f
+  }
+}
+```
 
 # References {.unnumbered}
