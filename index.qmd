@@ -12,7 +12,7 @@ author:
     url: https://github.com/rayccg
   - name: Xiaoman Guo
     url: https://github.com/mandyxmg
-    - name: Nathan Huynh
+  - name: Nathan Huynh
     url: https://github.com/nathanh93
   - name: Thomas Kronholm Møller
     url: https://github.com/ThomasKronhol
@@ -567,7 +567,7 @@ A possible extension to the model is to relax the assumption of normally distrib
 $$ u_t \sim \mathcal{t}(0,\Sigma,\nu) $$
 
 
-#### Scale Mixture of Normals Representation of the T Distribution
+#### Scale Mixture of Normals Representation of the $t$ Distribution
 
 Implementation of t-distributed errors can be achieved by representing the t-distribution as a 'scale mixture of normal distributions'. 
 
@@ -599,7 +599,7 @@ The likelihood under this specification now becomes
 $$ L(\boldsymbol{\alpha}, \sigma^2, \lambda | \boldsymbol{y}, \boldsymbol{X}) = (2\pi)^{-\frac{T}{2}} (\sigma^2)^{-\frac{T}{2}} \det(\lambda I_T)^{-\frac{1}{2}}
 exp(-\frac{1}{2}\frac{1}{\sigma^2}(\boldsymbol{y - X\alpha})'(\lambda I_T)^{-1}(\boldsymbol{y - X\alpha}))$$
 
-As before, we can derive the full conditional posteriors of the parameters by multiplying the likelihood and the priors. The natural conjugacy of $\alpha$ and $\sigma^2$ are preserved under this specification and therefore the joint posterior is given by
+As before, we can derive the full conditional posteriors of the parameters by multiplying the likelihood and the priors. The natural conjugacy of $\boldsymbol\alpha$ and $\sigma^2$ are preserved under this specification and therefore the joint posterior is given by
 
 $$ p(\boldsymbol{\alpha}, \sigma^2|\boldsymbol{y, X}, \lambda) \propto L(\boldsymbol{\alpha}, \sigma^2, \lambda | \boldsymbol{y}, \boldsymbol{X}) p(\boldsymbol{\alpha}, \sigma^2) $$
 
@@ -625,7 +625,7 @@ Rearranging the above to express in the form of $\mathcal{IG2}$
 
 $$\begin{align*}
 p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &= \mathcal{IG2}(\overline s_\lambda, \overline \nu_\lambda) \\
-\overline s_\lambda &= \frac{1}{\sigma^2}(\mathbf{y - X\alpha})'(\mathbf{y - X\alpha}) + \underline s_\lambda \\
+\overline s_\lambda &= \frac{1}{\sigma^2}(\mathbf{y - X\boldsymbol\alpha})'(\mathbf{y - X\boldsymbol\alpha}) + \underline s_\lambda \\
 \overline \nu_\lambda &= T + \underline \nu_\lambda
 \end{align*}$$
 
@@ -642,7 +642,7 @@ Initialize lambda based on priors for $\underline s_\lambda$ and $\underline \nu
 At each iteration s:
 
 1.    Draw $\sigma^{2(s)}$ from the $\mathcal{IG2}(\overline S, \overline\nu)$ distribution
-2.    Draw $\mathbf{\alpha^{(s)}}$ from the $\mathcal{N}(\boldsymbol{\overline \alpha}, \sigma^{2(s)}, \overline V)$ distribution
+2.    Draw $\mathbf{\alpha^{(s)}}$ from the $\mathcal{N}(\boldsymbol{\overline \alpha}, \sigma^{2(s)} \overline V)$ distribution
 3.    Draw $\lambda^{(s)}$ from $\mathcal{IG2}(\overline s_\lambda, \overline\nu_\lambda)$
 
 The sampling routine is implemented via the following function in R and the results of applying the sampler to the artificial random walk data are displayed. For the purposes of this simulation a relatively large prior for the degrees of freedom parameter is chosen, which communicates our prior belief that the data should follow a random walk.
