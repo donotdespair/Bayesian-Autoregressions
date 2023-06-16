@@ -1043,7 +1043,7 @@ covid.est <- function(data, p=4, S=100, k1=1, k2=100, start_date = c(1991,1), Th
 
 # Forecasting
 
-## Conditional predictive density
+## Forecasting one period ahead
 
 The Bayesian approach of the conditional predictive density is a combination of a conditional predictive density and the posterior distribution of the unknown parameters $\boldsymbol\alpha$ and $\sigma^{2}$. The one-period ahead conditional predictive density can be expressed as below. 
 
@@ -1068,7 +1068,7 @@ Obtain $\left\{ y_{t+1|t}^{(s)} \right\}^{S}_{s=1}$
 Characterise the predictive density using $\left\{ y_{t+1|t}^{(s)} \right\}^{S}_{s=1}$
 
 
-## Algorithm to sample from the predictive density
+## Forecasting many periods ahead
 
 ## Sampler implementation in R
 
