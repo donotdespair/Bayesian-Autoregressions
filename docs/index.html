@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.475">
+<meta name="generator" content="quarto-1.2.269">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -21,6 +21,25 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1.6em;
   vertical-align: middle;
+}
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
 }
 </style>
 
@@ -127,7 +146,10 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#model-extensions" id="toc-model-extensions" class="nav-link" data-scroll-target="#model-extensions">Model Extensions</a>
   <ul class="collapse">
   <li><a href="#student-t-error-term" id="toc-student-t-error-term" class="nav-link" data-scroll-target="#student-t-error-term">Student-<span class="math inline">\(t\)</span> error term</a></li>
-  <li><a href="#estimating-autoregressions-after-2020" id="toc-estimating-autoregressions-after-2020" class="nav-link" data-scroll-target="#estimating-autoregressions-after-2020">Estimating autoregressions after 2020</a></li>
+  <li><a href="#estimating-autoregressions-after-2020" id="toc-estimating-autoregressions-after-2020" class="nav-link" data-scroll-target="#estimating-autoregressions-after-2020">Estimating autoregressions after 2020</a>
+  <ul class="collapse">
+  <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology">Methodology</a></li>
+  </ul></li>
   <li><a href="#stochastic-volatility-heteroskedasticity" id="toc-stochastic-volatility-heteroskedasticity" class="nav-link" data-scroll-target="#stochastic-volatility-heteroskedasticity">Stochastic volatility heteroskedasticity</a></li>
   </ul></li>
   <li><a href="#forecasting" id="toc-forecasting" class="nav-link" data-scroll-target="#forecasting">Forecasting</a>
@@ -257,6 +279,25 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 </section>
 <section id="estimating-autoregressions-after-2020" class="level2">
 <h2 class="anchored" data-anchor-id="estimating-autoregressions-after-2020">Estimating autoregressions after 2020</h2>
+<p>The 2020 COVID-19 pandemic significantly altered the global economic landscape. It may be argued that the pre and post COVID periods are not easily comparable, or that the most severe changes for COVID would best be discounted due to their warping effect on the overall data. However, <span class="citation" data-cites="lenza2022estimate">Lenza and Primiceri (<a href="#ref-lenza2022estimate" role="doc-biblioref">2022</a>)</span> disagree. In their paper <em>How to estimate a vector autoregression after March 2020</em>, rather than discount data, they suggest that the effects of COVID be modeled as a temporary spike in volatility. They found that the first three periods of the pandemic are where volatility is the most unpredictable and this finding holds regardless of whether monthly or quarterly data is being used. For higher frequency data the exact effect is unknown though should cover at least the first 3 months of the pandemic. Thus, they propose the following change to the standard formula for autoregressions:</p>
+<p><span class="math display">\[y_t = \mathbf{x}_t'\boldsymbol\alpha + c_tu_t,\]</span></p>
+<p>where <span class="math inline">\(c_t\)</span> is a standard deviation multiplier. That is, for every period before COVID it takes a value of 1, for the first 3 periods of COVID it takes values <span class="math inline">\(\bar{c}_0\)</span>, <span class="math inline">\(\bar{c}_1\)</span>, <span class="math inline">\(\bar{c}_2\)</span>, and then in all future periods a value of <span class="math display">\[c_{t*+j} = 1 + (\bar{c}_2 - 1)\rho^{j-2}, \]</span> where <span class="math inline">\(\rho\in(0,1)\)</span> captures the exponential decay in the value of the conditional standard deviation towards the value one. This creates a vector that leaves the error term unchanged before COVID, has a surge in volatility during COVID, and then decays geometrically after COVID. This structure approximates the observed shocks to volatility and facilitates straightforward estimation.</p>
+<p>By dividing both sides by <span class="math inline">\(c_t\)</span> the model equation can be rewritten as <span class="math display">\[\bar{y}_t = \bar{\mathbf{x}}_t'\boldsymbol\alpha + u_t\]</span> where <span class="math inline">\(\bar{y}_t = y_t/c_t\)</span> and <span class="math inline">\(\bar{\mathbf{x}}_t = \mathbf{x}_t/c_t\)</span>. These simple transformations then lend themselves to analysis using whatever estimation method is preferred.</p>
+<p>The main difficulty arises in the estimation of <span class="math inline">\(c_t\)</span> as it is an unknown parameter in many cases.</p>
+<section id="methodology" class="level3">
+<h3 class="anchored" data-anchor-id="methodology">Methodology</h3>
+<p>To estimate the values for <span class="math inline">\(c_0\)</span>, <span class="math inline">\(c_1\)</span>, and <span class="math inline">\(c_2\)</span> define a <span class="math inline">\(T\)</span>-vector <span class="math inline">\(\mathbf{c}\)</span> of COVID volatility variables:</p>
+<p><span class="math display">\[\mathbf{c}=\begin{bmatrix}1&amp;\dots&amp; c_0 &amp; c_1 &amp; c_2 &amp; 1+(c_2-1)\rho &amp;  1+(c_2-1)\rho^2&amp;\dots\end{bmatrix}'\]</span></p>
+<p>Intuitively, volatility variable for the period before COVID is set to unity. Heightened volatility during the first three quarters of COVID are parameterized, then they are assumed to decay at a geometric rate beginning at the fourth quarter since the pandemic’s onset.</p>
+<p>These COVID volatility parameters are collected in a vector <span class="math inline">\(\boldsymbol\theta=(c_0\quad c_1\quad c_2\quad\rho)\)</span> and are estimated from their own marginal posterior as proposed by <span class="citation" data-cites="lenza2022estimate">Lenza and Primiceri (<a href="#ref-lenza2022estimate" role="doc-biblioref">2022</a>)</span>:</p>
+<p><span class="math display">\[p(\boldsymbol\theta\mid\mathbf{y},\mathbf{X},\underline{\gamma})\propto P(\mathbf{y}\mid\mathbf{X},\boldsymbol\theta,\underline{\gamma})p(\boldsymbol\theta\mid\underline{\gamma})\]</span></p>
+<p>where the likelihood function is given as:</p>
+<p><span class="math display">\[P(\mathbf{y},\mathbf{X}|\boldsymbol\theta,\underline{\gamma})\propto \Bigg(\prod^T_{t=1}c_t^{-N}\Bigg)||\underline{V}||^{\frac{N}{2}}||\underline{S}||^{\frac{\underline{\nu}}{2}}||\tilde{X}'\tilde{X}+\underline{V}^{-1}||^{\frac{N}{2}}\\\]</span></p>
+<p><span class="math display">\[||\underline{S}+\hat{\tilde{\mathbf{u}}}'\hat{\tilde{\mathbf{u}}}+(\hat{\tilde{\boldsymbol\alpha}}-\tilde{Y}+\tilde{\mathbf{X}}\underline{\boldsymbol\alpha})'\underline{V}^{-1}(\hat{\tilde{\boldsymbol\alpha}}-\tilde{\mathbf{y}}+\tilde{\mathbf{X}}\underline{\boldsymbol\alpha})||^{-\frac{T-p+\underline{\nu}}{2}}\]</span> Then, after substituting in data for y and X, the likelihood function for estimation of the parameters is given by:</p>
+<p><span class="math display">\[L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) = (2\pi)^{-\frac{T}{2}}\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)'(\mathbf{y} - \mathbf{X}\boldsymbol\alpha)\right\}\]</span></p>
+<p>where <span class="math inline">\(\tilde{\mathbf{x}}_t=\frac{(1,\mathbf{y}_t,...,\mathbf{y}_{t-p})'}{\mathbf{c}_t}\)</span>, <span class="math inline">\(\tilde{\hat{A}}=(\tilde{\mathbf{X}}'\tilde{\mathbf{X}}-\underline{V}^{-1})^{-1}\)</span>, and <span class="math inline">\(\underline{\gamma}=(\underline{A},\underline{S},\underline{V},\underline{\nu})\)</span></p>
+<p>and the priors are assumed to be: <span class="math inline">\(\mathbf{c}_0,\mathbf{c}_1,\mathbf{c}_2\sim Pareto(1,1)\)</span> and <span class="math inline">\(\rho\sim Beta(3,1.5)\)</span></p>
+</section>
 </section>
 <section id="stochastic-volatility-heteroskedasticity" class="level2">
 <h2 class="anchored" data-anchor-id="stochastic-volatility-heteroskedasticity">Stochastic volatility heteroskedasticity</h2>
@@ -275,12 +316,17 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 </section>
 </section>
 <section id="references" class="level1 unnumbered">
-<h1 class="unnumbered">References</h1>
+
+
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{woźniak2023,
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-lenza2022estimate" class="csl-entry" role="doc-biblioentry">
+Lenza, Michele, and Giorgio E Primiceri. 2022. <span>“How to Estimate a Vector Autoregression After March 2020.”</span> <em>Journal of Applied Econometrics</em> 37 (4): 688–99.
+</div>
+</div></section><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{woźniak2023,
   author = {Tomasz Woźniak and Your Name},
   title = {Bayesian {Autoregressions}},
   date = {2023-05-25},
