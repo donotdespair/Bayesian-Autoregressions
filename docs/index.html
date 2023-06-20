@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.361">
+<meta name="generator" content="quarto-1.3.306">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -119,8 +119,7 @@ div.csl-indent {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit",
-    "search-label": "Search"
+    "search-submit-button-title": "Submit"
   }
 }</script>
 
@@ -203,6 +202,7 @@ div.csl-indent {
   </ul></li>
   <li><a href="#forecasting" id="toc-forecasting" class="nav-link" data-scroll-target="#forecasting">Forecasting</a>
   <ul class="collapse">
+  <li><a href="#comparison-of-frequentist-and-bayesian-forecasting" id="toc-comparison-of-frequentist-and-bayesian-forecasting" class="nav-link" data-scroll-target="#comparison-of-frequentist-and-bayesian-forecasting">Comparison of Frequentist and Bayesian forecasting</a></li>
   <li><a href="#forecasting-one-period-ahead" id="toc-forecasting-one-period-ahead" class="nav-link" data-scroll-target="#forecasting-one-period-ahead">Forecasting one period ahead</a></li>
   <li><a href="#forecasting-many-periods-ahead" id="toc-forecasting-many-periods-ahead" class="nav-link" data-scroll-target="#forecasting-many-periods-ahead">Forecasting many periods ahead</a></li>
   <li><a href="#sampler-implementation-in-r" id="toc-sampler-implementation-in-r" class="nav-link" data-scroll-target="#sampler-implementation-in-r">Sampler implementation in R</a></li>
@@ -1084,6 +1084,34 @@ p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &amp;= \mathcal{IG2}(\overl
 </section>
 <section id="forecasting" class="level1">
 <h1>Forecasting</h1>
+<section id="comparison-of-frequentist-and-bayesian-forecasting" class="level2">
+<h2 class="anchored" data-anchor-id="comparison-of-frequentist-and-bayesian-forecasting">Comparison of Frequentist and Bayesian forecasting</h2>
+<p>In the frequentist approach, we condition the predictive density on <span class="math inline">\(\theta\)</span>, the parameters. The latters are treated as non-random. Therefore, it can be stated that this approach ignores estimation uncertainty.</p>
+<p>To solve this issue, the Bayesian approach treats the parameters <span class="math inline">\(A\)</span> and <span class="math inline">\(\Sigma\)</span> as random variables and thus, it incorporates estimation uncertainty into the predictive density. In fact, if we impose appropriate priors, Bayesian forecasting often leads to more precise estimations as it narrows the confidence intervals by using priors.</p>
+<p>Moreover, Bayesian forecasting uses the frequentist approach as a starting point. In the following formula for the conditional one-period ahead forecast, the first expression under the integral signs is the conditional predictive density of the frequentist approach and the second expression is the joint posterior distribution that we are now used to derive.</p>
+<p><span class="math display">\[
+\begin{aligned}
+p\left(y_{t+1} \mid x_{t+1}, Y, X\right) &amp; =\iint p\left(y_{t+1} \mid x_{t+1}, Y, X, A, \Sigma\right) p(A, \Sigma \mid Y, X) d A d \Sigma \\
+p\left(y_{t+1} \mid x_{t+1} Y, X, A, \Sigma\right) &amp; =\mathcal{M} \mathcal{N}_{1 \times N}\left(x_{t+1}^{\prime} A, \Sigma, 1\right) \\
+p(A, \Sigma \mid Y, X) &amp; =p(A \mid Y, X, \Sigma) p(\Sigma \mid Y, X) \\
+p(A \mid Y, X, \Sigma) &amp; =\mathcal{M} \mathcal{N}_{K \times N}(\bar{A}, \Sigma, \bar{V}) \\
+p(\Sigma \mid Y, X) &amp; =\mathcal{I W}_N(\bar{S}, \bar{\nu})
+\end{aligned}
+\]</span> To derive the solution of this expression analytically, we integrate the parameters out in this order:</p>
+<ol type="1">
+<li>We integrate out <span class="math inline">\(A\)</span>.</li>
+</ol>
+<p>By integrating out <span class="math inline">\(A\)</span>, we obtain:</p>
+<p><span class="math display">\[
+p\left(y_{t+1} \mid x_{t+1}, Y, X, \Sigma\right)=\mathcal{M N}_{1 \times N}\left(x_{t+1}^{\prime} \bar{A}, \Sigma, 1+x_{t+1}^{\prime} \bar{V} x_{t+1}\right)
+\]</span></p>
+<ol start="2" type="1">
+<li>We integrate out <span class="math inline">\(\Sigma\)</span></li>
+</ol>
+<p>By integrating out <span class="math inline">\(\Sigma\)</span>, we obtain: <span class="math display">\[
+p\left(y_{t+1} \mid x_{t+1}, Y, X\right)=\mathcal{M} t_{1 \times N}\left(x_{t+1}^{\prime} \bar{A}, 1+x_{t+1}^{\prime} \bar{V} x_{t+1}, \bar{S}, \bar{\nu}\right)
+\]</span></p>
+</section>
 <section id="forecasting-one-period-ahead" class="level2">
 <h2 class="anchored" data-anchor-id="forecasting-one-period-ahead">Forecasting one period ahead</h2>
 <p>The Bayesian approach of the conditional predictive density is a combination of a conditional predictive density and the posterior distribution of the unknown parameters <span class="math inline">\(\boldsymbol\alpha\)</span> and <span class="math inline">\(\sigma^{2}\)</span>. The one-period ahead conditional predictive density can be expressed as below.</p>

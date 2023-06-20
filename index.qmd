@@ -18,6 +18,8 @@ author:
     url: https://github.com/nathanh93
   - name: Thomas Kronholm Møller
     url: https://github.com/ThomasKronhol
+  - name: Victoria Sonnemans
+    url: https://github.com/vsonnemans
   - name: Yobin Timilsena
     url: https://github.com/yobin-tim
   - name: Django Trueman-Greinke
@@ -1092,9 +1094,40 @@ covid.est <- function(data, p=4, S=100, k1=1, k2=100, start_date = c(1991,1), Th
 
 ## Stochastic volatility heteroskedasticity
 
+
+
 # Forecasting
 
-## Forecasting one period ahead
+## Analytical results for one-period-ahead forecast 
+
+In the frequentist approach, we condition the predictive density on the parameters $\left(\boldsymbol\alpha\right)$, the parameters. The latter are treated as non-random.  Therefore, it can be stated that this approach to forecasting ignores estimation uncertainty. 
+
+To address this issue, the Bayesian approach treats the parameters $\boldsymbol\alpha$ and $\sigma^2$ as random variables and thus, it incorporates estimation uncertainty into the predictive density. Additionally, by imposing appropriate priors Bayesian forecasting often leads to more precise forecasts as it narrows the predictive intervals. 
+
+Moreover, Bayesian forecasting uses the conditional predictive density as a starting point. In the following formula for the conditional one-period ahead forecast, the first expression under the integral is the conditional predictive density and the second expression is the joint posterior distribution that we are now used to derive. 
+
+$$\begin{align}
+p\left(y _{t+1} \mid \mathbf{y}, \mathbf{X}\right) &=\iint p\left(y _{t+1} \mid\mathbf{y}, \mathbf{X}, \boldsymbol\alpha, \sigma^2\right) p\left(\boldsymbol\alpha, \sigma^2 \mid \mathbf{y}, \mathbf{X}\right) d \boldsymbol\alpha d \sigma^2\\
+p\left(y _{t+1} \mid\mathbf{y}, \mathbf{X}, \boldsymbol\alpha, \sigma^2 \right) &=\mathcal{N} \left(x_{t+1}^{\prime} \boldsymbol\alpha, \sigma^2\right)\\
+p\left(\boldsymbol\alpha, \sigma^2 \mid \mathbf{y}, \mathbf{X}\right) &=p\left(\boldsymbol\alpha \mid \mathbf{y}, \mathbf{X}, \sigma^2\right) p\left(\sigma^2 \mid \mathbf{y}, \mathbf{X}\right)\\
+p\left(\boldsymbol\alpha \mid \mathbf{y}, \mathbf{X}, \sigma^2 \right) &= \mathcal{N}_{K}\left(\overline{\boldsymbol\alpha}, \sigma^2\overline{\mathbf{V}}\right)\\
+p\left(\sigma^2 \mid \mathbf{y}, \mathbf{X}\right) &=\mathcal{IG}2(\overline{s}, \overline{\nu})
+\end{align}
+$$
+To derive the solution of this expression analytically, we integrate the parameters out in this order: 
+
+1. We integrate out $\boldsymbol\alpha$ and obtain:
+
+$$
+p\left(y_{t+1} \mid \mathbf{y}, \mathbf{X}, \sigma^2\right)=\mathcal{N}\left(\mathbf{x}_{t+1}^{\prime} \overline{\boldsymbol\alpha}, \sigma^2\left(1+\mathbf{x}_{t+1}^{\prime} \overline{\mathbf{V}} \mathbf{x}_{t+1}\right)\right)
+$$
+
+2. We integrate out $\sigma^2$ and obtain the one-period-ahead predictive density given by a Student-$t$ distribution as defined by @Bauwens1999:
+$$
+p\left(y_{t+1} \mid \mathbf{y}, \mathbf{X}\right)=t\left(\mathbf{x}_{t+1}^{\prime} \overline{\boldsymbol\alpha}, 1+\mathbf{x}_{t+1}^{\prime} \overline{\mathbf{V}} \mathbf{x}_{t+1}, \overline{s}, \overline{\nu}\right).
+$$
+
+## Numerical approach to one-period-ahead forecast
 
 The Bayesian approach of the conditional predictive density is a combination of a conditional predictive density and the posterior distribution of the unknown parameters $\boldsymbol\alpha$ and $\sigma^{2}$. The one-period ahead conditional predictive density can be expressed as below. 
 
