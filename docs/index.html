@@ -4,10 +4,19 @@
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.2.269">
 
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Tomasz Woźniak">
-<meta name="author" content="Your Name">
+<meta name="author" content="Jonas Loopers Davidsen">
+<meta name="author" content="Filippo Dell’Andrea">
+<meta name="author" content="Ray Gomez">
+<meta name="author" content="Xiaoman Guo">
+<meta name="author" content="Nathan Huynh">
+<meta name="author" content="Thomas Kronholm Møller">
+<meta name="author" content="Yobin Timilsena">
+<meta name="author" content="Django Trueman-Greinke">
+<meta name="author" content="Hanwen Zhang">
 
 <title>Macroeconometrics Students Present - Bayesian Autoregressions</title>
 <style>
@@ -19,9 +28,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
@@ -40,6 +50,7 @@ div.csl-right-inline {
 }
 div.csl-indent {
   margin-left: 2em;
+
 }
 </style>
 
@@ -76,10 +87,12 @@ div.csl-indent {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="styles.css">
@@ -96,18 +109,20 @@ div.csl-indent {
     <span class="navbar-title">Macroeconometrics Students Present</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/donotdespair/Bayesian-Autoregressions"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/donotdespair/Bayesian-Autoregressions" rel="" target=""><i class="bi bi-github" role="img">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
@@ -129,6 +144,7 @@ div.csl-indent {
   </ul></li>
   <li><a href="#natural-conjugate-analysis" id="toc-natural-conjugate-analysis" class="nav-link" data-scroll-target="#natural-conjugate-analysis">Natural-Conjugate Analysis</a>
   <ul class="collapse">
+  <li><a href="#likelihood-as-normal-inverted-gamma-2" id="toc-likelihood-as-normal-inverted-gamma-2" class="nav-link" data-scroll-target="#likelihood-as-normal-inverted-gamma-2">Likelihood as normal-inverted gamma 2</a></li>
   <li><a href="#normal-inverted-gamma-2-prior" id="toc-normal-inverted-gamma-2-prior" class="nav-link" data-scroll-target="#normal-inverted-gamma-2-prior">Normal-inverted gamma 2 prior</a></li>
   <li><a href="#normal-inverted-gamma-2-posterior" id="toc-normal-inverted-gamma-2-posterior" class="nav-link" data-scroll-target="#normal-inverted-gamma-2-posterior">Normal-inverted gamma 2 posterior</a></li>
   <li><a href="#sampling-draws-from-the-posterior" id="toc-sampling-draws-from-the-posterior" class="nav-link" data-scroll-target="#sampling-draws-from-the-posterior">Sampling draws from the posterior</a></li>
@@ -154,8 +170,8 @@ div.csl-indent {
   </ul></li>
   <li><a href="#forecasting" id="toc-forecasting" class="nav-link" data-scroll-target="#forecasting">Forecasting</a>
   <ul class="collapse">
-  <li><a href="#conditional-predictive-density" id="toc-conditional-predictive-density" class="nav-link" data-scroll-target="#conditional-predictive-density">Conditional predictive density</a></li>
-  <li><a href="#algorithm-to-sample-from-the-predictive-density" id="toc-algorithm-to-sample-from-the-predictive-density" class="nav-link" data-scroll-target="#algorithm-to-sample-from-the-predictive-density">Algorithm to sample from the predictive density</a></li>
+  <li><a href="#forecasting-one-period-ahead" id="toc-forecasting-one-period-ahead" class="nav-link" data-scroll-target="#forecasting-one-period-ahead">Forecasting one period ahead</a></li>
+  <li><a href="#forecasting-many-periods-ahead" id="toc-forecasting-many-periods-ahead" class="nav-link" data-scroll-target="#forecasting-many-periods-ahead">Forecasting many periods ahead</a></li>
   <li><a href="#sampler-implementation-in-r" id="toc-sampler-implementation-in-r" class="nav-link" data-scroll-target="#sampler-implementation-in-r">Sampler implementation in R</a></li>
   </ul></li>
   <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
@@ -171,26 +187,25 @@ div.csl-indent {
 </div>
 
 
-<div class="quarto-title-meta-author">
-  <div class="quarto-title-meta-heading">Authors</div>
-  <div class="quarto-title-meta-heading">Affiliation</div>
-  
-    <div class="quarto-title-meta-contents">
-    <a href="https://github.com/donotdespair">Tomasz Woźniak</a> <a href="https://orcid.org/0000-0003-2212-2378" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a>
-  </div>
-    <div class="quarto-title-meta-contents">
-        <p class="affiliation">
-            University of Melbourne
-          </p>
-      </div>
-      <div class="quarto-title-meta-contents">
-    Your Name 
-  </div>
-    </div>
 
 <div class="quarto-title-meta">
 
-      
+    <div>
+    <div class="quarto-title-meta-heading">Authors</div>
+    <div class="quarto-title-meta-contents">
+             <p><a href="https://github.com/donotdespair">Tomasz Woźniak</a> <a href="https://orcid.org/0000-0003-2212-2378" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+             <p><a href="https://github.com/jonasld23">Jonas Loopers Davidsen</a> </p>
+             <p><a href="https://github.com/IoTiFeelo">Filippo Dell’Andrea</a> </p>
+             <p><a href="https://github.com/rayccg">Ray Gomez</a> </p>
+             <p><a href="https://github.com/mandyxmg">Xiaoman Guo</a> </p>
+             <p><a href="https://github.com/nathanh93">Nathan Huynh</a> </p>
+             <p><a href="https://github.com/ThomasKronhol">Thomas Kronholm Møller</a> </p>
+             <p><a href="https://github.com/yobin-tim">Yobin Timilsena</a> </p>
+             <p><a href="https://github.com/DjangoTG">Django Trueman-Greinke</a> </p>
+             <p><a href="https://github.com/hanwenzhang0317">Hanwen Zhang</a> </p>
+          </div>
+  </div>
+    
   
     
   </div>
@@ -244,14 +259,121 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 </section>
 <section id="natural-conjugate-analysis" class="level1">
 <h1>Natural-Conjugate Analysis</h1>
+<blockquote class="blockquote">
+<p><strong>Authors:</strong> Thomas Kronholm Møller &amp; Jonas Loopers Davidsen</p>
+</blockquote>
+<section id="likelihood-as-normal-inverted-gamma-2" class="level2">
+<h2 class="anchored" data-anchor-id="likelihood-as-normal-inverted-gamma-2">Likelihood as normal-inverted gamma 2</h2>
+<p>In order to facilitate deriving the posterior distribution, the likelihood function can be rewritten to a <span class="math inline">\(\mathcal{NIG}2\)</span>-distribution given by:</p>
+<span class="math display">\[\begin{align}
+L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) &amp;\propto \left(\sigma^2\right)^{-\frac{T-(k+2)+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right)'\mathbf{X}'\mathbf{X}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right) \right\}\\
+&amp;\qquad\times\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right) \right\},
+\end{align}\]</span>
+<p>where <span class="math inline">\(\boldsymbol{\hat{\alpha}} = (\mathbf{X}'\mathbf{X})^{-1}\mathbf{X}'\mathbf{y}\)</span> in the maximum likelihood estimator of <span class="math inline">\(\boldsymbol\alpha\)</span>. It is now quite straight forward to identify the <span class="math inline">\(\mathcal{NIG}2\)</span>-kernel. By remembering that the <span class="math inline">\(\mathcal{NIG}2\)</span>-distribution is characterized by its four moments, we get the following outcome:</p>
+<span class="math display">\[\begin{align}
+L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) = \mathcal{NIG}2\left(\mu=\boldsymbol{\hat{\alpha}},\Sigma=\left(\mathbf{X}'\mathbf{X}\right)^{-1},s=\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right),\nu=T-k-2\right)
+\end{align}\]</span>
+</section>
 <section id="normal-inverted-gamma-2-prior" class="level2">
 <h2 class="anchored" data-anchor-id="normal-inverted-gamma-2-prior">Normal-inverted gamma 2 prior</h2>
+<p>The prior distribution of the natural conjugate is determined by the form of the distribution of the parameters implied by the likelihood function discussed above. The priors for the Normal-inverse gamma 2 distribution can thus be written as:</p>
+<span class="math display">\[\begin{align}
+p(\boldsymbol\alpha,\sigma^2) &amp;= p(\boldsymbol\alpha|\sigma^2)p(\sigma^2)\\
+      p(\boldsymbol\alpha|\sigma^2) &amp;= \mathcal{N}(\underline{\boldsymbol\alpha},\sigma^2\underline{\mathbf{V}}_{\boldsymbol\alpha})\\
+      p(\sigma^2) &amp; = \mathcal{IG}2(\underline{s},\underline{\nu})
+\end{align}\]</span>
+<p>Using the distributions above, we can write the kernel of the <span class="math inline">\(\mathcal{NIG}2\)</span> prior as:</p>
+<span class="math display">\[\begin{align}
+\mathcal{NIG}2_{k}(\underline{\boldsymbol\alpha},\underline{\mathbf{V}}_{\boldsymbol\alpha}, \underline{s}, \underline{\nu}) \propto (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
+\end{align}\]</span>
 </section>
 <section id="normal-inverted-gamma-2-posterior" class="level2">
 <h2 class="anchored" data-anchor-id="normal-inverted-gamma-2-posterior">Normal-inverted gamma 2 posterior</h2>
+<p>The product of the prior distribution and the likelihood function as introduced above gives the posterior distribution given by:</p>
+<span class="math display">\[\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) \propto L(\mathbf{y}|\mathbf{X}, \boldsymbol\alpha, \sigma^2)p(\boldsymbol\alpha,\sigma^2) =  L(\mathbf{y}|\mathbf{X}, \boldsymbol\alpha, \sigma^2)p( \boldsymbol\alpha| \sigma^2)p(\sigma^2)
+\end{align}\]</span>
+<p>Now plugging in the expressions for the likelihood and the prior distribution:</p>
+<span class="math display">\[\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &amp;\propto \left(\sigma^2\right)^{-\frac{T-(k-2)+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right)'\mathbf{X}'\mathbf{X}\left(\boldsymbol\alpha-\boldsymbol{\hat{\alpha}}\right) \right\}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right)'\left(\mathbf{y}-\mathbf{X}\boldsymbol{\hat{\alpha}}\right) \right\} \\
+&amp;\times (\sigma^2)^{-\frac{\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})'\underline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
+\end{align}\]</span>
+<p>By collecting all terms and simplifying the expressions, the joint posterior distribution can be derived to be:</p>
+<span class="math display">\[\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &amp;\propto (\sigma^2)^{-\frac{T+\underline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2} (\boldsymbol\alpha-\overline{\boldsymbol\alpha})'\overline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\overline{\boldsymbol\alpha})\right\} \times \exp\left\{-\frac{1}{2}\frac{1}{\sigma^2}\left(\underline{s}-\overline{\boldsymbol\alpha}'\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}+\underline{\boldsymbol\alpha}'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{y}'\mathbf{y}\right)\right\}
+\\&amp;= (\sigma^2)^{\frac{\overline{\nu}+k+2}{2}}\exp\left\{-\frac{1}{2}\frac{1}{\sigma^2} (\boldsymbol\alpha-\overline{\boldsymbol\alpha})'\overline{\mathbf{V}}_{\boldsymbol\alpha}^{-1}(\boldsymbol\alpha-\overline{\boldsymbol\alpha})\right\} \times \exp\left\{-\frac{1}{2}\frac{\overline{s}}{\sigma^2}\right\}
+\end{align}\]</span>
+<p>This now fully defines the joint posterior distribution as is it is in a normal inverse gamma 2 form with its corresponding four moments:</p>
+<span class="math display">\[\begin{align}
+p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X}) &amp;= \mathcal{NIG}2_{k}\left(\overline{\boldsymbol\alpha},\overline{\mathbf{V}}_{\boldsymbol\alpha},\overline{s},\overline{\nu}\right)\\
+\overline{\boldsymbol\alpha} &amp;= \overline{\mathbf{V}}_{\boldsymbol\alpha}( \underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{X}'\mathbf{y})\\
+\overline{\mathbf{V}}_{\boldsymbol\alpha} &amp;=\left(\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}+\mathbf{X}'\mathbf{X}\right)^{-1} \\
+\overline{s} &amp;= \underline{s}-\overline{\boldsymbol\alpha}'\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}+\underline{\boldsymbol\alpha}'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{y}'\mathbf{y}\\
+\overline{\nu} &amp;= \underline{\nu}+T
+\end{align}\]</span>
 </section>
 <section id="sampling-draws-from-the-posterior" class="level2">
 <h2 class="anchored" data-anchor-id="sampling-draws-from-the-posterior">Sampling draws from the posterior</h2>
+<p>We start by generating a random walk, which can be used to validate that our estimation is indeed correct.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>T       <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>N       <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>y       <span class="ot">=</span> <span class="fu">apply</span>(<span class="fu">matrix</span>(<span class="fu">rnorm</span>(T <span class="sc">*</span> N), <span class="at">ncol =</span> N), <span class="dv">2</span>, cumsum)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>y       <span class="ot">=</span> <span class="fu">as.matrix</span>(y)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>p       <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>d       <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>k    <span class="ot">=</span> p <span class="sc">+</span> d </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>T     <span class="ot">=</span> <span class="fu">nrow</span>(y)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>Y     <span class="ot">=</span> <span class="fu">as.matrix</span>(y[(p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>T,])</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>X     <span class="ot">=</span> <span class="fu">cbind</span>(<span class="fu">rep</span>(<span class="dv">1</span>, T <span class="sc">-</span> p), y[<span class="dv">1</span><span class="sc">:</span>(T <span class="sc">-</span> p),])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, defining our priors for <span class="math inline">\(\underline{\boldsymbol\alpha}\)</span>, <span class="math inline">\(\underline{\mathbf{V}}_{\boldsymbol\alpha}\)</span>, <span class="math inline">\(\underline{s}\)</span> and <span class="math inline">\(\underline{\nu}\)</span>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>priors <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">alpha   =</span> <span class="fu">as.matrix</span>(<span class="fu">rep</span>(<span class="dv">0</span>, k)),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Sigma   =</span> <span class="fu">diag</span>(<span class="dv">2</span>),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">S       =</span> <span class="dv">1</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">nu      =</span> <span class="dv">3</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>and computing the function for the posterior parameters:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>posterior <span class="ot">=</span> <span class="cf">function</span>(y, priors){</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  Sigma.inv <span class="ot">=</span> <span class="fu">t</span>(X) <span class="sc">%*%</span> X <span class="sc">+</span> priors<span class="sc">$</span>Sigma</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  Sigma     <span class="ot">=</span> <span class="fu">solve</span>(Sigma.inv)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  alpha     <span class="ot">=</span> Sigma <span class="sc">%*%</span> (<span class="fu">t</span>(X) <span class="sc">%*%</span> Y <span class="sc">+</span> <span class="fu">solve</span>(priors<span class="sc">$</span>Sigma) <span class="sc">%*%</span> priors<span class="sc">$</span>alpha)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  S         <span class="ot">=</span> <span class="fu">as.numeric</span>(<span class="fu">t</span>(Y) <span class="sc">%*%</span> Y <span class="sc">+</span> priors<span class="sc">$</span>S <span class="sc">+</span> <span class="fu">t</span>(priors<span class="sc">$</span>alpha) <span class="sc">%*%</span> <span class="fu">solve</span>(priors<span class="sc">$</span>Sigma) <span class="sc">%*%</span> priors<span class="sc">$</span>alpha </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                     <span class="sc">-</span> <span class="fu">t</span>(alpha) <span class="sc">%*%</span> Sigma.inv <span class="sc">%*%</span> alpha)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  nu        <span class="ot">=</span> T <span class="sc">+</span> priors<span class="sc">$</span>nu </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sigma  =</span> Sigma,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha  =</span> alpha,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">S      =</span> S,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">nu     =</span> nu</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>post <span class="ot">=</span> <span class="fu">posterior</span>(<span class="at">y =</span> y, <span class="at">priors =</span> priors)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We are then able to do the estimation of our parameters using the Gibbs sampler provided below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>posterior.draws <span class="ot">=</span> <span class="cf">function</span>(S, posterior){</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  Sigma2.posterior      <span class="ot">=</span> <span class="fu">as.matrix</span>(posterior<span class="sc">$</span>S <span class="sc">/</span> <span class="fu">rchisq</span>(S, posterior<span class="sc">$</span>nu))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  alpha.posterior       <span class="ot">=</span> <span class="fu">simplify2array</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>S, <span class="cf">function</span>(i){</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>      mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> posterior<span class="sc">$</span>alpha, <span class="at">sigma =</span> Sigma2.posterior[i,] <span class="sc">*</span> posterior<span class="sc">$</span>Sigma)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  output <span class="ot">=</span> <span class="fu">cbind</span>(<span class="fu">t</span>(alpha.posterior[<span class="dv">1</span>,,]), Sigma2.posterior)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(output)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>draws <span class="ot">=</span> <span class="fu">posterior.draws</span>(<span class="at">S =</span> <span class="dv">1000</span>, <span class="at">posterior =</span> post)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 </section>
 <section id="hierarchical-prior-analysis" class="level1">
@@ -260,22 +382,355 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 <h2 class="anchored" data-anchor-id="estimating-autoregressive-prior-shrinkage">Estimating autoregressive prior shrinkage</h2>
 <section id="inverted-gamma-2-scale-mixture-of-normal" class="level3">
 <h3 class="anchored" data-anchor-id="inverted-gamma-2-scale-mixture-of-normal">Inverted gamma 2 scale mixture of normal</h3>
+<p>Given the scalar scale follows an inverted gamma 2 distribution: <span class="math display">\[\begin{align}
+\kappa_{\boldsymbol\alpha} \sim \mathcal{IG}2 (\underline{s}_{\boldsymbol\alpha},\underline{\nu}_{\boldsymbol\alpha})
+\end{align}\]</span></p>
+<p>We have priors as: <span class="math display">\[\begin{align}
+\boldsymbol\alpha | \sigma^2, \kappa_{\boldsymbol\alpha} &amp;\sim \mathcal{N}_{k}(\underline{\boldsymbol\alpha}, \sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}} _{\boldsymbol\alpha}) \\
+\\ \sigma^2 &amp;\sim \mathcal{IG}2(\underline{s},\underline{\nu}) \\
+\\ p(\boldsymbol\alpha, \sigma^2, \kappa_{\boldsymbol\alpha}) &amp;= p(\boldsymbol\alpha | \sigma^2, \kappa_{\boldsymbol\alpha}) p(\sigma^2) p(\kappa_{\boldsymbol\alpha})
+\end{align}\]</span></p>
+<p>Then, the joint distribution of <span class="math inline">\((\boldsymbol\alpha,\sigma^2)\)</span> given <span class="math inline">\(\kappa_{\boldsymbol\alpha}\)</span> would follow a normal-inverted gamma 2 distribution: <span class="math display">\[\begin{align*}
+p\left(\boldsymbol\alpha,\sigma^2 \mid \kappa_{\boldsymbol\alpha}\right) = \mathcal{NIG}2_N(\underline{\boldsymbol\alpha},\kappa_{\boldsymbol\alpha} \underline{\mathbf{V}} _{\boldsymbol\alpha}, \underline{s},\underline{\nu})
+\end{align*}\]</span></p>
+<p>A <strong>Gibbs Sampler</strong> can be applied using the following steps:</p>
+<p>Initialize <span class="math inline">\(\kappa_{\boldsymbol\alpha}\)</span> at <span class="math inline">\(\kappa_{\boldsymbol\alpha}^{(0)}\)</span>.</p>
+<p>At each iteration s:</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;Step 1. Draw <span class="math inline">\((\boldsymbol\alpha,\sigma^2)^{(s)} \sim p(\boldsymbol\alpha,\sigma^2|\mathbf{X},\mathbf{y},\kappa_{\boldsymbol\alpha}^{(s-1)}) = \mathcal{NIG}2(\overline{\boldsymbol\alpha},\overline{\mathbf{V}},\overline{s},\overline{\nu})\)</span>.</p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;Step 2. Draw <span class="math inline">\(\kappa_{\boldsymbol\alpha}^{(s)} \sim p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},\boldsymbol\alpha,\sigma^2) = \mathcal{IG}2(\overline{s},\overline{\nu})\)</span>.</p>
+<p>Repeat step 1 and 2 <span class="math inline">\((S_1+S_2)\)</span> times and discard the first <span class="math inline">\(S_1\)</span> draws.</p>
+<p>The <strong>full conditional posterior</strong> of <span class="math inline">\(\kappa_{\boldsymbol\alpha}\)</span> is: <span class="math display">\[\begin{gather*}
+p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},\boldsymbol\alpha,\sigma^2) = L(\mathbf{y}|\mathbf{X},\boldsymbol\alpha,\sigma^2) p(\kappa_{\boldsymbol\alpha})  p(\boldsymbol\alpha|\sigma^2,\kappa_{\boldsymbol\alpha}) p(\sigma^2) \\
+
+\\ \propto p(\kappa_{\boldsymbol\alpha}) p(\boldsymbol\alpha|\sigma^2,\kappa_{\boldsymbol\alpha}) \\
+
+\\ \propto (\kappa_{\boldsymbol\alpha})^{-\frac{\nu+2}{2}} exp \left\{ -\frac{1}{2}\frac{s}{\kappa_{\boldsymbol\alpha}} \right\}
+\times \text{det}(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}} _{\boldsymbol\alpha})^{-\frac{1}{2}} exp \left\{ -\frac{1}{2} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'}(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}} _{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\} \\
+
+\\ =  (\kappa_{\boldsymbol\alpha})^{-\frac{\nu+2+k}{2}} exp \left\{ -\frac{1}{2}\frac{s}{\kappa_{\boldsymbol\alpha}} \right\} exp \left\{ -\frac{1}{2}\frac{1}{\kappa_{\boldsymbol\alpha}} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}
+\end{gather*}\]</span></p>
+<p>in which we recognize a kernel of inverted gamma 2 distribution with parameters:</p>
+<p><span class="math display">\[\begin{align}
+\overline{s}_{\boldsymbol\alpha} &amp;= s + (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} \sigma^{-2} \underline{\mathbf{V}}_{\boldsymbol\alpha}^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \\
+\overline{\nu}_{\boldsymbol\alpha} &amp;= \nu + k
+\end{align}\]</span></p>
+<p>To sample from the <span class="math inline">\(\mathcal{IG}2(s,\nu)\)</span> distribution, the following code can be used:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set parameters of IG2 distribution </span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="dv">1</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>nu <span class="ot">&lt;-</span> <span class="dv">1</span>  </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw one sample from IG2 distribution </span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>sample <span class="ot">&lt;-</span> s <span class="sc">/</span> <span class="fu">rchisq</span>(<span class="dv">1</span>, <span class="at">df =</span> nu)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="gamma-scale-mixture-of-normal" class="level3">
 <h3 class="anchored" data-anchor-id="gamma-scale-mixture-of-normal">Gamma scale mixture of normal</h3>
+<blockquote class="blockquote">
+<p>Contributor: Yobin Timilsena</p>
+</blockquote>
+<p>Alternatively, the scalar scale <span class="math inline">\(\kappa_{\boldsymbol\alpha}\)</span> that premultiplies the covariance matrix of the normal prior for vector <span class="math inline">\(\boldsymbol\alpha\)</span> can be assumed to have a hierarchical prior with a gamma distribution: <span class="math display">\[
+\kappa_{\boldsymbol\alpha}|\underline s_\kappa, \underline a_\kappa \sim \mathcal{G}(\underline s_\kappa, \underline a_\kappa)
+\]</span> The following code creates a list <code>kappa.priors</code> to store priors on <span class="math inline">\(\kappa_\boldsymbol\alpha\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>kappa.priors <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">a =</span> <span class="dv">1</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">s =</span> .<span class="dv">1</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Given the likelihood and priors above, we can obtain the <strong>full conditional posterior</strong> of <span class="math inline">\(\kappa_\boldsymbol\alpha\)</span> as <span class="math display">\[
+\begin{align*}
+    p(\kappa_{\boldsymbol\alpha} | \bf y, \bf X, \boldsymbol\alpha, \sigma^2) &amp; \propto p(\kappa_{\boldsymbol\alpha} | \underline s_{\boldsymbol\kappa}, \underline a_{\boldsymbol\kappa}) \cdot p(\boldsymbol\alpha | \kappa_{\boldsymbol\alpha}, \sigma^2)\\
+    &amp;\qquad\times (\kappa_{\boldsymbol\alpha})^{\underline a_{\boldsymbol\kappa} - 1} \exp \left\{  - \frac{\kappa_{\boldsymbol\alpha}}{\underline s_{\boldsymbol\kappa}} \right\} \cdot \det(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\bf V}_{\boldsymbol\alpha})^{-\frac{1}{2}} exp \left\{ -\frac{1}{2} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'}(\sigma^2 \kappa_{\boldsymbol\alpha} \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}  \\
+    &amp; \propto (\kappa_{\boldsymbol\alpha})^{\underline a_{\boldsymbol\kappa} - 1} \exp \left\{  - \frac{\kappa_{\boldsymbol\alpha}}{\underline s_{\boldsymbol\kappa}} \right\} \cdot (\sigma^2)^{-\frac{K}{2}} (\kappa_{\boldsymbol\alpha})^{-\frac{K}{2}} \det(\underline{\bf V}_{\boldsymbol\alpha})^{-\frac{1}{2}} exp \left\{ -\frac{1}{2 \kappa_{\boldsymbol\alpha}} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha})\right\}  \\
+    &amp; \propto (\kappa_{\boldsymbol\alpha})^{\underline a_{\boldsymbol\kappa} - \frac{K}{2} - 1} \exp \left\{  -\frac{1}{2} \left( (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \cdot \frac{1}{\kappa_{\boldsymbol\alpha}} + \frac{2}{\underline s_{\boldsymbol\kappa}} \kappa_{\boldsymbol\alpha} \right) \right\}
+\end{align*}
+\]</span> which is a kernel for a Generalised Inverse Gaussian distribution with parameters: <span class="math display">\[
+\begin{align*}
+    &amp; \overline\lambda = \underline a_{\boldsymbol\kappa} - \frac{K}{2}\\
+    &amp; \overline\chi = (\boldsymbol\alpha-\underline{\boldsymbol\alpha})^{'} (\sigma^2 \underline{\mathbf{V}}_{\boldsymbol\alpha})^{-1} (\boldsymbol\alpha-\underline{\boldsymbol\alpha}) \\
+    &amp; \overline\Psi = \frac{2}{\underline s_{\boldsymbol\kappa}}
+\end{align*}
+\]</span> Hence, the <strong>full-conditional posterior</strong> distribution of <span class="math inline">\(\kappa_\alpha\)</span> follows a Generalised Inverse Gaussian distribution. <span class="math display">\[
+\kappa_{\boldsymbol\alpha} | \bf y, \bf X, {\boldsymbol\alpha}, \sigma^2 \sim \mathcal{GIG}(\overline\lambda, \overline\chi, \overline\Psi)
+\]</span> Given the full conditional posterior of both <span class="math inline">\(\kappa_\alpha\)</span> and <span class="math inline">\((\boldsymbol\alpha, \sigma^2)\)</span>, we can implement the <strong>Gibbs Sampler</strong> with the following steps:</p>
+<ul>
+<li>Initialise <span class="math inline">\(\kappa_\alpha^{(0)}\)</span>.</li>
+<li>At each iteration <span class="math inline">\(s\)</span>:
+<ul>
+<li>Step 1: Draw <span class="math inline">\((\boldsymbol\alpha,\sigma^2)^{(s)} \sim p(\boldsymbol\alpha,\sigma^2|\mathbf{X},\mathbf{y},\kappa_{\boldsymbol\alpha}^{(s-1)}) = \mathcal{NIG}2(\overline{\boldsymbol\alpha},\overline{\mathbf{V}},\overline{s},\overline{\nu})\)</span>.</li>
+<li>Step 2. Draw <span class="math inline">\(\kappa_{\boldsymbol\alpha}^{(s)} \sim p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},(\boldsymbol\alpha,\sigma^2)^{(s)}) = \mathcal{GIG}(\lambda, \chi, \Psi)\)</span>.</li>
+</ul></li>
+</ul>
+<p>The <code>Gamma.sampler</code> function below implements the Gibbs Sampler using the aforementioned algorithm.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Gamma.sampler <span class="ot">=</span> <span class="cf">function</span>(S, posterior, priors, kappa.priors){</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">12345</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  S.burnin <span class="ot">=</span> <span class="dv">100</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  S.total <span class="ot">=</span> S <span class="sc">+</span> S.burnin</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#create matrices to store posterior draws</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  alpha.posterior  <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(k,<span class="dv">1</span>,S.total))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  kappa.posterior  <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>,<span class="fu">c</span>(<span class="dv">1</span>,S.total))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">#initial value for kappa</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  kappa.posterior[<span class="dv">1</span>] <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Draw sigma^2 from IG2 outside the loop as it does not update iteratively </span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  Sigma2.posterior <span class="ot">=</span> posterior<span class="sc">$</span>S <span class="sc">/</span> <span class="fu">rchisq</span>(<span class="at">n=</span>S.total,<span class="at">df=</span>posterior<span class="sc">$</span>nu)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>(S.total)) {</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Plug in current kappa to update Sigma (or V in slides)</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    prior.Sigma.inv <span class="ot">=</span> <span class="fu">solve</span>(kappa.posterior[i] <span class="sc">*</span> priors<span class="sc">$</span>Sigma)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    Sigma.inv <span class="ot">=</span> <span class="fu">t</span>(X) <span class="sc">%*%</span> X <span class="sc">+</span> prior.Sigma.inv</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    Sigma <span class="ot">=</span> <span class="fu">solve</span>(Sigma.inv)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw alpha from normal dist using sigma^2 and updated var-covar matrix Sigma</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    alpha.posterior[,,i]  <span class="ot">=</span> <span class="fu">t</span>(mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="at">n=</span><span class="dv">1</span>, <span class="at">mean =</span> posterior<span class="sc">$</span>alpha, <span class="at">sigma =</span> Sigma2.posterior[i] <span class="sc">*</span> Sigma))</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Update parameters for kappa posterior</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    lambda <span class="ot">=</span> kappa.priors<span class="sc">$</span>a <span class="sc">-</span> k<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    chi    <span class="ot">=</span> <span class="fu">t</span>(alpha.posterior[,,i] <span class="sc">-</span> priors<span class="sc">$</span>alpha) <span class="sc">%*%</span> <span class="fu">solve</span>(Sigma2.posterior[i] <span class="sc">*</span> priors<span class="sc">$</span>Sigma) <span class="sc">%*%</span> (alpha.posterior[,,i] <span class="sc">-</span> priors<span class="sc">$</span>alpha)</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    Psi    <span class="ot">=</span> <span class="dv">2</span> <span class="sc">/</span> kappa.priors<span class="sc">$</span>s</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Draw next period value for kappa from GIG distribution</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (i <span class="sc">!=</span> S.total){</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>      kappa.posterior[i<span class="sc">+</span><span class="dv">1</span>] <span class="ot">=</span> GIGrvg<span class="sc">::</span><span class="fu">rgig</span>(<span class="at">n=</span><span class="dv">1</span>, <span class="at">lambda =</span> lambda, <span class="at">chi =</span> chi, <span class="at">psi =</span> Psi)</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># save output as a list </span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha.posterior =</span> alpha.posterior[,,((S.burnin<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>S.total)],</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sigma2.posterior =</span> Sigma2.posterior[((S.burnin<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>S.total)],</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">kappa.posterior =</span> kappa.posterior[((S.burnin<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>S.total)]</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>GammaScale.draws <span class="ot">=</span> <span class="fu">Gamma.sampler</span>(<span class="at">S =</span> <span class="dv">1000</span>, post, priors, kappa.priors)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>I compute and display the posterior means for <span class="math inline">\(({\boldsymbol\alpha, \sigma^2, \kappa_{\boldsymbol\alpha}})\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean <span class="ot">=</span> <span class="fu">rowMeans</span>(GammaScale.draws<span class="sc">$</span>alpha.posterior)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4495536 0.8758433</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>Sigma2.posterior)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.9151682</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>kappa.posterior)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.2571134</code></pre>
+</div>
+</div>
 </section>
 </section>
 <section id="estimating-error-term-variance-prior-scale" class="level2">
 <h2 class="anchored" data-anchor-id="estimating-error-term-variance-prior-scale">Estimating error term variance prior scale</h2>
+<p>In this section, we estimate the error term variance prior scale <span class="math inline">\(\underline{s}\)</span> that follows a Gamma distribution <span class="math inline">\(G(\underline{s}_s,\underline{a}_s)\)</span> with scale <span class="math inline">\(\underline{s}_s\)</span> shape <span class="math inline">\(\underline{a}_s\)</span> that follow a probability density function equal to: <span class="math display">\[p(\underline{s})=\Gamma(\underline{a}_s)^{-1}\underline{s}_s^{-\underline{a}_s}\underline{s}^{\underline{a}_s-1}\exp\left\{-\frac{\underline{s}}{\underline{s}_s}\right\}\]</span> In order to find our full conditional posterior of <span class="math inline">\(\underline{s}\)</span> write out its kernel as: <span class="math display">\[\begin{align}
+p(\underline{s}|y,X,\alpha,\sigma^2) &amp;\propto
+L(y|X,\alpha,\sigma^2) \times p(\alpha|\sigma^2) \times p(\sigma^2|\underline{s}) \times p(\underline{s})\\
+&amp;\propto p(\sigma^2|\underline{s}) \times p(\underline{s})\\
+&amp;\propto \underline{s}^{\frac{\underline{\nu}}{2}}
+\exp\left\{-\frac{1}{2}\frac{\underline{s}}{\sigma^2}\right\}
+\underline{s}^{\underline{a}_s-1}\exp\left\{-\frac{\underline{s}}{\underline{s}_s}\right\}\\
+&amp;\propto
+\underline{s}^{\frac{\underline{\nu}}{2}+\underline{a}_s-1}\exp\left\{-\frac{\underline{s}}{
+\left[\left(2\sigma^2\right)^{-1} + \underline{s}_s^{-1}\right]^{-1}
+} \right\}
+\end{align}\]</span> from which we recognise a Gamma function <span class="math inline">\(G(\overline{a}_s, \overline{s}_s)\)</span> with parameters: <span class="math display">\[\begin{align}
+\overline{a}_s&amp;=\frac{\underline{\nu}}{2}+\underline{a}_s\\
+\overline{s}_s&amp;=\left[\left(2\sigma^2\right)^{-1} + \underline{s}_s^{-1}\right]^{-1}
+\end{align}\]</span></p>
+<p>In order to obtain a sample from the posterior distribution we use a Gibbs sampler. We generate random draws from the joint posterior distribution and we update them at each iteration. In this case we exploit the following procedure:</p>
+<p>Initialize <span class="math inline">\(\underline{s}\)</span> at <span class="math inline">\(\underline{s}^{(0)}\)</span></p>
+<p>At each iteration s:</p>
+<ol type="1">
+<li>Draw <span class="math inline">\((\boldsymbol\alpha,\sigma^2)^{(s)} \sim p\left(\boldsymbol\alpha,\sigma^2 \mid \mathbf{y},\mathbf{X}, \boldsymbol\alpha^{(s-1)}, {\sigma^2}^{(s-1)}, \underline{s}^{(s)}\right)\)</span></li>
+<li>Draw <span class="math inline">\(\underline{s}^{(s)} \sim p(\underline{s}\mid\mathbf{y},\mathbf{X},\boldsymbol\alpha,\sigma^2)\)</span></li>
+</ol>
+<p>Repeat steps 1 and 2 for <span class="math inline">\((S_1 + S_2)\)</span> times. Discard the first <span class="math inline">\(S_1\)</span> repetitions. Return the output as <span class="math inline">\(\left \{ \boldsymbol\alpha^{(s)}, \sigma^{2(s)}, \underline{s}^{(s)}\right \}^{S_1+S_2}_{s=S_1+1}\)</span>.</p>
+<p>The following script illustrates sampling from the full conditional posterior distribution of <span class="math inline">\(\underline{s}\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>nu <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="ot">=</span> <span class="dv">10</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># define the prior hyper-parameters</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>s.prior.s  <span class="ot">&lt;-</span> <span class="fl">0.01</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>a.prior.s  <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">#define the posteriors</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>a.bar.s <span class="ot">&lt;-</span> (nu <span class="sc">/</span> <span class="dv">2</span>) <span class="sc">+</span> s.prior.s</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>s.bar.s <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span><span class="sc">/</span>(<span class="dv">2</span> <span class="sc">*</span> sigma2) <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">/</span> s.prior.s))</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">#sample from the gamma distribution using rgamma function</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>s.sigma <span class="ot">&lt;-</span> <span class="fu">rgamma</span>(<span class="dv">1</span>, <span class="at">shape =</span> a.bar.s, <span class="at">scale =</span> s.bar.s)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="dummy-observation-prior" class="level2">
 <h2 class="anchored" data-anchor-id="dummy-observation-prior">Dummy observation prior</h2>
+<p>In this extended model, the system is augmented using the <em>sum of coefficients</em> and <em>dummy initial observation</em> prior. The idea for this way of setting a prior is to generate artificial new rows that augment data matrices <span class="math inline">\(\bf y\)</span> and <span class="math inline">\(\bf X\)</span>. It is equivalent to assuming a normal-inverted gamma 2 prior whose parameters are determined by dummy observations augmenting the system.</p>
+<p>The <em>sum of coefficients</em> prior takes the average of the lagged values and adds them to the basic equation. This is because these values are assumed to be a good forecast of future observations. The <em>dummy initial observation</em> prior adds a single dummy observation such that all values are set equal to the averages of initial conditions, up to a scaling factor.</p>
+<p>In order to practically generate the additional rows the following steps should be taken.</p>
+<p>Firstly, the average of lagged values needs to be calculated, <code>y.bar</code>. This is done by finding the mean of the first <span class="math inline">\(p\)</span> values in the data. Next, values of of the scaling factors need to be selected, where values equal to 1 are chosen typically.</p>
+<p>Once this has been done, the rows can be created. In the univariate case this is simple, two rows are added to vector <span class="math inline">\(\bf y\)</span>, the first equal to <code>y.bar</code> divided by the first scaling factor, <span class="math inline">\(\lambda_3\)</span>, the second equal to th same value divided by the second scaling factor, <span class="math inline">\(\lambda_4\)</span>.</p>
+<p>Adding rows to <span class="math inline">\(\bf X\)</span> is slightly more complicated. The additional rows are as follows. The values in the first row, corresponding to the sum of coefficients, are all equal to <code>y.bar</code> divided by <span class="math inline">\(\lambda_3\)</span>, except the last column, which is equal to zero. The values in the second row, corresponding to the dummy initial observation, are all equal to <code>y.bar</code>, except the last column, which is equal to one, al of which are divided by <span class="math inline">\(\lambda_4\)</span>.</p>
+<p>The following <strong>R</strong> function <code>prior.ex()</code> generates vectors and matrices by which <span class="math inline">\(\bf y\)</span> and <span class="math inline">\(\bf X\)</span> should be extended.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>prior.ex <span class="ot">&lt;-</span> <span class="cf">function</span>(data, <span class="at">p =</span> <span class="dv">1</span>, <span class="at">lambda_3 =</span> <span class="dv">1</span>, <span class="at">lambda_4 =</span> <span class="dv">1</span>){</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  N <span class="ot">=</span> <span class="dv">1</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  M <span class="ot">=</span> p <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  y.bar     <span class="ot">=</span> <span class="fu">mean</span>(data[<span class="dv">1</span><span class="sc">:</span>p])</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  Y_star    <span class="ot">=</span> <span class="fu">rbind</span>((y.bar)<span class="sc">/</span>lambda_3, y.bar<span class="sc">/</span>lambda_4)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  X_star    <span class="ot">=</span> <span class="fu">as.matrix</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="dv">0</span>, N), <span class="dv">1</span><span class="sc">/</span>lambda_4))</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>p) {</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    X_star  <span class="ot">=</span> <span class="fu">cbind</span>(Y_star, X_star)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  ext.data <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">YN =</span> Y_star, <span class="at">XN =</span> X_star)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ext.data)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 </section>
 <section id="model-extensions" class="level1">
 <h1>Model Extensions</h1>
 <section id="student-t-error-term" class="level2">
 <h2 class="anchored" data-anchor-id="student-t-error-term">Student-<span class="math inline">\(t\)</span> error term</h2>
+<p>A possible extension to the model is to relax the assumption of normally distributed errors. By assuming a t-distribution for the errors we can better account for excess kurtosis in the data, also referred to as ‘fat tails’. Such a specification lends itself well to estimating models on data commonly found to be leptokurtic, such as financial time series.</p>
+<p><span class="math display">\[ u_t \sim \mathcal{t}(0,\Sigma,\nu) \]</span></p>
+<section id="scale-mixture-of-normals-representation-of-the-t-distribution" class="level4">
+<h4 class="anchored" data-anchor-id="scale-mixture-of-normals-representation-of-the-t-distribution">Scale Mixture of Normals Representation of the <span class="math inline">\(t\)</span> Distribution</h4>
+<p>Implementation of t-distributed errors can be achieved by representing the t-distribution as a ‘scale mixture of normal distributions’.</p>
+<p>If, <span class="math display">\[
+\begin{align*}
+  x|\lambda &amp;\sim \mathcal{N}(0, \lambda\sigma^2) \\
+  \lambda &amp;\sim \mathcal{IG2}(s, \nu)
+\end{align*}
+\]</span> then <span class="math display">\[ x \sim t(0, s, \sigma^2, \nu) \]</span> This result can be derived by expressing the joint distribution of <span class="math inline">\(x\)</span> and <span class="math inline">\(\lambda\)</span> as <span class="math display">\[ p(x,\lambda) = p(x|\lambda) p(\lambda) \]</span> and then intergrating with respect to <span class="math inline">\(\lambda\)</span></p>
+<p><span class="math display">\[ \int_0^\infty p(x|\lambda) p(\lambda) d\lambda \]</span></p>
+<p>This integration produces a density function which is proportional to the distribution for a Student-t distribution with <span class="math inline">\(\nu\)</span> degrees of freedom. Hence, <span class="math inline">\(x\sim t_\nu\)</span>.</p>
+</section>
+<section id="likelihood-and-posteriors-under-student-t-errors" class="level4">
+<h4 class="anchored" data-anchor-id="likelihood-and-posteriors-under-student-t-errors">Likelihood and Posteriors under Student-t errors</h4>
+<p>Implementing the scale mixture specification, the conditional distribution of <span class="math inline">\(y\)</span> now takes the following form</p>
+<p><span class="math display">\[ \boldsymbol{y}|\boldsymbol{X},\boldsymbol{\alpha},\sigma^2,\lambda \sim \mathcal{N_T}(\boldsymbol{X}\boldsymbol{\alpha}, \sigma^2\lambda I_T) \]</span></p>
+<p>The likelihood under this specification now becomes</p>
+<p><span class="math display">\[ L(\boldsymbol{\alpha}, \sigma^2, \lambda | \boldsymbol{y}, \boldsymbol{X}) = (2\pi)^{-\frac{T}{2}} (\sigma^2)^{-\frac{T}{2}} \det(\lambda I_T)^{-\frac{1}{2}}
+exp(-\frac{1}{2}\frac{1}{\sigma^2}(\boldsymbol{y - X\alpha})'(\lambda I_T)^{-1}(\boldsymbol{y - X\alpha}))\]</span></p>
+<p>As before, we can derive the full conditional posteriors of the parameters by multiplying the likelihood and the priors. The natural conjugacy of <span class="math inline">\(\boldsymbol\alpha\)</span> and <span class="math inline">\(\sigma^2\)</span> are preserved under this specification and therefore the joint posterior is given by</p>
+<p><span class="math display">\[ p(\boldsymbol{\alpha}, \sigma^2|\boldsymbol{y, X}, \lambda) \propto L(\boldsymbol{\alpha}, \sigma^2, \lambda | \boldsymbol{y}, \boldsymbol{X}) p(\boldsymbol{\alpha}, \sigma^2) \]</span></p>
+<p>Expanding and rearranging the resulting expression allows the posterior to be expressed in the form of a Normal Inverse Gamma 2 with the following moments</p>
+<p><span class="math display">\[\begin{align*}
+p(\boldsymbol{\alpha}, \sigma^2|\boldsymbol{\mathbf{y}, \mathbf{X}}, \lambda) &amp;= \mathcal{NIG2}(\boldsymbol{\overline\alpha, \overline V_\alpha}, \overline s, \overline \nu) \\
+\overline{\boldsymbol\alpha} &amp;= \overline{\mathbf{V}}_{\boldsymbol\alpha}( \underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{X}'(\lambda I_T)^{-1}\mathbf{y})\\
+\overline{\mathbf{V}}_{\boldsymbol\alpha} &amp;=\left(\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}+\mathbf{X}'(\lambda I_T)^{-1}\mathbf{X}\right)^{-1} \\
+\overline{s} &amp;= \underline{s}+\overline{\boldsymbol\alpha}'\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}+\underline{\boldsymbol\alpha}'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{y}'(\lambda I_T)^{-1}\mathbf{y}\\
+\overline{\nu} &amp;= \underline{\nu}+T
+\end{align*}\]</span></p>
+<p>The full conditional for <span class="math inline">\(\lambda\)</span> is also derived in a similar manner, with the posterior distribution taking the form of an Inverse Gamma 2</p>
+<p><span class="math display">\[\begin{align*}
+p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &amp;\propto L(\boldsymbol{\alpha}, \sigma^2, \lambda | \mathbf{y, X})p(\lambda) \\
+&amp;\propto (\sigma^2)^{-\frac{T}{2}}\det(\lambda I_T)^{-\frac{1}{2}}\exp(-\frac{1}{2}\frac{1}{\sigma^2}(\mathbf{y - X\alpha})'(\lambda I_T)^{-1}(\mathbf{y - X\alpha})) \\
+&amp;\times \lambda^{-\frac{\underline \nu_\lambda +2}{2}}\exp(-\frac{1}{2}\frac{\underline s_\lambda}{\lambda})
+\end{align*}\]</span></p>
+<p>Rearranging the above to express in the form of <span class="math inline">\(\mathcal{IG2}\)</span></p>
+<p><span class="math display">\[\begin{align*}
+p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &amp;= \mathcal{IG2}(\overline s_\lambda, \overline \nu_\lambda) \\
+\overline s_\lambda &amp;= \frac{1}{\sigma^2}(\mathbf{y - X\boldsymbol\alpha})'(\mathbf{y - X\boldsymbol\alpha}) + \underline s_\lambda \\
+\overline \nu_\lambda &amp;= T + \underline \nu_\lambda
+\end{align*}\]</span></p>
+</section>
+<section id="gibbs-sampler-code-for-t-distributed-errors" class="level4">
+<h4 class="anchored" data-anchor-id="gibbs-sampler-code-for-t-distributed-errors">Gibbs Sampler Code for t-distributed errors</h4>
+<p>Now that we have the full conditionals for all of the parameters we can incorporate them into the Gibbs Sampler routine in order to draw a sample from the posterior densities.</p>
+<p>The routine proceeds as follows:</p>
+<p>Initialize lambda based on priors for <span class="math inline">\(\underline s_\lambda\)</span> and <span class="math inline">\(\underline \nu_\lambda\)</span>.</p>
+<p>At each iteration s:</p>
+<ol type="1">
+<li>Draw <span class="math inline">\(\sigma^{2(s)}\)</span> from the <span class="math inline">\(\mathcal{IG2}(\overline S, \overline\nu)\)</span> distribution</li>
+<li>Draw <span class="math inline">\(\mathbf{\alpha^{(s)}}\)</span> from the <span class="math inline">\(\mathcal{N}(\boldsymbol{\overline \alpha}, \sigma^{2(s)} \overline V)\)</span> distribution</li>
+<li>Draw <span class="math inline">\(\lambda^{(s)}\)</span> from <span class="math inline">\(\mathcal{IG2}(\overline s_\lambda, \overline\nu_\lambda)\)</span></li>
+</ol>
+<p>The sampling routine is implemented via the following function in R and the results of applying the sampler to the artificial random walk data are displayed. For the purposes of this simulation a relatively large prior for the degrees of freedom parameter is chosen, which communicates our prior belief that the data should follow a random walk.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>TDist.Gibbs.sampler <span class="ot">=</span> <span class="cf">function</span>(S, Y, X, priors){</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># A function to sample from the full conditionals of alpha, sigma and lambda</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># priors: a list containing the usual priors for alpha, Sigma, S and nu</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># as well as additional priors for lambda hyper-parameters lambda_s and lambda_nu.</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  A.prior <span class="ot">=</span> priors<span class="sc">$</span>alpha</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  A_V.gprior <span class="ot">=</span> priors<span class="sc">$</span>Sigma</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  Sigma_s.prior <span class="ot">=</span> priors<span class="sc">$</span>S</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  Sigma_v.prior <span class="ot">=</span> priors<span class="sc">$</span>nu</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  lambda_s.prior <span class="ot">=</span> priors<span class="sc">$</span>lambda_s</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  lambda_v.prior <span class="ot">=</span> priors<span class="sc">$</span>lambda_nu</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  lambda.draw <span class="ot">=</span> lambda_s.prior<span class="sc">/</span><span class="fu">rchisq</span>(<span class="dv">1</span>, lambda_v.prior)</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior.draws <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,S))</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  A.posterior.draws <span class="ot">=</span> <span class="fu">array</span>(<span class="cn">NA</span>, <span class="fu">c</span>(k,<span class="dv">1</span>,S))</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  lambda.posterior.draws <span class="ot">=</span> <span class="fu">rep</span>(<span class="cn">NA</span>,S)</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    lambda.gprior.diag <span class="ot">=</span> <span class="fu">diag</span>(lambda.draw, <span class="fu">nrow</span>(Y))</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    A_V.posterior     <span class="ot">=</span> <span class="fu">solve</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span><span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(lambda.gprior.diag))<span class="sc">%*%</span>X <span class="sc">+</span> <span class="fu">solve</span>(A_V.gprior))</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    A.posterior       <span class="ot">=</span> A_V.posterior<span class="sc">%*%</span>(<span class="fu">t</span>(X)<span class="sc">%*%</span><span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(lambda.gprior.diag))<span class="sc">%*%</span>Y <span class="sc">+</span> <span class="fu">solve</span>(A_V.gprior)<span class="sc">%*%</span>A.prior)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    Sigma_s.posterior <span class="ot">=</span> <span class="fu">t</span>(Y)<span class="sc">%*%</span><span class="fu">diag</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">diag</span>(lambda.gprior.diag))<span class="sc">%*%</span>Y <span class="sc">+</span> <span class="fu">t</span>(A.prior)<span class="sc">%*%</span><span class="fu">solve</span>(A_V.gprior)<span class="sc">%*%</span>A.prior <span class="sc">+</span> Sigma_s.prior <span class="sc">-</span> <span class="fu">t</span>(A.posterior)<span class="sc">%*%</span><span class="fu">solve</span>(A_V.posterior)<span class="sc">%*%</span>A.posterior</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    Sigma_v.posterior <span class="ot">=</span> <span class="fu">nrow</span>(Y) <span class="sc">+</span> Sigma_v.prior</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Sigma.inv.draw      = rWishart(1, Sigma_v.posterior, solve(Sigma_s.posterior))[,,1]</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="co">#Sigma.posterior.draws[,,s] = solve(Sigma.inv.draw)</span></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>    Sigma.posterior.draws[,,s] <span class="ot">=</span> Sigma_s.posterior<span class="sc">/</span> <span class="fu">rchisq</span>(<span class="dv">1</span>, <span class="at">df=</span>Sigma_v.posterior)</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>    Sigma.inv.draw <span class="ot">=</span> <span class="fu">solve</span>(Sigma.posterior.draws[,,s])</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>    A.posterior.draws[,,s] <span class="ot">=</span> <span class="fu">matrix</span>(mvtnorm<span class="sc">::</span><span class="fu">rmvnorm</span>(<span class="dv">1</span>, <span class="at">mean=</span><span class="fu">as.vector</span>(A.posterior), <span class="at">sigma=</span>Sigma.posterior.draws[,,s]<span class="sc">%x%</span>A_V.posterior), <span class="at">ncol=</span><span class="dv">2</span>)</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>    lambda_s.posterior <span class="ot">=</span> <span class="fu">sum</span>(<span class="fu">diag</span>(Sigma.inv.draw<span class="sc">%*%</span><span class="fu">t</span>(Y <span class="sc">-</span> X<span class="sc">%*%</span>A.posterior.draws[,,s])<span class="sc">%*%</span>(Y <span class="sc">-</span> X<span class="sc">%*%</span>A.posterior.draws[,,s]))) <span class="sc">+</span> lambda_s.prior</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>    lambda_v.posterior <span class="ot">=</span> <span class="fu">nrow</span>(Y)<span class="sc">*</span><span class="dv">2</span> <span class="sc">+</span> lambda_v.prior</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>    lambda.draw <span class="ot">=</span> lambda_s.posterior <span class="sc">/</span> <span class="fu">rchisq</span>(<span class="dv">1</span>, lambda_v.posterior)</span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>    lambda.posterior.draws[s] <span class="ot">=</span> lambda.draw</span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(A.posterior.draws, Sigma.posterior.draws, lambda.posterior.draws))</span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>tdist.res <span class="ot">=</span> <span class="fu">TDist.Gibbs.sampler</span>(<span class="dv">1000</span>, Y, X, <span class="fu">c</span>(priors, <span class="fu">list</span>(<span class="at">lambda_s=</span><span class="dv">30</span>, <span class="at">lambda_nu=</span><span class="dv">30</span>)))</span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a><span class="co">#Alpha posterior mean:</span></span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(tdist.res[[<span class="dv">1</span>]], <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, mean),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1]
+[1,] 0.45
+[2,] 0.88</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Sigma posterior mean:</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(tdist.res[[<span class="dv">2</span>]]),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3.75</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lambda posterior mean:</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(tdist.res[[<span class="dv">3</span>]]),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.25</code></pre>
+</div>
+</div>
+</section>
 </section>
 <section id="estimating-autoregressions-after-2020" class="level2">
 <h2 class="anchored" data-anchor-id="estimating-autoregressions-after-2020">Estimating autoregressions after 2020</h2>
@@ -305,14 +760,50 @@ L(\boldsymbol\alpha,\sigma^2|\mathbf{y}, \mathbf{X}) =
 </section>
 <section id="forecasting" class="level1">
 <h1>Forecasting</h1>
-<section id="conditional-predictive-density" class="level2">
-<h2 class="anchored" data-anchor-id="conditional-predictive-density">Conditional predictive density</h2>
+<section id="forecasting-one-period-ahead" class="level2">
+<h2 class="anchored" data-anchor-id="forecasting-one-period-ahead">Forecasting one period ahead</h2>
+<p>The Bayesian approach of the conditional predictive density is a combination of a conditional predictive density and the posterior distribution of the unknown parameters <span class="math inline">\(\boldsymbol\alpha\)</span> and <span class="math inline">\(\sigma^{2}\)</span>. The one-period ahead conditional predictive density can be expressed as below.</p>
+<p><span class="math display">\[
+p(y_{t+1} |x_{t+1},\mathbf{y}, \mathbf{X}) = \int\int p(y_{t+1} |x_{t+1}, \mathbf{y}, \mathbf{X}, \boldsymbol\alpha, \sigma^{2})p(\boldsymbol\alpha, \sigma^{2}|\mathbf{y},\mathbf{X}) d\boldsymbol\alpha d\sigma^{2}\]</span></p>
+<p><span class="math display">\[p(y_{t+1} |x_{t+1}, \mathbf{y},\mathbf{X}, \boldsymbol\alpha, \sigma^{2}) = \mathcal{N}( \alpha'_{d}d_{t+1|t} + \alpha_{1}y_{t}+\dots+\alpha_{p}y_{t-p+1}, \sigma^{2})\]</span></p>
+<p><span class="math display">\[p(\boldsymbol\alpha, \sigma^{2}|\mathbf{y},\mathbf{X}) = \mathcal{NIG}2(\overline{\boldsymbol\alpha}, \overline{\sigma^{2}}, \overline{S}, \overline{v}) \]</span></p>
+<p>To sample the joint predictive density, we integrate out <span class="math inline">\(\boldsymbol\alpha\)</span> and <span class="math inline">\(\sigma^{2}\)</span>. Below steps show how the one-period ahead joint predictive density can be obtained.</p>
+<p>Sample draws from the posterior distribution <span class="math inline">\(p(\boldsymbol\alpha, \sigma^{2}|\bf y,\bf X)\)</span> and</p>
+<p>Obtain <span class="math inline">\(\left\{ \boldsymbol\alpha^{(s)}, \sigma^{2(s)} \right\}^{S}_{s=1}\)</span></p>
+<p>For each draw of <span class="math inline">\(\boldsymbol\alpha\)</span> and <span class="math inline">\(\sigma^{2}\)</span> sample from <span class="math inline">\(p(y_{t+1} |x_{t+1})\)</span> that is specified as <span class="math inline">\(y_{t+1} \sim \mathcal{N} (x_{t+1|t}\boldsymbol\alpha^{(s)}, \sigma^{2(s)})\)</span></p>
+<p>Obtain <span class="math inline">\(\left\{ y_{t+1|t}^{(s)} \right\}^{S}_{s=1}\)</span></p>
+<p>Characterise the predictive density using <span class="math inline">\(\left\{ y_{t+1|t}^{(s)} \right\}^{S}_{s=1}\)</span></p>
 </section>
-<section id="algorithm-to-sample-from-the-predictive-density" class="level2">
-<h2 class="anchored" data-anchor-id="algorithm-to-sample-from-the-predictive-density">Algorithm to sample from the predictive density</h2>
+<section id="forecasting-many-periods-ahead" class="level2">
+<h2 class="anchored" data-anchor-id="forecasting-many-periods-ahead">Forecasting many periods ahead</h2>
 </section>
 <section id="sampler-implementation-in-r" class="level2">
 <h2 class="anchored" data-anchor-id="sampler-implementation-in-r">Sampler implementation in R</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Apply function when needed</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>posterior.sample.draws <span class="ot">=</span> <span class="fu">posterior.draws</span>(<span class="at">S=</span><span class="dv">50000</span>, <span class="at">Y=</span>Y, <span class="at">X=</span>X)         <span class="co"># using the posterior function to draw alpha and sigma</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>A.posterior.simu       <span class="ot">=</span> posterior.sample.draws<span class="sc">$</span>A.posterior         <span class="co"># obtain posterior alpha</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>Sigma.posterior.simu   <span class="ot">=</span> posterior.sample.draws<span class="sc">$</span>Sigma.posterior     <span class="co"># obtain posterior sigma</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="do">## forecasting setup</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>h                      <span class="ot">=</span> <span class="dv">12</span>                                         <span class="co"># specify the desired number of steps ahead</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>S                      <span class="ot">=</span> <span class="dv">50000</span>                                      <span class="co"># the number of sampling time, no greater than the simulation time in the posterior draw function</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>Y.h                    <span class="ot">=</span> <span class="fu">matrix</span>(<span class="cn">NA</span>,h,S)                             <span class="co"># create empty matrix to store the h-step ahead Y </span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="do">## sampling predictive density</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (s <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>S){</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  A.posterior.draw     <span class="ot">=</span> A.posterior.simu[,s]</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  Sigma.posterior.draw <span class="ot">=</span> Sigma.posterior.simu[,s]</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    x.Ti               <span class="ot">=</span> Y[(<span class="fu">nrow</span>(Y)<span class="sc">-</span>p<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(Y)]                   <span class="co"># the number of lags in Y</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    x.Ti               <span class="ot">=</span> x.Ti[p<span class="sc">:</span><span class="dv">1</span>]</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h){</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    x.T                <span class="ot">=</span> <span class="fu">c</span>(d,<span class="fu">as.vector</span>(<span class="fu">t</span>(x.Ti)))                    <span class="co"># d refers to d row vector for the deterministic term data</span></span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    Y.f                <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> x.T<span class="sc">%*%</span>A.posterior.draw, <span class="at">sigma=</span>Sigma.posterior.draw)</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>      x.Ti             <span class="ot">=</span> <span class="fu">rbind</span>(Y.f,x.Ti[<span class="dv">1</span><span class="sc">:</span>(p<span class="dv">-1</span>)])                   <span class="co"># refresh the initial data in Y</span></span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>    Y.h[i,s]           <span class="ot">=</span> Y.f</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 </section>
 <section id="references" class="level1 unnumbered">
@@ -334,8 +825,10 @@ Lenza, Michele, and Giorgio E Primiceri. 2022. <span>“How to Estimate a Vector
   doi = {10.26188/23255657},
   langid = {en}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-woźniak2023" class="csl-entry quarto-appendix-citeas" role="doc-biblioentry">
-Tomasz Woźniak, and Your Name. 2023. <span>“Bayesian
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-woźniak2023" class="csl-entry quarto-appendix-citeas" role="listitem">
+Woźniak, Tomasz, Jonas Loopers Davidsen, Filippo Dell’Andrea, Ray Gomez,
+Xiaoman Guo, Nathan Huynh, Thomas Kronholm Møller, Yobin Timilsena,
+Django Trueman-Greinke, and Hanwen Zhang. 2023. <span>“Bayesian
 Autoregressions.”</span> May 25, 2023. <a href="https://doi.org/10.26188/23255657">https://doi.org/10.26188/23255657</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -365,9 +858,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -432,6 +939,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
