@@ -8,6 +8,8 @@ author:
     url: https://github.com/jonasld23
   - name: Filippo Dell'Andrea
     url: https://github.com/IoTiFeelo
+  - name: Corwin Getty
+    url: https://github.com/Wintersend
   - name: Ray Gomez
     url: https://github.com/rayccg
   - name: Xiaoman Guo
@@ -275,7 +277,6 @@ draws = posterior.draws(S = 1000, posterior = post)
 ```
 
 
-
 # Hierarchical Prior Analysis
 
 ## Estimating autoregressive prior shrinkage
@@ -513,7 +514,6 @@ s.sigma <- rgamma(1, shape = a.bar.s, scale = s.bar.s)
 ```
 ## Dummy observation prior
 
-
 In this extended model, the system is augmented using the *sum of coefficients* and *dummy initial observation* prior. The idea for this way of setting a prior is to generate artificial new rows that augment data matrices $\bf y$ and $\bf X$. It is equivalent to assuming a normal-inverted gamma 2 prior whose parameters are determined by dummy observations augmenting the system.
 
 The *sum of coefficients* prior takes the average of the lagged values and adds them to the basic equation. This is because these values are assumed to be a good forecast of future observations. The *dummy initial observation* prior adds a single dummy observation such that all values are set equal to the averages of initial conditions, up to a scaling factor.
@@ -553,13 +553,6 @@ prior.ex <- function(data, p = 1, lambda_3 = 1, lambda_4 = 1){
 
 ```
 
-
-
-
-```{R}
-
-
-```
 # Model Extensions
 
 ## Student-$t$ error term
@@ -716,20 +709,78 @@ round(mean(tdist.res[[3]]),2)
 
 ## Estimating autoregressions after 2020
 
+The 2020 COVID-19 pandemic significantly altered the global economic
+landscape. It may be argued that the pre and post COVID periods are not
+easily comparable, or that the most severe changes for COVID would best
+be discounted due to their warping effect on the overall data. However,
+@lenza2022estimate disagree. In their paper *How to estimate a vector
+autoregression after March 2020*, rather than discount data, they
+suggest that the effects of COVID be modeled as a temporary spike in
+volatility. They found that the first three periods of the pandemic are
+where volatility is the most unpredictable and this finding holds
+regardless of whether monthly or quarterly data is being used. For
+higher frequency data the exact effect is unknown though should cover at
+least the first 3 months of the pandemic. Thus, they propose the
+following change to the standard formula for autoregressions:
+
+$$y_t = \mathbf{x}_t'\boldsymbol\alpha + c_tu_t,$$
+
+where $c_t$ is a standard deviation multiplier. That is, for every
+period before COVID it takes a value of 1, for the first 3 periods of
+COVID it takes values $\bar{c}_0$, $\bar{c}_1$, $\bar{c}_2$, and then in
+all future periods a value of
+$$c_{t*+j} = 1 + (\bar{c}_2 - 1)\rho^{j-2}, $$ where $\rho\in(0,1)$
+captures the exponential decay in the value of the conditional standard
+deviation towards the value one. This creates a vector that leaves the
+error term unchanged before COVID, has a surge in volatility during
+COVID, and then decays geometrically after COVID. This structure
+approximates the observed shocks to volatility and facilitates
+straightforward estimation.
+
+By dividing both sides by $c_t$ the model equation can be rewritten as
+$$\tilde{y}_t = \tilde{\mathbf{x}}_t'\boldsymbol\alpha + u_t$$ where
+$\tilde{y}_t = y_t/c_t$ and $\tilde{\mathbf{x}}_t = \mathbf{x}_t/c_t$. These
+simple transformations then lend themselves to analysis using whatever
+estimation method is preferred.
+
+The main difficulty arises in the estimation of $c_t$ as it is an
+unknown parameter in many cases.
+
+### Methodology
+
+To estimate the values for $c_0$, $c_1$, and $c_2$ define a $T$-vector
+$\mathbf{c}$ of COVID volatility variables:
+
+$$\mathbf{c}=\begin{bmatrix}1&\dots& c_0 & c_1 & c_2 & 1+(c_2-1)\rho &  1+(c_2-1)\rho^2&\dots\end{bmatrix}'$$
+
+Intuitively, volatility variable for the period before COVID is set to
+unity. Heightened volatility during the first three quarters of COVID
+are parameterized, then they are assumed to decay at a geometric rate
+beginning at the fourth quarter since the pandemic's onset.
+
+These COVID volatility parameters are collected in a vector
+$\boldsymbol\theta=(c_0\quad c_1\quad c_2\quad\rho)$ and are estimated
+from their own marginal posterior as proposed by @lenza2022estimate:
+
+$$p(\boldsymbol\theta\mid\mathbf{y},\mathbf{X})\propto P(\mathbf{y}\mid\mathbf{X},\boldsymbol\theta)p(\boldsymbol\theta)$$
+
+where the likelihood function is given as:
+
+$$\begin{align}p(\mathbf{y},\mathbf{X}|\boldsymbol\theta) &\propto \Bigg(\prod^T_{t=1}c_t^{-N}\Bigg)\underline{\mathbf{s}}^{\frac{\underline{\nu}}{2}}\det\left(\underline{\mathbf{V}}\right)^{-\frac{1}{2}}\det\left(\tilde{\mathbf{X}}'\tilde{\mathbf{X}}+\underline{\mathbf{V}}^{-1}\right)^{-\frac{1}{2}}\\
+&\det\left(\underline{\mathbf{s}}+\hat{\tilde{\mathbf{u}}}'\hat{\tilde{\mathbf{u}}}+(\hat{\tilde{\boldsymbol\alpha}}-\underline{\boldsymbol\alpha})'\underline{\mathbf{V}}^{-1}(\hat{\tilde{\boldsymbol\alpha}}-\underline{\boldsymbol\alpha})\right)^{-\frac{T-p+\underline{\nu}}{2}},\end{align}$$
+where $\tilde{\mathbf{X}} = \begin{bmatrix}\tilde{\mathbf{x}}_1' & \dots & \tilde{\mathbf{x}}_T' \end{bmatrix}'$, $\tilde{\mathbf{y}} = \begin{bmatrix}\tilde{y}_1 & \dots & \tilde{y}_T \end{bmatrix}'$, $\hat{\tilde{\mathbf{u}}} = \tilde{\mathbf{y}} - \tilde{\mathbf{X}}\hat{\tilde{\boldsymbol\alpha}}$, and
+$\hat{\tilde{\boldsymbol\alpha}}=(\tilde{\mathbf{X}}'\tilde{\mathbf{X}}-\underline{\mathbf{V}}^{-1})^{-1}(\tilde{\mathbf{X}}'\tilde{\mathbf{y}}-\underline{\mathbf{V}}^{-1}\underline{\boldsymbol\alpha})$.
+
+and the priors are assumed to be: 
+$$\begin{align}
+\mathbf{c}_0,\mathbf{c}_1,\mathbf{c}_2 &\sim \mathcal{P}areto(1,1)\\
+\rho&\sim \mathcal{B}eta(3,1.5)
+\end{align}$$
+
 
 ### Algorithm with code
 
-From the concise matrix notation:
-
-$$\textbf{y}=\textbf{X}\boldsymbol{\alpha} +\textbf{u}$$
-$$\textbf{u}|\textbf{X}\sim \mathcal{N}_T(0,\sigma^2\text{diag}(\textbf{c}^2))$$
-
-This first step is to sample draws of the vector of COVID volatility
-variables $\textbf{c}=[1\quad...\quad1 \quad \bar{c}_0\quad \bar{c}_1\quad \bar{c}_2\quad 1+(\bar{c}_2-1)\rho\quad 1+(\bar{c}_2-1)\rho^2\quad...]'$.
-
-This is done by estimating parameters in $\boldsymbol\theta=(\bar{c}_0,\bar{c}_1,\bar{c}_2,\rho)$ by
-sampling from their own marginal posterior via a Metropolis MCMC
-algorithm:
+This first step is to sample draws of the vector of COVID volatility variables $\textbf{c}$, which is done by estimating parameters in $\boldsymbol\theta=(\bar{c}_0,\bar{c}_1,\bar{c}_2,\rho)$ by sampling from their own marginal posterior via a Metropolis MCMC algorithm:
 
 1.  Initialize $\boldsymbol\theta$ at the posterior mode which is can be located
     via numerical optimization. We executed this in `R` through the
@@ -1104,6 +1155,7 @@ Characterise the predictive density using $\left\{ y_{t+1|t}^{(s)} \right\}^{S}_
 ## Forecasting many periods ahead
 
 ## Sampler implementation in R
+
 
 ```{r forecasting h step}
 #| echo: true

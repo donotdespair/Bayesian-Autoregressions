@@ -9,6 +9,7 @@
 <meta name="author" content="Tomasz Woźniak">
 <meta name="author" content="Jonas Loopers Davidsen">
 <meta name="author" content="Filippo Dell’Andrea">
+<meta name="author" content="Corwin Getty">
 <meta name="author" content="Ray Gomez">
 <meta name="author" content="Xiaoman Guo">
 <meta name="author" content="Nathan Huynh">
@@ -64,7 +65,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -175,6 +195,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#student-t-error-term" id="toc-student-t-error-term" class="nav-link" data-scroll-target="#student-t-error-term">Student-<span class="math inline">\(t\)</span> error term</a></li>
   <li><a href="#estimating-autoregressions-after-2020" id="toc-estimating-autoregressions-after-2020" class="nav-link" data-scroll-target="#estimating-autoregressions-after-2020">Estimating autoregressions after 2020</a>
   <ul class="collapse">
+  <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology">Methodology</a></li>
   <li><a href="#algorithm-with-code" id="toc-algorithm-with-code" class="nav-link" data-scroll-target="#algorithm-with-code">Algorithm with code</a></li>
   </ul></li>
   <li><a href="#stochastic-volatility-heteroskedasticity" id="toc-stochastic-volatility-heteroskedasticity" class="nav-link" data-scroll-target="#stochastic-volatility-heteroskedasticity">Stochastic volatility heteroskedasticity</a></li>
@@ -208,6 +229,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
              <p><a href="https://github.com/donotdespair">Tomasz Woźniak</a> <a href="https://orcid.org/0000-0003-2212-2378" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
              <p><a href="https://github.com/jonasld23">Jonas Loopers Davidsen</a> </p>
              <p><a href="https://github.com/IoTiFeelo">Filippo Dell’Andrea</a> </p>
+             <p><a href="https://github.com/Wintersend">Corwin Getty</a> </p>
              <p><a href="https://github.com/rayccg">Ray Gomez</a> </p>
              <p><a href="https://github.com/mandyxmg">Xiaoman Guo</a> </p>
              <p><a href="https://github.com/nathanh93">Nathan Huynh</a> </p>
@@ -524,21 +546,21 @@ p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},\boldsymbol\alpha,\sigma^2) =
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean <span class="ot">=</span> <span class="fu">rowMeans</span>(GammaScale.draws<span class="sc">$</span>alpha.posterior)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -0.0147001  0.9609792</code></pre>
+<pre><code>[1] 0.2870307 0.9713162</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>Sigma2.posterior)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1.094356</code></pre>
+<pre><code>[1] 0.92873</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>kappa.posterior)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.2318031</code></pre>
+<pre><code>[1] 0.2610147</code></pre>
 </div>
 </div>
 </section>
@@ -727,14 +749,14 @@ p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &amp;= \mathcal{IG2}(\overl
 <span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a><span class="co">#Alpha posterior mean:</span></span>
 <span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(tdist.res[[<span class="dv">1</span>]], <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, mean),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      [,1]
-[1,] -0.02
-[2,]  0.96</code></pre>
+<pre><code>     [,1]
+[1,] 0.29
+[2,] 0.97</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Sigma posterior mean:</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(tdist.res[[<span class="dv">2</span>]]),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 4.49</code></pre>
+<pre><code>[1] 3.8</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lambda posterior mean:</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(tdist.res[[<span class="dv">3</span>]]),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -746,12 +768,29 @@ p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &amp;= \mathcal{IG2}(\overl
 </section>
 <section id="estimating-autoregressions-after-2020" class="level2">
 <h2 class="anchored" data-anchor-id="estimating-autoregressions-after-2020">Estimating autoregressions after 2020</h2>
+<p>The 2020 COVID-19 pandemic significantly altered the global economic landscape. It may be argued that the pre and post COVID periods are not easily comparable, or that the most severe changes for COVID would best be discounted due to their warping effect on the overall data. However, <span class="citation" data-cites="lenza2022estimate">Lenza and Primiceri (<a href="#ref-lenza2022estimate" role="doc-biblioref">2022</a>)</span> disagree. In their paper <em>How to estimate a vector autoregression after March 2020</em>, rather than discount data, they suggest that the effects of COVID be modeled as a temporary spike in volatility. They found that the first three periods of the pandemic are where volatility is the most unpredictable and this finding holds regardless of whether monthly or quarterly data is being used. For higher frequency data the exact effect is unknown though should cover at least the first 3 months of the pandemic. Thus, they propose the following change to the standard formula for autoregressions:</p>
+<p><span class="math display">\[y_t = \mathbf{x}_t'\boldsymbol\alpha + c_tu_t,\]</span></p>
+<p>where <span class="math inline">\(c_t\)</span> is a standard deviation multiplier. That is, for every period before COVID it takes a value of 1, for the first 3 periods of COVID it takes values <span class="math inline">\(\bar{c}_0\)</span>, <span class="math inline">\(\bar{c}_1\)</span>, <span class="math inline">\(\bar{c}_2\)</span>, and then in all future periods a value of <span class="math display">\[c_{t*+j} = 1 + (\bar{c}_2 - 1)\rho^{j-2}, \]</span> where <span class="math inline">\(\rho\in(0,1)\)</span> captures the exponential decay in the value of the conditional standard deviation towards the value one. This creates a vector that leaves the error term unchanged before COVID, has a surge in volatility during COVID, and then decays geometrically after COVID. This structure approximates the observed shocks to volatility and facilitates straightforward estimation.</p>
+<p>By dividing both sides by <span class="math inline">\(c_t\)</span> the model equation can be rewritten as <span class="math display">\[\tilde{y}_t = \tilde{\mathbf{x}}_t'\boldsymbol\alpha + u_t\]</span> where <span class="math inline">\(\tilde{y}_t = y_t/c_t\)</span> and <span class="math inline">\(\tilde{\mathbf{x}}_t = \mathbf{x}_t/c_t\)</span>. These simple transformations then lend themselves to analysis using whatever estimation method is preferred.</p>
+<p>The main difficulty arises in the estimation of <span class="math inline">\(c_t\)</span> as it is an unknown parameter in many cases.</p>
+<section id="methodology" class="level3">
+<h3 class="anchored" data-anchor-id="methodology">Methodology</h3>
+<p>To estimate the values for <span class="math inline">\(c_0\)</span>, <span class="math inline">\(c_1\)</span>, and <span class="math inline">\(c_2\)</span> define a <span class="math inline">\(T\)</span>-vector <span class="math inline">\(\mathbf{c}\)</span> of COVID volatility variables:</p>
+<p><span class="math display">\[\mathbf{c}=\begin{bmatrix}1&amp;\dots&amp; c_0 &amp; c_1 &amp; c_2 &amp; 1+(c_2-1)\rho &amp;  1+(c_2-1)\rho^2&amp;\dots\end{bmatrix}'\]</span></p>
+<p>Intuitively, volatility variable for the period before COVID is set to unity. Heightened volatility during the first three quarters of COVID are parameterized, then they are assumed to decay at a geometric rate beginning at the fourth quarter since the pandemic’s onset.</p>
+<p>These COVID volatility parameters are collected in a vector <span class="math inline">\(\boldsymbol\theta=(c_0\quad c_1\quad c_2\quad\rho)\)</span> and are estimated from their own marginal posterior as proposed by <span class="citation" data-cites="lenza2022estimate">Lenza and Primiceri (<a href="#ref-lenza2022estimate" role="doc-biblioref">2022</a>)</span>:</p>
+<p><span class="math display">\[p(\boldsymbol\theta\mid\mathbf{y},\mathbf{X})\propto P(\mathbf{y}\mid\mathbf{X},\boldsymbol\theta)p(\boldsymbol\theta)\]</span></p>
+<p>where the likelihood function is given as:</p>
+<p><span class="math display">\[\begin{align}p(\mathbf{y},\mathbf{X}|\boldsymbol\theta) &amp;\propto \Bigg(\prod^T_{t=1}c_t^{-N}\Bigg)\underline{\mathbf{s}}^{\frac{\underline{\nu}}{2}}\det\left(\underline{\mathbf{V}}\right)^{-\frac{1}{2}}\det\left(\tilde{\mathbf{X}}'\tilde{\mathbf{X}}+\underline{\mathbf{V}}^{-1}\right)^{-\frac{1}{2}}\\
+&amp;\det\left(\underline{\mathbf{s}}+\hat{\tilde{\mathbf{u}}}'\hat{\tilde{\mathbf{u}}}+(\hat{\tilde{\boldsymbol\alpha}}-\underline{\boldsymbol\alpha})'\underline{\mathbf{V}}^{-1}(\hat{\tilde{\boldsymbol\alpha}}-\underline{\boldsymbol\alpha})\right)^{-\frac{T-p+\underline{\nu}}{2}},\end{align}\]</span> where <span class="math inline">\(\tilde{\mathbf{X}} = \begin{bmatrix}\tilde{\mathbf{x}}_1' &amp; \dots &amp; \tilde{\mathbf{x}}_T' \end{bmatrix}'\)</span>, <span class="math inline">\(\tilde{\mathbf{y}} = \begin{bmatrix}\tilde{y}_1 &amp; \dots &amp; \tilde{y}_T \end{bmatrix}'\)</span>, <span class="math inline">\(\hat{\tilde{\mathbf{u}}} = \tilde{\mathbf{y}} - \tilde{\mathbf{X}}\hat{\tilde{\boldsymbol\alpha}}\)</span>, and <span class="math inline">\(\hat{\tilde{\boldsymbol\alpha}}=(\tilde{\mathbf{X}}'\tilde{\mathbf{X}}-\underline{\mathbf{V}}^{-1})^{-1}(\tilde{\mathbf{X}}'\tilde{\mathbf{y}}-\underline{\mathbf{V}}^{-1}\underline{\boldsymbol\alpha})\)</span>.</p>
+<p>and the priors are assumed to be: <span class="math display">\[\begin{align}
+\mathbf{c}_0,\mathbf{c}_1,\mathbf{c}_2 &amp;\sim \mathcal{P}areto(1,1)\\
+\rho&amp;\sim \mathcal{B}eta(3,1.5)
+\end{align}\]</span></p>
+</section>
 <section id="algorithm-with-code" class="level3">
 <h3 class="anchored" data-anchor-id="algorithm-with-code">Algorithm with code</h3>
-<p>From the concise matrix notation:</p>
-<p><span class="math display">\[\textbf{y}=\textbf{X}\boldsymbol{\alpha} +\textbf{u}\]</span> <span class="math display">\[\textbf{u}|\textbf{X}\sim \mathcal{N}_T(0,\sigma^2\text{diag}(\textbf{c}^2))\]</span></p>
-<p>This first step is to sample draws of the vector of COVID volatility variables <span class="math inline">\(\textbf{c}=[1\quad...\quad1 \quad \bar{c}_0\quad \bar{c}_1\quad \bar{c}_2\quad 1+(\bar{c}_2-1)\rho\quad 1+(\bar{c}_2-1)\rho^2\quad...]'\)</span>.</p>
-<p>This is done by estimating parameters in <span class="math inline">\(\boldsymbol\theta=(\bar{c}_0,\bar{c}_1,\bar{c}_2,\rho)\)</span> by sampling from their own marginal posterior via a Metropolis MCMC algorithm:</p>
+<p>This first step is to sample draws of the vector of COVID volatility variables <span class="math inline">\(\textbf{c}\)</span>, which is done by estimating parameters in <span class="math inline">\(\boldsymbol\theta=(\bar{c}_0,\bar{c}_1,\bar{c}_2,\rho)\)</span> by sampling from their own marginal posterior via a Metropolis MCMC algorithm:</p>
 <ol type="1">
 <li>Initialize <span class="math inline">\(\boldsymbol\theta\)</span> at the posterior mode which is can be located via numerical optimization. We executed this in <code>R</code> through the following function, <code>c.posterior.mode</code>. This function takes in data representing matrix <span class="math inline">\(\textbf{y}\)</span> and returns values for <span class="math inline">\(\boldsymbol\theta\)</span> that minimize its negative log-posterior, as well as the corresponding Hessian.</li>
 </ol>
@@ -1120,16 +1159,21 @@ p(y_{t+1} |x_{t+1},\mathbf{y}, \mathbf{X}) = \int\int p(y_{t+1} |x_{t+1}, \mathb
 </section>
 </section>
 <section id="references" class="level1 unnumbered">
-<h1 class="unnumbered">References</h1>
+
+
 
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{woźniak2023,
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-lenza2022estimate" class="csl-entry" role="listitem">
+Lenza, Michele, and Giorgio E Primiceri. 2022. <span>“How to Estimate a Vector Autoregression After March 2020.”</span> <em>Journal of Applied Econometrics</em> 37 (4): 688–99.
+</div>
+</div></section><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{woźniak2023,
   author = {Woźniak, Tomasz and Loopers Davidsen, Jonas and Dell’Andrea,
-    Filippo and Gomez, Ray and Guo, Xiaoman and Huynh, Nathan and
-    Kronholm Møller, Thomas and Timilsena, Yobin and Trueman-Greinke,
-    Django and Zhang, Hanwen},
+    Filippo and Getty, Corwin and Gomez, Ray and Guo, Xiaoman and Huynh,
+    Nathan and Kronholm Møller, Thomas and Timilsena, Yobin and
+    Trueman-Greinke, Django and Zhang, Hanwen},
   title = {Bayesian {Autoregressions}},
   date = {2023-05-25},
   url = {https://donotdespair.github.io/Bayesian-Autoregressions/},
@@ -1137,10 +1181,9 @@ p(y_{t+1} |x_{t+1},\mathbf{y}, \mathbf{X}) = \int\int p(y_{t+1} |x_{t+1}, \mathb
   langid = {en}
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-woźniak2023" class="csl-entry quarto-appendix-citeas" role="listitem">
-Woźniak, Tomasz, Jonas Loopers Davidsen, Filippo Dell’Andrea, Ray Gomez,
-Xiaoman Guo, Nathan Huynh, Thomas Kronholm Møller, Yobin Timilsena,
-Django Trueman-Greinke, and Hanwen Zhang. 2023. <span>“Bayesian
-Autoregressions.”</span> May 25, 2023. <a href="https://doi.org/10.26188/23255657">https://doi.org/10.26188/23255657</a>.
+Woźniak, Tomasz, Jonas Loopers Davidsen, Filippo Dell’Andrea, Corwin
+Getty, Ray Gomez, Xiaoman Guo, Nathan Huynh, et al. 2023.
+<span>“Bayesian Autoregressions.”</span> May 25, 2023. <a href="https://doi.org/10.26188/23255657">https://doi.org/10.26188/23255657</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
