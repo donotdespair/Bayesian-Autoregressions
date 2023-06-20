@@ -14,8 +14,12 @@ author:
     url: https://github.com/rayccg
   - name: Xiaoman Guo
     url: https://github.com/mandyxmg
+  - name: Manting Huang
+    url: https://github.com/mantihuang
   - name: Nathan Huynh
     url: https://github.com/nathanh93
+  - name: Eungwon Lee
+    url: https://github.com/eung1
   - name: Thomas Kronholm Møller
     url: https://github.com/ThomasKronhol
   - name: Victoria Sonnemans
@@ -26,10 +30,6 @@ author:
     url: https://github.com/DjangoTG
   - name: Hanwen Zhang
     url: https://github.com/hanwenzhang0317
-  - name: Manting Huang
-    url: https://github.com/mantihuang
-  - name: Eungwon Lee
-    url: https://github.com/eung1
 execute:
   echo: false
 citation: 

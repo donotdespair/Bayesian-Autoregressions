@@ -12,14 +12,14 @@
 <meta name="author" content="Corwin Getty">
 <meta name="author" content="Ray Gomez">
 <meta name="author" content="Xiaoman Guo">
+<meta name="author" content="Manting Huang">
 <meta name="author" content="Nathan Huynh">
+<meta name="author" content="Eungwon Lee">
 <meta name="author" content="Thomas Kronholm Møller">
 <meta name="author" content="Victoria Sonnemans">
 <meta name="author" content="Yobin Timilsena">
 <meta name="author" content="Django Trueman-Greinke">
 <meta name="author" content="Hanwen Zhang">
-<meta name="author" content="Manting Huang">
-<meta name="author" content="Eungwon Lee">
 
 <title>Macroeconometrics Students Present - Bayesian Autoregressions</title>
 <style>
@@ -242,14 +242,14 @@ div.csl-indent {
              <p><a href="https://github.com/Wintersend">Corwin Getty</a> </p>
              <p><a href="https://github.com/rayccg">Ray Gomez</a> </p>
              <p><a href="https://github.com/mandyxmg">Xiaoman Guo</a> </p>
+             <p><a href="https://github.com/mantihuang">Manting Huang</a> </p>
              <p><a href="https://github.com/nathanh93">Nathan Huynh</a> </p>
+             <p><a href="https://github.com/eung1">Eungwon Lee</a> </p>
              <p><a href="https://github.com/ThomasKronhol">Thomas Kronholm Møller</a> </p>
              <p><a href="https://github.com/vsonnemans">Victoria Sonnemans</a> </p>
              <p><a href="https://github.com/yobin-tim">Yobin Timilsena</a> </p>
              <p><a href="https://github.com/DjangoTG">Django Trueman-Greinke</a> </p>
              <p><a href="https://github.com/hanwenzhang0317">Hanwen Zhang</a> </p>
-             <p><a href="https://github.com/mantihuang">Manting Huang</a> </p>
-             <p><a href="https://github.com/eung1">Eungwon Lee</a> </p>
           </div>
   </div>
     
@@ -559,21 +559,21 @@ p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},\boldsymbol\alpha,\sigma^2) =
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean <span class="ot">=</span> <span class="fu">rowMeans</span>(GammaScale.draws<span class="sc">$</span>alpha.posterior)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -0.09149183  0.94499879</code></pre>
+<pre><code>[1] -0.05634373  0.99357623</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>Sigma2.posterior)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9584908</code></pre>
+<pre><code>[1] 1.080411</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>kappa.posterior)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.2430458</code></pre>
+<pre><code>[1] 0.2408404</code></pre>
 </div>
 </div>
 </section>
@@ -763,13 +763,13 @@ p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &amp;= \mathcal{IG2}(\overl
 <span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(tdist.res[[<span class="dv">1</span>]], <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, mean),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      [,1]
-[1,] -0.09
-[2,]  0.95</code></pre>
+[1,] -0.06
+[2,]  1.00</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Sigma posterior mean:</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(tdist.res[[<span class="dv">2</span>]]),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.93</code></pre>
+<pre><code>[1] 4.43</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lambda posterior mean:</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(tdist.res[[<span class="dv">3</span>]]),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1269,10 +1269,10 @@ Wood, S. 2020. <span>“Mgcv: Mixed GAM Computation Vehicle with Automatic Smoot
 </div>
 </div></section><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{woźniak2023,
   author = {Woźniak, Tomasz and Loopers Davidsen, Jonas and Dell’Andrea,
-    Filippo and Getty, Corwin and Gomez, Ray and Guo, Xiaoman and Huynh,
-    Nathan and Kronholm Møller, Thomas and Sonnemans, Victoria and
-    Timilsena, Yobin and Trueman-Greinke, Django and Zhang, Hanwen and
-    Huang, Manting and Lee, Eungwon},
+    Filippo and Getty, Corwin and Gomez, Ray and Guo, Xiaoman and Huang,
+    Manting and Huynh, Nathan and Lee, Eungwon and Kronholm Møller,
+    Thomas and Sonnemans, Victoria and Timilsena, Yobin and
+    Trueman-Greinke, Django and Zhang, Hanwen},
   title = {Bayesian {Autoregressions}},
   date = {2023-05-25},
   url = {https://donotdespair.github.io/Bayesian-Autoregressions/},
@@ -1281,7 +1281,7 @@ Wood, S. 2020. <span>“Mgcv: Mixed GAM Computation Vehicle with Automatic Smoot
 }
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-woźniak2023" class="csl-entry quarto-appendix-citeas" role="listitem">
 Woźniak, Tomasz, Jonas Loopers Davidsen, Filippo Dell’Andrea, Corwin
-Getty, Ray Gomez, Xiaoman Guo, Nathan Huynh, et al. 2023.
+Getty, Ray Gomez, Xiaoman Guo, Manting Huang, et al. 2023.
 <span>“Bayesian Autoregressions.”</span> May 25, 2023. <a href="https://doi.org/10.26188/23255657">https://doi.org/10.26188/23255657</a>.
 </div></div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
