@@ -18,6 +18,8 @@
 <meta name="author" content="Yobin Timilsena">
 <meta name="author" content="Django Trueman-Greinke">
 <meta name="author" content="Hanwen Zhang">
+<meta name="author" content="Manting Huang">
+<meta name="author" content="Eungwon Lee">
 
 <title>Macroeconometrics Students Present - Bayesian Autoregressions</title>
 <style>
@@ -200,7 +202,13 @@ div.csl-indent {
   <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology">Methodology</a></li>
   <li><a href="#algorithm-with-code" id="toc-algorithm-with-code" class="nav-link" data-scroll-target="#algorithm-with-code">Algorithm with code</a></li>
   </ul></li>
-  <li><a href="#stochastic-volatility-heteroskedasticity" id="toc-stochastic-volatility-heteroskedasticity" class="nav-link" data-scroll-target="#stochastic-volatility-heteroskedasticity">Stochastic volatility heteroskedasticity</a></li>
+  <li><a href="#stochastic-volatility-heteroskedasticity" id="toc-stochastic-volatility-heteroskedasticity" class="nav-link" data-scroll-target="#stochastic-volatility-heteroskedasticity">Stochastic volatility heteroskedasticity</a>
+  <ul class="collapse">
+  <li><a href="#model-equations" id="toc-model-equations" class="nav-link" data-scroll-target="#model-equations">Model equations</a></li>
+  <li><a href="#essential-techniques" id="toc-essential-techniques" class="nav-link" data-scroll-target="#essential-techniques">Essential techniques</a></li>
+  <li><a href="#gibbs-sampler" id="toc-gibbs-sampler" class="nav-link" data-scroll-target="#gibbs-sampler">Gibbs sampler</a></li>
+  <li><a href="#algorithm" id="toc-algorithm" class="nav-link" data-scroll-target="#algorithm">Algorithm</a></li>
+  </ul></li>
   </ul></li>
   <li><a href="#forecasting" id="toc-forecasting" class="nav-link" data-scroll-target="#forecasting">Forecasting</a>
   <ul class="collapse">
@@ -240,6 +248,8 @@ div.csl-indent {
              <p><a href="https://github.com/yobin-tim">Yobin Timilsena</a> </p>
              <p><a href="https://github.com/DjangoTG">Django Trueman-Greinke</a> </p>
              <p><a href="https://github.com/hanwenzhang0317">Hanwen Zhang</a> </p>
+             <p><a href="https://github.com/mantihuang">Manting Huang</a> </p>
+             <p><a href="https://github.com/eung1">Eungwon Lee</a> </p>
           </div>
   </div>
     
@@ -549,21 +559,21 @@ p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},\boldsymbol\alpha,\sigma^2) =
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean <span class="ot">=</span> <span class="fu">rowMeans</span>(GammaScale.draws<span class="sc">$</span>alpha.posterior)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] -0.09659746  0.98313834</code></pre>
+<pre><code>[1] -0.09149183  0.94499879</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>Sigma2.posterior)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1.018755</code></pre>
+<pre><code>[1] 0.9584908</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>kappa.posterior)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.2442665</code></pre>
+<pre><code>[1] 0.2430458</code></pre>
 </div>
 </div>
 </section>
@@ -753,13 +763,13 @@ p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &amp;= \mathcal{IG2}(\overl
 <span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(tdist.res[[<span class="dv">1</span>]], <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, mean),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      [,1]
-[1,] -0.10
-[2,]  0.98</code></pre>
+[1,] -0.09
+[2,]  0.95</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Sigma posterior mean:</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(tdist.res[[<span class="dv">2</span>]]),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 4.18</code></pre>
+<pre><code>[1] 3.93</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lambda posterior mean:</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(tdist.res[[<span class="dv">3</span>]]),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1083,6 +1093,82 @@ p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &amp;= \mathcal{IG2}(\overl
 </section>
 <section id="stochastic-volatility-heteroskedasticity" class="level2">
 <h2 class="anchored" data-anchor-id="stochastic-volatility-heteroskedasticity">Stochastic volatility heteroskedasticity</h2>
+<section id="model-equations" class="level3">
+<h3 class="anchored" data-anchor-id="model-equations">Model equations</h3>
+<p>Introduction of Stochastic Volatility requires changing the assumptions regarding the error term: <span class="math display">\[
+\mathbf{u}\mid\mathbf{X} \sim N_T(\mathbf{0}_{T},\text{diag}(\boldsymbol\sigma^2)),
+\]</span> where <span class="math inline">\(\boldsymbol\sigma^2\)</span> is a <span class="math inline">\(T\)</span>-vector: <span class="math display">\[
+\boldsymbol\sigma^2 = (\exp\{h_1\}, ... , \exp\{h_t\}),
+\]</span> and <span class="math inline">\(h_t\)</span> follows a Stochastic Volatility process: <span class="math display">\[
+\begin{align*}
+h_t &amp;= h_{t-1}+\sigma_vv_t \\
+v_t &amp;\sim N(0,1).
+\end{align*}
+\]</span></p>
+<p>The likelihood function is then <span class="math display">\[
+L(\boldsymbol\alpha|\mathbf{y},\mathbf{X},\boldsymbol\sigma^2) \propto \det(\text{diag}(\boldsymbol\sigma^2))^{-1/2}\times \exp\{  -\frac{1}{2}  (\mathbf{y}-\boldsymbol\alpha \mathbf{X})' \text{diag}(\boldsymbol\sigma^2)^{-1}(\mathbf{y}-\boldsymbol\alpha \mathbf{X}) \}
+\]</span> The full conditional posterior distribution for <span class="math inline">\(\boldsymbol\alpha\)</span> is given by <span class="math display">\[
+p(\boldsymbol\alpha|\mathbf{y},\mathbf{X},\boldsymbol\sigma^2) = \mathcal{N}_K (\bar{\boldsymbol\alpha},\bar{\mathbf{V}})
+\]</span> where <span class="math display">\[\begin{align}
+\bar{\mathbf{V}}&amp;=(\mathbf{X}'\text{diag}(\boldsymbol\sigma^2)^{-1}\mathbf{X}+\underline{\mathbf{V}}^{-1})^{-1}\\
+\bar{\boldsymbol\alpha}&amp;=\bar{\mathbf{V}}(\mathbf{X}'\text{diag}(\boldsymbol\sigma^2)^{-1}\mathbf{y}+\underline{\mathbf{V}}^{-1}\underline{\boldsymbol\alpha})
+\end{align}\]</span></p>
+</section>
+<section id="essential-techniques" class="level3">
+<h3 class="anchored" data-anchor-id="essential-techniques">Essential techniques</h3>
+<section id="log-linearisation" class="level4">
+<h4 class="anchored" data-anchor-id="log-linearisation">Log-linearisation</h4>
+<p>In order to estimate the SV model rewrite the autoregressive equation as <span class="math display">\[\begin{align}
+y_t - \mathbf{x}_t'\boldsymbol\alpha &amp;= \exp\left\{\frac{1}{2}h_t\right\}z_t\\
+z_t\mid\mathbf{x}_t &amp;\sim\mathcal{N}(0,1)
+\end{align}\]</span> Square both sides of the equation and take the log to obtain: <span class="math display">\[\begin{align}
+\tilde{y}_t &amp;= h_t + \tilde{z}_t\\
+\tilde{z}_t\mid\mathbf{x}_t &amp;\sim\log\chi^2_1
+\end{align}\]</span> where <span class="math inline">\(\tilde{z}_t = \log\left(y_t - \mathbf{x}_t'\boldsymbol\alpha\right)^2\)</span>, and <span class="math inline">\(\tilde{z}_t = \log z_t^2\)</span> that follows the <span class="math inline">\(\log\chi^2_1\)</span> distribution. This is a non-Gaussian linear model in <span class="math inline">\(h_t\)</span>.</p>
+</section>
+<section id="auxiliary-mixture" class="level4">
+<h4 class="anchored" data-anchor-id="auxiliary-mixture">Auxiliary mixture</h4>
+<p>To deal with the non-Gaussianity, <span class="citation" data-cites="omori2007stochastic">Omori et al. (<a href="#ref-omori2007stochastic" role="doc-biblioref">2007</a>)</span> propose to approximate the log chi-squared distribution with one degree of freedom by a mixture of ten normal distributions given by: <span class="math display">\[
+log\chi^2_1 \approx \sum^{10}_{m=1}Pr[s_t=m]N(\mu_m, \sigma^2_m)
+\]</span> where <span class="math inline">\(s_t\in\{1,...,10\}\)</span> is a discrete-valued random indicator of the mixture component and <span class="math inline">\(\mu_m, \sigma^2_m, Pr(s_t=m)\)</span> are predetermined.</p>
+<p>The conditional distribution of <span class="math inline">\(\tilde{\epsilon_t}\)</span> is given by <span class="math display">\[
+\tilde{\epsilon_t}|s_t = m \sim N(\mu_m, \sigma^2_m)
+\]</span> A simple stochastic volatility model is given by <span class="math display">\[
+\begin{align*}
+\tilde{y} &amp;= h + \tilde{\epsilon} \\
+Hh &amp;= h_0e_{1.T}+\sigma_vv \\
+\tilde{\epsilon_t}|s &amp;\sim N_T(\mu_s, diag(\sigma^2_s)) \\
+v &amp;\sim N_T(0_T, I_T) \\
+\end{align*}
+\]</span></p>
+</section>
+<section id="precision-sampler" class="level4">
+<h4 class="anchored" data-anchor-id="precision-sampler">Precision sampler</h4>
+<p>The full-conditional posterior distribution of the log-volatilities <span class="math inline">\(h\)</span> is a <span class="math inline">\(T\)</span>-variate normal distribution with the precision matrix that is a tridiagonal matrix. Therefore, a computationally fast method of sampling from this full-conditional posterior distribution is by the precision sampler introduced by <span class="citation" data-cites="chan2009efficient">Chan and Jeliazkov (<a href="#ref-chan2009efficient" role="doc-biblioref">2009</a>)</span>. The implementation in R requires using computer routines for tridiagonal matrices from package mgcv by <span class="citation" data-cites="wood2020mgcv">Wood (<a href="#ref-wood2020mgcv" role="doc-biblioref">2020</a>)</span>.</p>
+</section>
+</section>
+<section id="gibbs-sampler" class="level3">
+<h3 class="anchored" data-anchor-id="gibbs-sampler">Gibbs sampler</h3>
+<p>Initialize the algorithm by proposing starting values for <span class="math inline">\(h^{(0)},s^{(0)},\mu_0^{(0)},\boldsymbol\alpha^{(0)},\sigma_v^{2(0)}\)</span></p>
+<p>For each iteration <span class="math inline">\(i\)</span> of the Gibbs sampling algorithm, draw <span class="math display">\[\begin{align}
+h_{0}^{(i)} &amp;\sim \mathcal{N}(\bar{h_0},\bar{\sigma}^2_h) \\
+\sigma_v^{2(i)} &amp;\sim \mathcal{IG}2(\bar{s},\bar{v})\\
+\mu_{0}^{(i)} &amp;\sim \mathcal{N}(\bar{\mu_0},\bar{\sigma}^2_\mu)
+\end{align}\]</span> <span class="math display">\[
+s_t^{(i)} \sim \mathcal{M}ultinomial (\{m\}_{m=1}^{10}, \{Pr[s_t = m|\tilde{y}_t,h_t^{(i)}\}_{m=1}^{10})
+\]</span> using inverse transform method, and: <span class="math display">\[
+\mathbf{h}^{(i)} \sim \mathcal{N}_T(\bar{\mathbf{h}},\bar{\mathbf{V}}_h)
+\]</span> using the precision sampler and compute vector <span class="math inline">\(\boldsymbol\sigma^{2(i)}\)</span>.</p>
+<p>Then, sample the autoregressive parameters: <span class="math display">\[
+\boldsymbol\alpha^{(i)} \sim \mathcal{N}_K(\bar{\boldsymbol\alpha},\bar{\mathbf{V}}_\boldsymbol\alpha),
+\]</span> and return a sample of <span class="math inline">\(S\)</span> draws from the posterior distribution: <span class="math display">\[
+\{\mathbf{h}^{(i)},\mathbf{s}^{(i)},\mu_{0}^{(i)},h_0^{(i)}, \sigma_v^{2(i)},\boldsymbol\sigma^{2(i)},\boldsymbol\alpha^{(i)}\}_{i=1}^{S}.
+\]</span></p>
+</section>
+<section id="algorithm" class="level3">
+<h3 class="anchored" data-anchor-id="algorithm">Algorithm</h3>
+<p>Following is a function implementing the Gibbs sampler.</p>
+</section>
 </section>
 </section>
 <section id="forecasting" class="level1">
@@ -1169,14 +1255,24 @@ p(y_{t+1} |x_{t+1},\mathbf{y}, \mathbf{X}) = \int\int p(y_{t+1} |x_{t+1}, \mathb
 <div id="ref-Bauwens1999" class="csl-entry" role="listitem">
 Bauwens, Luc, Michel Lubrano, and J. F. Richard. 1999. <em><span class="nocase">Bayesian inference in dynamic econometric models</span></em>. Oxford University Press, USA.
 </div>
+<div id="ref-chan2009efficient" class="csl-entry" role="listitem">
+Chan, Joshua, and Ivan Jeliazkov. 2009. <span>“Efficient Simulation and Integrated Likelihood Estimation in State Space Models.”</span> <em>International Journal of Mathematical Modelling and Numerical Optimisation</em> 1: 101–20.
+</div>
 <div id="ref-lenza2022estimate" class="csl-entry" role="listitem">
 Lenza, Michele, and Giorgio E Primiceri. 2022. <span>“How to Estimate a Vector Autoregression After March 2020.”</span> <em>Journal of Applied Econometrics</em> 37 (4): 688–99.
+</div>
+<div id="ref-omori2007stochastic" class="csl-entry" role="listitem">
+Omori, Yasuhiro, Siddhartha Chib, Neil Shephard, and Jouchi Nakajima. 2007. <span>“Stochastic Volatility with Leverage: Fast and Efficient Likelihood Inference.”</span> <em>Journal of Econometrics</em> 140 (2): 425–49.
+</div>
+<div id="ref-wood2020mgcv" class="csl-entry" role="listitem">
+Wood, S. 2020. <span>“Mgcv: Mixed GAM Computation Vehicle with Automatic Smoothness Estimation (1.8-33)[computer Software].”</span>
 </div>
 </div></section><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{woźniak2023,
   author = {Woźniak, Tomasz and Loopers Davidsen, Jonas and Dell’Andrea,
     Filippo and Getty, Corwin and Gomez, Ray and Guo, Xiaoman and Huynh,
     Nathan and Kronholm Møller, Thomas and Sonnemans, Victoria and
-    Timilsena, Yobin and Trueman-Greinke, Django and Zhang, Hanwen},
+    Timilsena, Yobin and Trueman-Greinke, Django and Zhang, Hanwen and
+    Huang, Manting and Lee, Eungwon},
   title = {Bayesian {Autoregressions}},
   date = {2023-05-25},
   url = {https://donotdespair.github.io/Bayesian-Autoregressions/},
