@@ -1099,54 +1099,61 @@ covid.est <- function(data, p=4, S=100, k1=1, k2=100, start_date = c(1991,1), Th
 ## Stochastic volatility heteroskedasticity
 
 ### Model equations
-$$
-Y = X\boldsymbol\alpha + E
-$$
-$$
-E|X \sim N_T(0_{T},\text{diag}(\boldsymbol\sigma^2))
-$$
 
+Introduction of Stochastic Volatility requires changing the assumptions regarding the error term:
 $$
-\boldsymbol\sigma^2 = (\exp\{h_1\}, ... , \exp\{h_t\})
+\mathbf{u}\mid\mathbf{X} \sim N_T(\mathbf{0}_{T},\text{diag}(\boldsymbol\sigma^2)),
 $$
-$h_t$ - follows a Stochastic Volatility process
+where $\boldsymbol\sigma^2$ is a $T$-vector:
+$$
+\boldsymbol\sigma^2 = (\exp\{h_1\}, ... , \exp\{h_t\}),
+$$
+and $h_t$ follows a Stochastic Volatility process:
 $$
 \begin{align*}
 h_t &= h_{t-1}+\sigma_vv_t \\
-v_t &\sim N(0,1)
+v_t &\sim N(0,1).
 \end{align*}
 $$
 
 The likelihood function is then
 $$
-L(\boldsymbol\alpha|\mathbf{y},\mathbf{X},\boldsymbol\sigma^2) \propto \det(\text{diag}(\boldsymbol\sigma^2))^{-1/2}\times \exp\{  -1/2  (\mathbf{y}-\boldsymbol\alpha \mathbf{X})' \text{diag}(\boldsymbol\sigma^2)^{-1}(\mathbf{y}-\boldsymbol\alpha \mathbf{X}) \}
+L(\boldsymbol\alpha|\mathbf{y},\mathbf{X},\boldsymbol\sigma^2) \propto \det(\text{diag}(\boldsymbol\sigma^2))^{-1/2}\times \exp\{  -\frac{1}{2}  (\mathbf{y}-\boldsymbol\alpha \mathbf{X})' \text{diag}(\boldsymbol\sigma^2)^{-1}(\mathbf{y}-\boldsymbol\alpha \mathbf{X}) \}
 $$
-The full conditional posterior distribution for $\boldsymbol\alpha,\boldsymbol\sigma^2$ is given by
+The full conditional posterior distribution for $\boldsymbol\alpha$ is given by
 $$
-p(\boldsymbol\alpha,\boldsymbol\sigma^2|\mathbf{y},\mathbf{X},\mathbf{h}) = \mathcal{MN} (\bar{\boldsymbol\alpha},\bar{\mathbf{V}},\bar{\mathbf{S}},\bar{\nu})
+p(\boldsymbol\alpha|\mathbf{y},\mathbf{X},\boldsymbol\sigma^2) = \mathcal{N}_K (\bar{\boldsymbol\alpha},\bar{\mathbf{V}})
 $$
 where
-$$
-\bar{\mathbf{V}}=(\mathbf{X}'\text{diag}(\boldsymbol\sigma^2)^{-1}X+\underline{\mathbf{V}}^{-1})^{-1}
-$$
-$$
-\bar{\boldsymbol\alpha}=\bar{\mathbf{V}}(\mathbf{X}'\text{diag}(\boldsymbol\sigma^2)^{-1}\mathbf{y}+\underline{\mathbf{V}}^{-1}\underline{\boldsymbol\alpha})
-$$
-$$
-\bar{\mathbf{S}}=\underline{\mathbf{S}}+\mathbf{y}'\text{diag}(\boldsymbol\sigma^2)^{-1}Y+\underline{\boldsymbol\alpha'}\underline{\mathbf{V}}^{-1}\underline{\boldsymbol\alpha}-\bar{\boldsymbol\alpha'}\bar{\mathbf{V}}^{-1}\bar{\boldsymbol\alpha}
-$$
-$$
-\bar{\nu}= T + \underline{\nu}
-$$
+$$\begin{align}
+\bar{\mathbf{V}}&=(\mathbf{X}'\text{diag}(\boldsymbol\sigma^2)^{-1}\mathbf{X}+\underline{\mathbf{V}}^{-1})^{-1}\\
+\bar{\boldsymbol\alpha}&=\bar{\mathbf{V}}(\mathbf{X}'\text{diag}(\boldsymbol\sigma^2)^{-1}\mathbf{y}+\underline{\mathbf{V}}^{-1}\underline{\boldsymbol\alpha})
+\end{align}$$
 
 ### Essential techniques 
 
+#### Log-linearisation
+
+In order to estimate the SV model rewrite the autoregressive equation as
+$$\begin{align}
+y_t - \mathbf{x}_t'\boldsymbol\alpha &= \exp\left\{\frac{1}{2}h_t\right\}z_t\\
+z_t\mid\mathbf{x}_t &\sim\mathcal{N}(0,1)
+\end{align}$$
+Square both sides of the equation and take the log to obtain:
+$$\begin{align}
+\tilde{y}_t &= h_t + \tilde{z}_t\\
+\tilde{z}_t\mid\mathbf{x}_t &\sim\log\chi^2_1
+\end{align}$$
+where $\tilde{z}_t = \log\left(y_t - \mathbf{x}_t'\boldsymbol\alpha\right)^2$, and $\tilde{z}_t = \log z_t^2$ that follows the $\log\chi^2_1$ distribution. This is a non-Gaussian linear model in $h_t$.
+
+
 #### Auxiliary mixture 
-@omori2007stochastic propose to approximiate the log chi-squared distribution with one degree of dreedom by a amixture of ten normal distributions given by:
+
+To deal with the non-Gaussianity, @omori2007stochastic propose to approximate the log chi-squared distribution with one degree of freedom by a mixture of ten normal distributions given by:
 $$
 log\chi^2_1 \approx \sum^{10}_{m=1}Pr[s_t=m]N(\mu_m, \sigma^2_m)
 $$ 
-where $x_t\in\{1,...,10\}$ is a discrete-valued random indicator of the mixture component and $\mu_m, \sigma^2_m, Pr(s_t=m)$ are predetermined.
+where $s_t\in\{1,...,10\}$ is a discrete-valued random indicator of the mixture component and $\mu_m, \sigma^2_m, Pr(s_t=m)$ are predetermined.
 
 The conditional distribution of $\tilde{\epsilon_t}$ is given by
 $$
@@ -1166,64 +1173,43 @@ $$
 #### Precision sampler 
 The full-conditional posterior distribution of the log-volatilities $h$ is a $T$-variate normal distribution with the precision matrix that is a tridiagonal matrix. Therefore, a computationally fast method of sampling from this full-conditional posterior distribution is by the precision sampler introduced by @chan2009efficient. The implementation in R requires using computer routines for tridiagonal matrices from package mgcv by @wood2020mgcv.
 
+### Gibbs sampler
 
-1. Initialize the algorithm by proposing starting values for $h^{(0)},s^{(0)},\mu_0^{(0)},\boldsymbol\alpha^{(0)},\sigma_v^{2(0)}$
-2. For each iteration i of the Gibbs sampling algorithm, draw
-$$
-h_{0}^{(i)} \sim \mathcal{N}(\bar{h_0},\bar{\sigma}^2_h) 
-$$ 
-$$
-\sigma_v^{2(i)} \sim \mathcal{IG}2(\bar{s},\bar{v})
-$$
-$$
-\mu_{0}^{(i)} \sim \mathcal{N}(\bar{\mu_0},\bar{\sigma}^2_\mu) 
-$$
-$$
-\boldsymbol\alpha^{(i)} \sim \mathcal{N}_K(\bar{\boldsymbol\alpha},\bar{\mathbf{V}}_\boldsymbol\alpha) 
-$$
-$$
-s_t^{(i)}\sim \mathcal{M}ultinomial (\{m\}_{m=1}^{10}, \{Pr[s_t = m|\tilde{y}_t,h_t^{(i)}\}_{m=1}^{10})
-$$ 
-using inverse transform method 
+Initialize the algorithm by proposing starting values for $h^{(0)},s^{(0)},\mu_0^{(0)},\boldsymbol\alpha^{(0)},\sigma_v^{2(0)}$
 
+
+For each iteration $i$ of the Gibbs sampling algorithm, draw
+$$\begin{align}
+h_{0}^{(i)} &\sim \mathcal{N}(\bar{h_0},\bar{\sigma}^2_h) \\
+\sigma_v^{2(i)} &\sim \mathcal{IG}2(\bar{s},\bar{v})\\
+\mu_{0}^{(i)} &\sim \mathcal{N}(\bar{\mu_0},\bar{\sigma}^2_\mu)
+\end{align}$$
+$$
+s_t^{(i)} \sim \mathcal{M}ultinomial (\{m\}_{m=1}^{10}, \{Pr[s_t = m|\tilde{y}_t,h_t^{(i)}\}_{m=1}^{10})
+$$ 
+using inverse transform method, and:
 $$
 \mathbf{h}^{(i)} \sim \mathcal{N}_T(\bar{\mathbf{h}},\bar{\mathbf{V}}_h)
 $$
-using precision sampler
-3. Return a sample drawn from the posterior distribution:
+using the precision sampler and compute vector $\boldsymbol\sigma^{2(i)}$.
+
+Then, sample the autoregressive parameters:
 $$
-\{\mathbf{h}^{(i)},\mathbf{s}^{(i)},\mu_{0}^{(i)},\boldsymbol\alpha^{(i)},h_0^{(i)}, \sigma_v^{2(i)}\}
+\boldsymbol\alpha^{(i)} \sim \mathcal{N}_K(\bar{\boldsymbol\alpha},\bar{\mathbf{V}}_\boldsymbol\alpha),
 $$
-
-### Gibbs sampler
-
-At each iteration s:
-
-   Step 1. Sample $\mathbf{h}^{(s)}$ from the distribution $p(\mathbf{h}|\mathbf{y},\mathbf{X},\boldsymbol\alpha, \sigma^2)$
-   Step 2. Sample $\boldsymbol\alpha^{(s)},\sigma^{2(s)}$ from the $p(\boldsymbol\alpha,\sigma^2|\mathbf{y},\mathbf{X},\mathbf{h}) = \mathcal{NIG}2 (\bar{\boldsymbol\alpha},\bar{\mathbf{V}}_\boldsymbol\alpha,\bar{\mathbf{S}},\bar{\nu})$
-   
-Return $\{\boldsymbol\alpha^{(s)},\sigma^{2(s)},\mathbf{h}^{(s)}\}_{s=1}^S$
-
-Technics for sampling h is listed in the previous section.
-
-Then it follows that 
+and return a sample of $S$ draws from the posterior distribution:
 $$
-\bar{\mathbf{V}} = (\mathbf{X}'\text{diag}(\mathbf{h})^{-1}\mathbf{X} + \underline{\mathbf{V}}^{-1})^{-1}$$
-$$\bar{\boldsymbol\alpha} = \bar{\mathbf{V}}(\mathbf{X}'\text{diag}(\mathbf{h})^{-1}\mathbf{y} + \underline{\mathbf{V}}^{-1}\underline{\boldsymbol\alpha})^{-1}$$
-$$\bar{\mathbf{S}} = \underline{\mathbf{S}} + \mathbf{y}'\text{diag}(\mathbf{h})^{-1}\mathbf{y} + \underline{\boldsymbol \alpha }'\underline{\mathbf{V}}^{-1}\underline{\boldsymbol\alpha} - \bar{\boldsymbol\alpha}'\bar{\mathbf{V}}^{-1}\bar{\boldsymbol\alpha}$$
-$$\bar{\nu}=T + \underline{\nu}$$
+\{\mathbf{h}^{(i)},\mathbf{s}^{(i)},\mu_{0}^{(i)},h_0^{(i)}, \sigma_v^{2(i)},\boldsymbol\sigma^{2(i)},\boldsymbol\alpha^{(i)}\}_{i=1}^{S}.
+$$
 
 
 ### Algorithm 
 
-Following is the algorithm for the part above to sample draws from full conditional posterior distribution. For each iteration, it draws h from a corresponding distribution and then using h, and then draws A and sigma from a multivariate normal distribution.
+Following is a function implementing the Gibbs sampler.
 
-```{r, echo = TRUE}
+```{r}
 
-SVcommon.Gibbs.iteration = function(S,aux, priors){
-  
-
-  #
+ARSV_Gibbs = function(S, aux, priors){
   # aux is a list containing:
   #   Y - a TxN matrix
   #   X - a TxK matrix
@@ -1242,92 +1228,13 @@ SVcommon.Gibbs.iteration = function(S,aux, priors){
   #   sigmav.nu - a positive scalar
   #   HH - a TxT matrix
 
-  
   T             = dim(aux$Y)[1]
   N             = dim(aux$Y)[2]
   K             = dim(X)[2]
-  
 
-    
   alpha.st      = c(1.92677,1.34744,0.73504,0.02266,0-0.85173,-1.97278,-3.46788,-5.55246,-8.68384,-14.65000)
   sigma.st      = c(0.11265,0.17788,0.26768,0.40611,0.62699,0.98583,1.57469,2.54498,4.16591,7.33342)
   pi.st         = c(0.00609,0.04775,0.13057,0.20674,0.22715,0.18842,0.12047,0.05591,0.01575,0.00115)
-  
-
-  Lambda        = solve(chol(aux$Sigma))
-  Z             = rowSums( ( aux$Y - aux$X %*% aux$A ) %*% Lambda ) / sqrt(N)
-  Y.tilde       = as.vector(log((Z + 0.0000001)^2))
-  Ytilde.alpha  = as.matrix(Y.tilde - alpha.st[as.vector(aux$s)])
-  
-    # Sampling A and Sigma
-  kappa.1     = 1
-  kappa.2     = 100
-  kappa.3     = 1
-
-  V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
-
-  nu.prior    = N+1
-  # normal-inverse Wishard posterior parameters
-  ############################################################
-  V.bar.inv   = t(aux$X)%*%diag(1/as.vector(aux$sigma2))%*%aux$X + diag(1/diag(V.prior))
-  V.bar       = solve(V.bar.inv)
-  A.bar       = V.bar%*%(t(aux$X)%*%aux$Y + diag(1/diag(V.prior))%*%aux$A)
-  nu.bar      = nrow(aux$Y) + nu.prior
-  S.bar       = aux$Sigma + t(aux$Y)%*%aux$Y + t(A.prior)%*%diag(1/diag(V.prior))%*%aux$A - t(A.bar)%*%V.bar.inv%*%A.bar
-  S.bar.inv   = solve(S.bar)
-  
-  # posterior draws 
-  ############################################################
-
-  Sigma.posterior.IW     = rWishart(1, df=nu.bar, Sigma=S.bar.inv)
-  Sigma.posterior.draw   = apply(Sigma.posterior.IW, 3 ,solve)
-  aux$Sigma              = array(Sigma.posterior.draw,c(N,N,1))
-  A.norm                 = array(rnorm(prod(c(K,N,1))),c(K,N,1))
-  L                      = t(chol(V.bar))
-  aux$A                  = A.bar + L%*%A.norm[,,1]%*%chol(aux$Sigma[,,1])
-  # sampling initial condition
-  ############################################################
-  V.h0.bar      = 1/((1 / priors$h0.v) + (1 / aux$sigma.v2))
-  m.h0.bar      = V.h0.bar*((priors$h0.m / priors$h0.v) + (aux$H[1] / aux$sigma.v2))
-  h0.draw       = rnorm(1, mean = m.h0.bar, sd = sqrt(V.h0.bar))
-  aux$h0        = h0.draw
-  
-  # sampling sigma.v2
-  ############################################################
-  sigma.v2.s    = priors$sigmav.s + sum(c(aux$H[1] - aux$h0, diff(aux$H))^2)
-  sigma.v2.draw = sigma.v2.s / rchisq(1, priors$sigmav.nu + T)
-  aux$sigma.v2  = sigma.v2.draw
-  
-  # sampling auxiliary states
-  ############################################################
-  Pr.tmp        = simplify2array(lapply(1:10,function(x){
-    dnorm(Y.tilde, mean = as.vector(aux$H + alpha.st[x]), sd = sqrt(sigma.st[x]), log = TRUE) + log(pi.st[x])
-  }))
-  Pr            = t(apply(Pr.tmp, 1, function(x){exp(x - max(x)) / sum(exp(x - max(x)))}))
-  s.cum         = t(apply(Pr, 1, cumsum))
-  r             = matrix(rep(runif(T), 10), ncol = 10)
-  ss            = apply(s.cum < r, 1, sum) + 1
-  aux$s         = as.matrix(ss)
-  
-  
-  # sampling log-volatilities using functions for tridiagonal precision matrix
-  ############################################################
-  Sigma.s.inv   = diag(1 / sigma.st[as.vector(aux$s)])
-  D.inv         = Sigma.s.inv + (1 / aux$sigma.v2) * priors$HH
-  b             = as.matrix(Ytilde.alpha / sigma.st[as.vector(aux$s)] + (aux$h0/aux$sigma.v2)*diag(T)[,1])
-  lead.diag     = diag(D.inv)
-  sub.diag      = mgcv::sdiag(D.inv, -1)
-  D.chol        = mgcv::trichol(ld = lead.diag, sd = sub.diag)
-  D.L           = diag(D.chol$ld)
-  mgcv::sdiag(D.L,-1) = D.chol$sd
-  x             = as.matrix(rnorm(T))
-  a             = forwardsolve(D.L, b)
-  draw          = backsolve(t(D.L), a + x)
-  aux$H         = as.matrix(draw)
-  aux$sigma2    = as.matrix(exp(draw))
-  
-
-
   
   posteriors      = list(
     H           = matrix(NA,T,S),
@@ -1339,22 +1246,90 @@ SVcommon.Gibbs.iteration = function(S,aux, priors){
     Sigma       = array(NA, c(N,N,S))
   )
 
-  for (s in 1:S){
-      posteriors$H[,s]             = aux$H
-      posteriors$sigma2[,s]        = aux$sigma2
-      posteriors$s[,s]             = aux$s
-      posteriors$h0[s]             = aux$h0
-      posteriors$sigma.v2[s]       = aux$sigma.v2
-      posteriors$A[,,s]            = aux$A
-      posteriors$Sigma[,,s]        = aux$Sigma
-      posteriors$A[,,s]            = aux$A
-      posteriors$Sigma[,,s]        = aux$Sigma
+  
+    # Sampling A and Sigma
+  kappa.1     = 1
+  kappa.2     = 100
+  kappa.3     = 1
+
+  V.prior     = diag(c(kappa.2,kappa.1*((1:p)^(-2))%x%rep(1,N)))
+  nu.prior    = N+1
+
+  for (s in 1:S) {
+    # normal-inverse Wishard posterior parameters
+    ############################################################
+    V.bar.inv   = t(aux$X)%*%diag(1/as.vector(aux$sigma2))%*%aux$X + diag(1/diag(V.prior))
+    V.bar       = solve(V.bar.inv)
+    A.bar       = V.bar%*%(t(aux$X)%*%aux$Y + diag(1/diag(V.prior))%*%aux$A)
+    nu.bar      = nrow(aux$Y) + nu.prior
+    S.bar       = aux$Sigma + t(aux$Y)%*%aux$Y + t(A.prior)%*%diag(1/diag(V.prior))%*%aux$A - t(A.bar)%*%V.bar.inv%*%A.bar
+    S.bar.inv   = solve(S.bar)
+    
+    # posterior draws 
+    ############################################################
+    Sigma.posterior.IW     = rWishart(1, df=nu.bar, Sigma=S.bar.inv)
+    Sigma.posterior.draw   = apply(Sigma.posterior.IW, 3 ,solve)
+    aux$Sigma              = array(Sigma.posterior.draw,c(N,N,1))
+    A.norm                 = array(rnorm(prod(c(K,N,1))),c(K,N,1))
+    L                      = t(chol(V.bar))
+    aux$A                  = A.bar + L%*%A.norm[,,1]%*%chol(aux$Sigma[,,1])
+    
+    Lambda        = solve(chol(aux$Sigma))
+    Z             = rowSums( ( aux$Y - aux$X %*% aux$A ) %*% Lambda ) / sqrt(N)
+    Y.tilde       = as.vector(log((Z + 0.0000001)^2))
+    Ytilde.alpha  = as.matrix(Y.tilde - alpha.st[as.vector(aux$s)])
+    
+    # sampling initial condition
+    ############################################################
+    V.h0.bar      = 1/((1 / priors$h0.v) + (1 / aux$sigma.v2))
+    m.h0.bar      = V.h0.bar*((priors$h0.m / priors$h0.v) + (aux$H[1] / aux$sigma.v2))
+    h0.draw       = rnorm(1, mean = m.h0.bar, sd = sqrt(V.h0.bar))
+    aux$h0        = h0.draw
+    
+    # sampling sigma.v2
+    ############################################################
+    sigma.v2.s    = priors$sigmav.s + sum(c(aux$H[1] - aux$h0, diff(aux$H))^2)
+    sigma.v2.draw = sigma.v2.s / rchisq(1, priors$sigmav.nu + T)
+    aux$sigma.v2  = sigma.v2.draw
+    
+    # sampling auxiliary states
+    ############################################################
+    Pr.tmp        = simplify2array(lapply(1:10,function(x){
+      dnorm(Y.tilde, mean = as.vector(aux$H + alpha.st[x]), sd = sqrt(sigma.st[x]), log = TRUE) + log(pi.st[x])
+    }))
+    Pr            = t(apply(Pr.tmp, 1, function(x){exp(x - max(x)) / sum(exp(x - max(x)))}))
+    s.cum         = t(apply(Pr, 1, cumsum))
+    r             = matrix(rep(runif(T), 10), ncol = 10)
+    ss            = apply(s.cum < r, 1, sum) + 1
+    aux$s         = as.matrix(ss)
+    
+    # sampling log-volatilities using functions for tridiagonal precision matrix
+    ############################################################
+    Sigma.s.inv   = diag(1 / sigma.st[as.vector(aux$s)])
+    D.inv         = Sigma.s.inv + (1 / aux$sigma.v2) * priors$HH
+    b             = as.matrix(Ytilde.alpha / sigma.st[as.vector(aux$s)] + (aux$h0/aux$sigma.v2)*diag(T)[,1])
+    lead.diag     = diag(D.inv)
+    sub.diag      = mgcv::sdiag(D.inv, -1)
+    D.chol        = mgcv::trichol(ld = lead.diag, sd = sub.diag)
+    D.L           = diag(D.chol$ld)
+    mgcv::sdiag(D.L,-1) = D.chol$sd
+    x             = as.matrix(rnorm(T))
+    a             = forwardsolve(D.L, b)
+    draw          = backsolve(t(D.L), a + x)
+    aux$H         = as.matrix(draw)
+    aux$sigma2    = as.matrix(exp(draw))
+    
+    posteriors$H[,s]             = aux$H
+    posteriors$sigma2[,s]        = aux$sigma2
+    posteriors$s[,s]             = aux$s
+    posteriors$h0[s]             = aux$h0
+    posteriors$sigma.v2[s]       = aux$sigma.v2
+    posteriors$A[,,s]            = aux$A
+    posteriors$Sigma[,,s]        = aux$Sigma
   }
   
-
   return(posteriors)
 }
-
 
 ```
 
