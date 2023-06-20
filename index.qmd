@@ -8,10 +8,18 @@ author:
     url: https://github.com/jonasld23
   - name: Filippo Dell'Andrea
     url: https://github.com/IoTiFeelo
+  - name: Corwin Getty
+    url: https://github.com/Wintersend
   - name: Ray Gomez
     url: https://github.com/rayccg
+  - name: Xiaoman Guo
+    url: https://github.com/mandyxmg
+  - name: Nathan Huynh
+    url: https://github.com/nathanh93
   - name: Thomas Kronholm Møller
     url: https://github.com/ThomasKronhol
+  - name: Victoria Sonnemans
+    url: https://github.com/vsonnemans
   - name: Yobin Timilsena
     url: https://github.com/yobin-tim
   - name: Django Trueman-Greinke
@@ -273,7 +281,6 @@ draws = posterior.draws(S = 1000, posterior = post)
 ```
 
 
-
 # Hierarchical Prior Analysis
 
 ## Estimating autoregressive prior shrinkage
@@ -511,7 +518,6 @@ s.sigma <- rgamma(1, shape = a.bar.s, scale = s.bar.s)
 ```
 ## Dummy observation prior
 
-
 In this extended model, the system is augmented using the *sum of coefficients* and *dummy initial observation* prior. The idea for this way of setting a prior is to generate artificial new rows that augment data matrices $\bf y$ and $\bf X$. It is equivalent to assuming a normal-inverted gamma 2 prior whose parameters are determined by dummy observations augmenting the system.
 
 The *sum of coefficients* prior takes the average of the lagged values and adds them to the basic equation. This is because these values are assumed to be a good forecast of future observations. The *dummy initial observation* prior adds a single dummy observation such that all values are set equal to the averages of initial conditions, up to a scaling factor.
@@ -551,33 +557,234 @@ prior.ex <- function(data, p = 1, lambda_3 = 1, lambda_4 = 1){
 
 ```
 
-
-
-
-```{R}
-
-
-```
 # Model Extensions
 
 ## Student-$t$ error term
 
+A possible extension to the model is to relax the assumption of normally distributed errors. By assuming a t-distribution for the errors we can better account for excess kurtosis in the data, also referred to as 'fat tails'. Such a specification lends itself well to estimating models on data commonly found to be leptokurtic, such as financial time series.
+
+$$ u_t \sim \mathcal{t}(0,\Sigma,\nu) $$
+
+
+#### Scale Mixture of Normals Representation of the $t$ Distribution
+
+Implementation of t-distributed errors can be achieved by representing the t-distribution as a 'scale mixture of normal distributions'. 
+
+If,
+$$
+\begin{align*}
+  x|\lambda &\sim \mathcal{N}(0, \lambda\sigma^2) \\
+  \lambda &\sim \mathcal{IG2}(s, \nu)
+\end{align*}
+$$
+then
+$$ x \sim t(0, s, \sigma^2, \nu) $$
+This result can be derived by expressing the joint distribution of $x$ and $\lambda$ as
+$$ p(x,\lambda) = p(x|\lambda) p(\lambda) $$
+and then intergrating with respect to $\lambda$
+
+$$ \int_0^\infty p(x|\lambda) p(\lambda) d\lambda $$
+
+This integration produces a density function which is proportional to the distribution for a Student-t distribution with $\nu$ degrees of freedom. Hence, $x\sim t_\nu$.
+
+#### Likelihood and Posteriors under Student-t errors
+
+Implementing the scale mixture specification, the conditional distribution of $y$ now takes the following form
+
+$$ \boldsymbol{y}|\boldsymbol{X},\boldsymbol{\alpha},\sigma^2,\lambda \sim \mathcal{N_T}(\boldsymbol{X}\boldsymbol{\alpha}, \sigma^2\lambda I_T) $$
+
+The likelihood under this specification now becomes
+
+$$ L(\boldsymbol{\alpha}, \sigma^2, \lambda | \boldsymbol{y}, \boldsymbol{X}) = (2\pi)^{-\frac{T}{2}} (\sigma^2)^{-\frac{T}{2}} \det(\lambda I_T)^{-\frac{1}{2}}
+exp(-\frac{1}{2}\frac{1}{\sigma^2}(\boldsymbol{y - X\alpha})'(\lambda I_T)^{-1}(\boldsymbol{y - X\alpha}))$$
+
+As before, we can derive the full conditional posteriors of the parameters by multiplying the likelihood and the priors. The natural conjugacy of $\boldsymbol\alpha$ and $\sigma^2$ are preserved under this specification and therefore the joint posterior is given by
+
+$$ p(\boldsymbol{\alpha}, \sigma^2|\boldsymbol{y, X}, \lambda) \propto L(\boldsymbol{\alpha}, \sigma^2, \lambda | \boldsymbol{y}, \boldsymbol{X}) p(\boldsymbol{\alpha}, \sigma^2) $$
+
+Expanding and rearranging the resulting expression allows the posterior to be expressed in the form of a Normal Inverse Gamma 2 with the following moments
+
+$$\begin{align*}
+p(\boldsymbol{\alpha}, \sigma^2|\boldsymbol{\mathbf{y}, \mathbf{X}}, \lambda) &= \mathcal{NIG2}(\boldsymbol{\overline\alpha, \overline V_\alpha}, \overline s, \overline \nu) \\
+\overline{\boldsymbol\alpha} &= \overline{\mathbf{V}}_{\boldsymbol\alpha}( \underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{X}'(\lambda I_T)^{-1}\mathbf{y})\\
+\overline{\mathbf{V}}_{\boldsymbol\alpha} &=\left(\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}+\mathbf{X}'(\lambda I_T)^{-1}\mathbf{X}\right)^{-1} \\
+\overline{s} &= \underline{s}+\overline{\boldsymbol\alpha}'\overline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\overline{\boldsymbol\alpha}+\underline{\boldsymbol\alpha}'\underline{\mathbf{V}}^{-1}_{\boldsymbol\alpha}\underline{\boldsymbol\alpha}+\mathbf{y}'(\lambda I_T)^{-1}\mathbf{y}\\
+\overline{\nu} &= \underline{\nu}+T
+\end{align*}$$
+
+The full conditional for $\lambda$ is also derived in a similar manner, with the posterior distribution taking the form of an Inverse Gamma 2
+
+$$\begin{align*}
+p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &\propto L(\boldsymbol{\alpha}, \sigma^2, \lambda | \mathbf{y, X})p(\lambda) \\
+&\propto (\sigma^2)^{-\frac{T}{2}}\det(\lambda I_T)^{-\frac{1}{2}}\exp(-\frac{1}{2}\frac{1}{\sigma^2}(\mathbf{y - X\alpha})'(\lambda I_T)^{-1}(\mathbf{y - X\alpha})) \\
+&\times \lambda^{-\frac{\underline \nu_\lambda +2}{2}}\exp(-\frac{1}{2}\frac{\underline s_\lambda}{\lambda})
+\end{align*}$$
+
+Rearranging the above to express in the form of $\mathcal{IG2}$
+
+$$\begin{align*}
+p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &= \mathcal{IG2}(\overline s_\lambda, \overline \nu_\lambda) \\
+\overline s_\lambda &= \frac{1}{\sigma^2}(\mathbf{y - X\boldsymbol\alpha})'(\mathbf{y - X\boldsymbol\alpha}) + \underline s_\lambda \\
+\overline \nu_\lambda &= T + \underline \nu_\lambda
+\end{align*}$$
+
+
+
+#### Gibbs Sampler Code for t-distributed errors
+
+Now that we have the full conditionals for all of the parameters we can incorporate them into the Gibbs Sampler routine in order to draw a sample from the posterior densities.
+
+The routine proceeds as follows:
+
+Initialize lambda based on priors for $\underline s_\lambda$ and $\underline \nu_\lambda$.
+
+At each iteration s:
+
+1.    Draw $\sigma^{2(s)}$ from the $\mathcal{IG2}(\overline S, \overline\nu)$ distribution
+2.    Draw $\mathbf{\alpha^{(s)}}$ from the $\mathcal{N}(\boldsymbol{\overline \alpha}, \sigma^{2(s)} \overline V)$ distribution
+3.    Draw $\lambda^{(s)}$ from $\mathcal{IG2}(\overline s_\lambda, \overline\nu_\lambda)$
+
+The sampling routine is implemented via the following function in R and the results of applying the sampler to the artificial random walk data are displayed. For the purposes of this simulation a relatively large prior for the degrees of freedom parameter is chosen, which communicates our prior belief that the data should follow a random walk.
+
+```{r}
+#| echo: true 
+#| message: false
+#| warning: false
+
+TDist.Gibbs.sampler = function(S, Y, X, priors){
+  # A function to sample from the full conditionals of alpha, sigma and lambda
+  #
+  # priors: a list containing the usual priors for alpha, Sigma, S and nu
+  # as well as additional priors for lambda hyper-parameters lambda_s and lambda_nu.
+  
+  A.prior = priors$alpha
+  A_V.gprior = priors$Sigma
+  Sigma_s.prior = priors$S
+  Sigma_v.prior = priors$nu
+  lambda_s.prior = priors$lambda_s
+  lambda_v.prior = priors$lambda_nu
+  
+  lambda.draw = lambda_s.prior/rchisq(1, lambda_v.prior)
+  
+  Sigma.posterior.draws = array(NA, c(1,1,S))
+  A.posterior.draws = array(NA, c(k,1,S))
+  lambda.posterior.draws = rep(NA,S)
+  for (s in 1:S){
+    
+    lambda.gprior.diag = diag(lambda.draw, nrow(Y))
+    
+    A_V.posterior     = solve(t(X)%*%diag(1/diag(lambda.gprior.diag))%*%X + solve(A_V.gprior))
+    A.posterior       = A_V.posterior%*%(t(X)%*%diag(1/diag(lambda.gprior.diag))%*%Y + solve(A_V.gprior)%*%A.prior)
+    Sigma_s.posterior = t(Y)%*%diag(1/diag(lambda.gprior.diag))%*%Y + t(A.prior)%*%solve(A_V.gprior)%*%A.prior + Sigma_s.prior - t(A.posterior)%*%solve(A_V.posterior)%*%A.posterior
+    Sigma_v.posterior = nrow(Y) + Sigma_v.prior
+    
+    #Sigma.inv.draw      = rWishart(1, Sigma_v.posterior, solve(Sigma_s.posterior))[,,1]
+    #Sigma.posterior.draws[,,s] = solve(Sigma.inv.draw)
+    
+    Sigma.posterior.draws[,,s] = Sigma_s.posterior/ rchisq(1, df=Sigma_v.posterior)
+    Sigma.inv.draw = solve(Sigma.posterior.draws[,,s])
+    
+    A.posterior.draws[,,s] = matrix(mvtnorm::rmvnorm(1, mean=as.vector(A.posterior), sigma=Sigma.posterior.draws[,,s]%x%A_V.posterior), ncol=2)
+    
+    lambda_s.posterior = sum(diag(Sigma.inv.draw%*%t(Y - X%*%A.posterior.draws[,,s])%*%(Y - X%*%A.posterior.draws[,,s]))) + lambda_s.prior
+    lambda_v.posterior = nrow(Y)*2 + lambda_v.prior
+    
+    lambda.draw = lambda_s.posterior / rchisq(1, lambda_v.posterior)
+    lambda.posterior.draws[s] = lambda.draw
+  }
+  return(list(A.posterior.draws, Sigma.posterior.draws, lambda.posterior.draws))
+}
+
+tdist.res = TDist.Gibbs.sampler(1000, Y, X, c(priors, list(lambda_s=30, lambda_nu=30)))
+
+#Alpha posterior mean:
+round(apply(tdist.res[[1]], 1:2, mean),2)
+
+#Sigma posterior mean:
+round(mean(tdist.res[[2]]),2)
+
+#Lambda posterior mean:
+round(mean(tdist.res[[3]]),2)
+
+```
+
+
+
+
 ## Estimating autoregressions after 2020
+
+The 2020 COVID-19 pandemic significantly altered the global economic
+landscape. It may be argued that the pre and post COVID periods are not
+easily comparable, or that the most severe changes for COVID would best
+be discounted due to their warping effect on the overall data. However,
+@lenza2022estimate disagree. In their paper *How to estimate a vector
+autoregression after March 2020*, rather than discount data, they
+suggest that the effects of COVID be modeled as a temporary spike in
+volatility. They found that the first three periods of the pandemic are
+where volatility is the most unpredictable and this finding holds
+regardless of whether monthly or quarterly data is being used. For
+higher frequency data the exact effect is unknown though should cover at
+least the first 3 months of the pandemic. Thus, they propose the
+following change to the standard formula for autoregressions:
+
+$$y_t = \mathbf{x}_t'\boldsymbol\alpha + c_tu_t,$$
+
+where $c_t$ is a standard deviation multiplier. That is, for every
+period before COVID it takes a value of 1, for the first 3 periods of
+COVID it takes values $\bar{c}_0$, $\bar{c}_1$, $\bar{c}_2$, and then in
+all future periods a value of
+$$c_{t*+j} = 1 + (\bar{c}_2 - 1)\rho^{j-2}, $$ where $\rho\in(0,1)$
+captures the exponential decay in the value of the conditional standard
+deviation towards the value one. This creates a vector that leaves the
+error term unchanged before COVID, has a surge in volatility during
+COVID, and then decays geometrically after COVID. This structure
+approximates the observed shocks to volatility and facilitates
+straightforward estimation.
+
+By dividing both sides by $c_t$ the model equation can be rewritten as
+$$\tilde{y}_t = \tilde{\mathbf{x}}_t'\boldsymbol\alpha + u_t$$ where
+$\tilde{y}_t = y_t/c_t$ and $\tilde{\mathbf{x}}_t = \mathbf{x}_t/c_t$. These
+simple transformations then lend themselves to analysis using whatever
+estimation method is preferred.
+
+The main difficulty arises in the estimation of $c_t$ as it is an
+unknown parameter in many cases.
+
+### Methodology
+
+To estimate the values for $c_0$, $c_1$, and $c_2$ define a $T$-vector
+$\mathbf{c}$ of COVID volatility variables:
+
+$$\mathbf{c}=\begin{bmatrix}1&\dots& c_0 & c_1 & c_2 & 1+(c_2-1)\rho &  1+(c_2-1)\rho^2&\dots\end{bmatrix}'$$
+
+Intuitively, volatility variable for the period before COVID is set to
+unity. Heightened volatility during the first three quarters of COVID
+are parameterized, then they are assumed to decay at a geometric rate
+beginning at the fourth quarter since the pandemic's onset.
+
+These COVID volatility parameters are collected in a vector
+$\boldsymbol\theta=(c_0\quad c_1\quad c_2\quad\rho)$ and are estimated
+from their own marginal posterior as proposed by @lenza2022estimate:
+
+$$p(\boldsymbol\theta\mid\mathbf{y},\mathbf{X})\propto P(\mathbf{y}\mid\mathbf{X},\boldsymbol\theta)p(\boldsymbol\theta)$$
+
+where the likelihood function is given as:
+
+$$\begin{align}p(\mathbf{y},\mathbf{X}|\boldsymbol\theta) &\propto \Bigg(\prod^T_{t=1}c_t^{-N}\Bigg)\underline{\mathbf{s}}^{\frac{\underline{\nu}}{2}}\det\left(\underline{\mathbf{V}}\right)^{-\frac{1}{2}}\det\left(\tilde{\mathbf{X}}'\tilde{\mathbf{X}}+\underline{\mathbf{V}}^{-1}\right)^{-\frac{1}{2}}\\
+&\det\left(\underline{\mathbf{s}}+\hat{\tilde{\mathbf{u}}}'\hat{\tilde{\mathbf{u}}}+(\hat{\tilde{\boldsymbol\alpha}}-\underline{\boldsymbol\alpha})'\underline{\mathbf{V}}^{-1}(\hat{\tilde{\boldsymbol\alpha}}-\underline{\boldsymbol\alpha})\right)^{-\frac{T-p+\underline{\nu}}{2}},\end{align}$$
+where $\tilde{\mathbf{X}} = \begin{bmatrix}\tilde{\mathbf{x}}_1' & \dots & \tilde{\mathbf{x}}_T' \end{bmatrix}'$, $\tilde{\mathbf{y}} = \begin{bmatrix}\tilde{y}_1 & \dots & \tilde{y}_T \end{bmatrix}'$, $\hat{\tilde{\mathbf{u}}} = \tilde{\mathbf{y}} - \tilde{\mathbf{X}}\hat{\tilde{\boldsymbol\alpha}}$, and
+$\hat{\tilde{\boldsymbol\alpha}}=(\tilde{\mathbf{X}}'\tilde{\mathbf{X}}-\underline{\mathbf{V}}^{-1})^{-1}(\tilde{\mathbf{X}}'\tilde{\mathbf{y}}-\underline{\mathbf{V}}^{-1}\underline{\boldsymbol\alpha})$.
+
+and the priors are assumed to be: 
+$$\begin{align}
+\mathbf{c}_0,\mathbf{c}_1,\mathbf{c}_2 &\sim \mathcal{P}areto(1,1)\\
+\rho&\sim \mathcal{B}eta(3,1.5)
+\end{align}$$
 
 
 ### Algorithm with code
 
-From the concise matrix notation:
-
-$$\textbf{y}=\textbf{X}\boldsymbol{\alpha} +\textbf{u}$$
-$$\textbf{u}|\textbf{X}\sim \mathcal{N}_T(0,\sigma^2\text{diag}(\textbf{c}^2))$$
-
-This first step is to sample draws of the vector of COVID volatility
-variables $\textbf{c}=[1\quad...\quad1 \quad \bar{c}_0\quad \bar{c}_1\quad \bar{c}_2\quad 1+(\bar{c}_2-1)\rho\quad 1+(\bar{c}_2-1)\rho^2\quad...]'$.
-
-This is done by estimating parameters in $\boldsymbol\theta=(\bar{c}_0,\bar{c}_1,\bar{c}_2,\rho)$ by
-sampling from their own marginal posterior via a Metropolis MCMC
-algorithm:
+This first step is to sample draws of the vector of COVID volatility variables $\textbf{c}$, which is done by estimating parameters in $\boldsymbol\theta=(\bar{c}_0,\bar{c}_1,\bar{c}_2,\rho)$ by sampling from their own marginal posterior via a Metropolis MCMC algorithm:
 
 1.  Initialize $\boldsymbol\theta$ at the posterior mode which is can be located
     via numerical optimization. We executed this in `R` through the
@@ -1154,10 +1361,93 @@ SVcommon.Gibbs.iteration = function(S,aux, priors){
 
 # Forecasting
 
-## Conditional predictive density
+## Analytical results for one-period-ahead forecast 
 
-## Algorithm to sample from the predictive density
+In the frequentist approach, we condition the predictive density on the parameters $\left(\boldsymbol\alpha\right)$, the parameters. The latter are treated as non-random.  Therefore, it can be stated that this approach to forecasting ignores estimation uncertainty. 
+
+To address this issue, the Bayesian approach treats the parameters $\boldsymbol\alpha$ and $\sigma^2$ as random variables and thus, it incorporates estimation uncertainty into the predictive density. Additionally, by imposing appropriate priors Bayesian forecasting often leads to more precise forecasts as it narrows the predictive intervals. 
+
+Moreover, Bayesian forecasting uses the conditional predictive density as a starting point. In the following formula for the conditional one-period ahead forecast, the first expression under the integral is the conditional predictive density and the second expression is the joint posterior distribution that we are now used to derive. 
+
+$$\begin{align}
+p\left(y _{t+1} \mid \mathbf{y}, \mathbf{X}\right) &=\iint p\left(y _{t+1} \mid\mathbf{y}, \mathbf{X}, \boldsymbol\alpha, \sigma^2\right) p\left(\boldsymbol\alpha, \sigma^2 \mid \mathbf{y}, \mathbf{X}\right) d \boldsymbol\alpha d \sigma^2\\
+p\left(y _{t+1} \mid\mathbf{y}, \mathbf{X}, \boldsymbol\alpha, \sigma^2 \right) &=\mathcal{N} \left(x_{t+1}^{\prime} \boldsymbol\alpha, \sigma^2\right)\\
+p\left(\boldsymbol\alpha, \sigma^2 \mid \mathbf{y}, \mathbf{X}\right) &=p\left(\boldsymbol\alpha \mid \mathbf{y}, \mathbf{X}, \sigma^2\right) p\left(\sigma^2 \mid \mathbf{y}, \mathbf{X}\right)\\
+p\left(\boldsymbol\alpha \mid \mathbf{y}, \mathbf{X}, \sigma^2 \right) &= \mathcal{N}_{K}\left(\overline{\boldsymbol\alpha}, \sigma^2\overline{\mathbf{V}}\right)\\
+p\left(\sigma^2 \mid \mathbf{y}, \mathbf{X}\right) &=\mathcal{IG}2(\overline{s}, \overline{\nu})
+\end{align}
+$$
+To derive the solution of this expression analytically, we integrate the parameters out in this order: 
+
+1. We integrate out $\boldsymbol\alpha$ and obtain:
+
+$$
+p\left(y_{t+1} \mid \mathbf{y}, \mathbf{X}, \sigma^2\right)=\mathcal{N}\left(\mathbf{x}_{t+1}^{\prime} \overline{\boldsymbol\alpha}, \sigma^2\left(1+\mathbf{x}_{t+1}^{\prime} \overline{\mathbf{V}} \mathbf{x}_{t+1}\right)\right)
+$$
+
+2. We integrate out $\sigma^2$ and obtain the one-period-ahead predictive density given by a Student-$t$ distribution as defined by @Bauwens1999:
+$$
+p\left(y_{t+1} \mid \mathbf{y}, \mathbf{X}\right)=t\left(\mathbf{x}_{t+1}^{\prime} \overline{\boldsymbol\alpha}, 1+\mathbf{x}_{t+1}^{\prime} \overline{\mathbf{V}} \mathbf{x}_{t+1}, \overline{s}, \overline{\nu}\right).
+$$
+
+## Numerical approach to one-period-ahead forecast
+
+The Bayesian approach of the conditional predictive density is a combination of a conditional predictive density and the posterior distribution of the unknown parameters $\boldsymbol\alpha$ and $\sigma^{2}$. The one-period ahead conditional predictive density can be expressed as below. 
+
+$$
+p(y_{t+1} |x_{t+1},\mathbf{y}, \mathbf{X}) = \int\int p(y_{t+1} |x_{t+1}, \mathbf{y}, \mathbf{X}, \boldsymbol\alpha, \sigma^{2})p(\boldsymbol\alpha, \sigma^{2}|\mathbf{y},\mathbf{X}) d\boldsymbol\alpha d\sigma^{2}$$
+
+$$p(y_{t+1} |x_{t+1}, \mathbf{y},\mathbf{X}, \boldsymbol\alpha, \sigma^{2}) = \mathcal{N}( \alpha'_{d}d_{t+1|t} + \alpha_{1}y_{t}+\dots+\alpha_{p}y_{t-p+1}, \sigma^{2})$$
+
+$$p(\boldsymbol\alpha, \sigma^{2}|\mathbf{y},\mathbf{X}) = \mathcal{NIG}2(\overline{\boldsymbol\alpha}, \overline{\sigma^{2}}, \overline{S}, \overline{v}) $$
+
+
+To sample the joint predictive density, we integrate out $\boldsymbol\alpha$ and $\sigma^{2}$. Below steps show how the one-period ahead joint predictive density can be obtained. 
+
+Sample draws from the posterior distribution $p(\boldsymbol\alpha, \sigma^{2}|\bf y,\bf X)$ and 
+
+Obtain $\left\{ \boldsymbol\alpha^{(s)},  \sigma^{2(s)} \right\}^{S}_{s=1}$
+
+For each draw of $\boldsymbol\alpha$ and $\sigma^{2}$ sample from $p(y_{t+1} |x_{t+1})$ that is specified as $y_{t+1} \sim \mathcal{N} (x_{t+1|t}\boldsymbol\alpha^{(s)},  \sigma^{2(s)})$
+
+Obtain $\left\{ y_{t+1|t}^{(s)} \right\}^{S}_{s=1}$
+
+Characterise the predictive density using $\left\{ y_{t+1|t}^{(s)} \right\}^{S}_{s=1}$
+
+
+## Forecasting many periods ahead
 
 ## Sampler implementation in R
+
+
+```{r forecasting h step}
+#| echo: true
+#| message: false
+#| warning: false
+#| eval: false
+## Apply function when needed
+posterior.sample.draws = posterior.draws(S=50000, Y=Y, X=X)         # using the posterior function to draw alpha and sigma
+A.posterior.simu       = posterior.sample.draws$A.posterior         # obtain posterior alpha
+Sigma.posterior.simu   = posterior.sample.draws$Sigma.posterior     # obtain posterior sigma
+
+## forecasting setup
+h                      = 12                                         # specify the desired number of steps ahead
+S                      = 50000                                      # the number of sampling time, no greater than the simulation time in the posterior draw function
+Y.h                    = matrix(NA,h,S)                             # create empty matrix to store the h-step ahead Y 
+
+## sampling predictive density
+for (s in 1:S){
+  A.posterior.draw     = A.posterior.simu[,s]
+  Sigma.posterior.draw = Sigma.posterior.simu[,s]
+    x.Ti               = Y[(nrow(Y)-p+1):nrow(Y)]                   # the number of lags in Y
+    x.Ti               = x.Ti[p:1]
+  for (i in 1:h){
+    x.T                = c(d,as.vector(t(x.Ti)))                    # d refers to d row vector for the deterministic term data
+    Y.f                = rnorm(1, mean = x.T%*%A.posterior.draw, sigma=Sigma.posterior.draw)
+      x.Ti             = rbind(Y.f,x.Ti[1:(p-1)])                   # refresh the initial data in Y
+    Y.h[i,s]           = Y.f
+  }
+}
+```
 
 # References {.unnumbered}
