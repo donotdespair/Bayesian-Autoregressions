@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.306">
+<meta name="generator" content="quarto-1.3.361">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -14,6 +14,7 @@
 <meta name="author" content="Xiaoman Guo">
 <meta name="author" content="Nathan Huynh">
 <meta name="author" content="Thomas Kronholm Møller">
+<meta name="author" content="Victoria Sonnemans">
 <meta name="author" content="Yobin Timilsena">
 <meta name="author" content="Django Trueman-Greinke">
 <meta name="author" content="Hanwen Zhang">
@@ -119,7 +120,8 @@ div.csl-indent {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -202,8 +204,8 @@ div.csl-indent {
   </ul></li>
   <li><a href="#forecasting" id="toc-forecasting" class="nav-link" data-scroll-target="#forecasting">Forecasting</a>
   <ul class="collapse">
-  <li><a href="#comparison-of-frequentist-and-bayesian-forecasting" id="toc-comparison-of-frequentist-and-bayesian-forecasting" class="nav-link" data-scroll-target="#comparison-of-frequentist-and-bayesian-forecasting">Comparison of Frequentist and Bayesian forecasting</a></li>
-  <li><a href="#forecasting-one-period-ahead" id="toc-forecasting-one-period-ahead" class="nav-link" data-scroll-target="#forecasting-one-period-ahead">Forecasting one period ahead</a></li>
+  <li><a href="#analytical-results-for-one-period-ahead-forecast" id="toc-analytical-results-for-one-period-ahead-forecast" class="nav-link" data-scroll-target="#analytical-results-for-one-period-ahead-forecast">Analytical results for one-period-ahead forecast</a></li>
+  <li><a href="#numerical-approach-to-one-period-ahead-forecast" id="toc-numerical-approach-to-one-period-ahead-forecast" class="nav-link" data-scroll-target="#numerical-approach-to-one-period-ahead-forecast">Numerical approach to one-period-ahead forecast</a></li>
   <li><a href="#forecasting-many-periods-ahead" id="toc-forecasting-many-periods-ahead" class="nav-link" data-scroll-target="#forecasting-many-periods-ahead">Forecasting many periods ahead</a></li>
   <li><a href="#sampler-implementation-in-r" id="toc-sampler-implementation-in-r" class="nav-link" data-scroll-target="#sampler-implementation-in-r">Sampler implementation in R</a></li>
   </ul></li>
@@ -234,6 +236,7 @@ div.csl-indent {
              <p><a href="https://github.com/mandyxmg">Xiaoman Guo</a> </p>
              <p><a href="https://github.com/nathanh93">Nathan Huynh</a> </p>
              <p><a href="https://github.com/ThomasKronhol">Thomas Kronholm Møller</a> </p>
+             <p><a href="https://github.com/vsonnemans">Victoria Sonnemans</a> </p>
              <p><a href="https://github.com/yobin-tim">Yobin Timilsena</a> </p>
              <p><a href="https://github.com/DjangoTG">Django Trueman-Greinke</a> </p>
              <p><a href="https://github.com/hanwenzhang0317">Hanwen Zhang</a> </p>
@@ -546,21 +549,21 @@ p(\kappa_{\boldsymbol\alpha}|\mathbf{X},\mathbf{y},\boldsymbol\alpha,\sigma^2) =
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean <span class="ot">=</span> <span class="fu">rowMeans</span>(GammaScale.draws<span class="sc">$</span>alpha.posterior)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>alpha.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.2870307 0.9713162</code></pre>
+<pre><code>[1] -0.09659746  0.98313834</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>Sigma2.posterior)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Sigma2.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.92873</code></pre>
+<pre><code>[1] 1.018755</code></pre>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean <span class="ot">=</span> <span class="fu">mean</span>(GammaScale.draws<span class="sc">$</span>kappa.posterior)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>kappa.posterior.mean</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.2610147</code></pre>
+<pre><code>[1] 0.2442665</code></pre>
 </div>
 </div>
 </section>
@@ -749,14 +752,14 @@ p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &amp;= \mathcal{IG2}(\overl
 <span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a><span class="co">#Alpha posterior mean:</span></span>
 <span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">apply</span>(tdist.res[[<span class="dv">1</span>]], <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, mean),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>     [,1]
-[1,] 0.29
-[2,] 0.97</code></pre>
+<pre><code>      [,1]
+[1,] -0.10
+[2,]  0.98</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Sigma posterior mean:</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(tdist.res[[<span class="dv">2</span>]]),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 3.8</code></pre>
+<pre><code>[1] 4.18</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Lambda posterior mean:</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">mean</span>(tdist.res[[<span class="dv">3</span>]]),<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1084,36 +1087,33 @@ p(\lambda|\mathbf{y,X},\boldsymbol{\alpha},\sigma^2) &amp;= \mathcal{IG2}(\overl
 </section>
 <section id="forecasting" class="level1">
 <h1>Forecasting</h1>
-<section id="comparison-of-frequentist-and-bayesian-forecasting" class="level2">
-<h2 class="anchored" data-anchor-id="comparison-of-frequentist-and-bayesian-forecasting">Comparison of Frequentist and Bayesian forecasting</h2>
-<p>In the frequentist approach, we condition the predictive density on <span class="math inline">\(\theta\)</span>, the parameters. The latters are treated as non-random. Therefore, it can be stated that this approach ignores estimation uncertainty.</p>
-<p>To solve this issue, the Bayesian approach treats the parameters <span class="math inline">\(A\)</span> and <span class="math inline">\(\Sigma\)</span> as random variables and thus, it incorporates estimation uncertainty into the predictive density. In fact, if we impose appropriate priors, Bayesian forecasting often leads to more precise estimations as it narrows the confidence intervals by using priors.</p>
-<p>Moreover, Bayesian forecasting uses the frequentist approach as a starting point. In the following formula for the conditional one-period ahead forecast, the first expression under the integral signs is the conditional predictive density of the frequentist approach and the second expression is the joint posterior distribution that we are now used to derive.</p>
-<p><span class="math display">\[
-\begin{aligned}
-p\left(y_{t+1} \mid x_{t+1}, Y, X\right) &amp; =\iint p\left(y_{t+1} \mid x_{t+1}, Y, X, A, \Sigma\right) p(A, \Sigma \mid Y, X) d A d \Sigma \\
-p\left(y_{t+1} \mid x_{t+1} Y, X, A, \Sigma\right) &amp; =\mathcal{M} \mathcal{N}_{1 \times N}\left(x_{t+1}^{\prime} A, \Sigma, 1\right) \\
-p(A, \Sigma \mid Y, X) &amp; =p(A \mid Y, X, \Sigma) p(\Sigma \mid Y, X) \\
-p(A \mid Y, X, \Sigma) &amp; =\mathcal{M} \mathcal{N}_{K \times N}(\bar{A}, \Sigma, \bar{V}) \\
-p(\Sigma \mid Y, X) &amp; =\mathcal{I W}_N(\bar{S}, \bar{\nu})
-\end{aligned}
+<section id="analytical-results-for-one-period-ahead-forecast" class="level2">
+<h2 class="anchored" data-anchor-id="analytical-results-for-one-period-ahead-forecast">Analytical results for one-period-ahead forecast</h2>
+<p>In the frequentist approach, we condition the predictive density on the parameters <span class="math inline">\(\left(\boldsymbol\alpha\right)\)</span>, the parameters. The latter are treated as non-random. Therefore, it can be stated that this approach to forecasting ignores estimation uncertainty.</p>
+<p>To address this issue, the Bayesian approach treats the parameters <span class="math inline">\(\boldsymbol\alpha\)</span> and <span class="math inline">\(\sigma^2\)</span> as random variables and thus, it incorporates estimation uncertainty into the predictive density. Additionally, by imposing appropriate priors Bayesian forecasting often leads to more precise forecasts as it narrows the predictive intervals.</p>
+<p>Moreover, Bayesian forecasting uses the conditional predictive density as a starting point. In the following formula for the conditional one-period ahead forecast, the first expression under the integral is the conditional predictive density and the second expression is the joint posterior distribution that we are now used to derive.</p>
+<p><span class="math display">\[\begin{align}
+p\left(y _{t+1} \mid \mathbf{y}, \mathbf{X}\right) &amp;=\iint p\left(y _{t+1} \mid\mathbf{y}, \mathbf{X}, \boldsymbol\alpha, \sigma^2\right) p\left(\boldsymbol\alpha, \sigma^2 \mid \mathbf{y}, \mathbf{X}\right) d \boldsymbol\alpha d \sigma^2\\
+p\left(y _{t+1} \mid\mathbf{y}, \mathbf{X}, \boldsymbol\alpha, \sigma^2 \right) &amp;=\mathcal{N} \left(x_{t+1}^{\prime} \boldsymbol\alpha, \sigma^2\right)\\
+p\left(\boldsymbol\alpha, \sigma^2 \mid \mathbf{y}, \mathbf{X}\right) &amp;=p\left(\boldsymbol\alpha \mid \mathbf{y}, \mathbf{X}, \sigma^2\right) p\left(\sigma^2 \mid \mathbf{y}, \mathbf{X}\right)\\
+p\left(\boldsymbol\alpha \mid \mathbf{y}, \mathbf{X}, \sigma^2 \right) &amp;= \mathcal{N}_{K}\left(\overline{\boldsymbol\alpha}, \sigma^2\overline{\mathbf{V}}\right)\\
+p\left(\sigma^2 \mid \mathbf{y}, \mathbf{X}\right) &amp;=\mathcal{IG}2(\overline{s}, \overline{\nu})
+\end{align}
 \]</span> To derive the solution of this expression analytically, we integrate the parameters out in this order:</p>
 <ol type="1">
-<li>We integrate out <span class="math inline">\(A\)</span>.</li>
+<li>We integrate out <span class="math inline">\(\boldsymbol\alpha\)</span> and obtain:</li>
 </ol>
-<p>By integrating out <span class="math inline">\(A\)</span>, we obtain:</p>
 <p><span class="math display">\[
-p\left(y_{t+1} \mid x_{t+1}, Y, X, \Sigma\right)=\mathcal{M N}_{1 \times N}\left(x_{t+1}^{\prime} \bar{A}, \Sigma, 1+x_{t+1}^{\prime} \bar{V} x_{t+1}\right)
+p\left(y_{t+1} \mid \mathbf{y}, \mathbf{X}, \sigma^2\right)=\mathcal{N}\left(\mathbf{x}_{t+1}^{\prime} \overline{\boldsymbol\alpha}, \sigma^2\left(1+\mathbf{x}_{t+1}^{\prime} \overline{\mathbf{V}} \mathbf{x}_{t+1}\right)\right)
 \]</span></p>
 <ol start="2" type="1">
-<li>We integrate out <span class="math inline">\(\Sigma\)</span></li>
+<li>We integrate out <span class="math inline">\(\sigma^2\)</span> and obtain the one-period-ahead predictive density given by a Student-<span class="math inline">\(t\)</span> distribution as defined by <span class="citation" data-cites="Bauwens1999">Bauwens, Lubrano, and Richard (<a href="#ref-Bauwens1999" role="doc-biblioref">1999</a>)</span>: <span class="math display">\[
+p\left(y_{t+1} \mid \mathbf{y}, \mathbf{X}\right)=t\left(\mathbf{x}_{t+1}^{\prime} \overline{\boldsymbol\alpha}, 1+\mathbf{x}_{t+1}^{\prime} \overline{\mathbf{V}} \mathbf{x}_{t+1}, \overline{s}, \overline{\nu}\right).
+\]</span></li>
 </ol>
-<p>By integrating out <span class="math inline">\(\Sigma\)</span>, we obtain: <span class="math display">\[
-p\left(y_{t+1} \mid x_{t+1}, Y, X\right)=\mathcal{M} t_{1 \times N}\left(x_{t+1}^{\prime} \bar{A}, 1+x_{t+1}^{\prime} \bar{V} x_{t+1}, \bar{S}, \bar{\nu}\right)
-\]</span></p>
 </section>
-<section id="forecasting-one-period-ahead" class="level2">
-<h2 class="anchored" data-anchor-id="forecasting-one-period-ahead">Forecasting one period ahead</h2>
+<section id="numerical-approach-to-one-period-ahead-forecast" class="level2">
+<h2 class="anchored" data-anchor-id="numerical-approach-to-one-period-ahead-forecast">Numerical approach to one-period-ahead forecast</h2>
 <p>The Bayesian approach of the conditional predictive density is a combination of a conditional predictive density and the posterior distribution of the unknown parameters <span class="math inline">\(\boldsymbol\alpha\)</span> and <span class="math inline">\(\sigma^{2}\)</span>. The one-period ahead conditional predictive density can be expressed as below.</p>
 <p><span class="math display">\[
 p(y_{t+1} |x_{t+1},\mathbf{y}, \mathbf{X}) = \int\int p(y_{t+1} |x_{t+1}, \mathbf{y}, \mathbf{X}, \boldsymbol\alpha, \sigma^{2})p(\boldsymbol\alpha, \sigma^{2}|\mathbf{y},\mathbf{X}) d\boldsymbol\alpha d\sigma^{2}\]</span></p>
@@ -1166,14 +1166,17 @@ p(y_{t+1} |x_{t+1},\mathbf{y}, \mathbf{X}) = \int\int p(y_{t+1} |x_{t+1}, \mathb
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-Bauwens1999" class="csl-entry" role="listitem">
+Bauwens, Luc, Michel Lubrano, and J. F. Richard. 1999. <em><span class="nocase">Bayesian inference in dynamic econometric models</span></em>. Oxford University Press, USA.
+</div>
 <div id="ref-lenza2022estimate" class="csl-entry" role="listitem">
 Lenza, Michele, and Giorgio E Primiceri. 2022. <span>“How to Estimate a Vector Autoregression After March 2020.”</span> <em>Journal of Applied Econometrics</em> 37 (4): 688–99.
 </div>
 </div></section><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{woźniak2023,
   author = {Woźniak, Tomasz and Loopers Davidsen, Jonas and Dell’Andrea,
     Filippo and Getty, Corwin and Gomez, Ray and Guo, Xiaoman and Huynh,
-    Nathan and Kronholm Møller, Thomas and Timilsena, Yobin and
-    Trueman-Greinke, Django and Zhang, Hanwen},
+    Nathan and Kronholm Møller, Thomas and Sonnemans, Victoria and
+    Timilsena, Yobin and Trueman-Greinke, Django and Zhang, Hanwen},
   title = {Bayesian {Autoregressions}},
   date = {2023-05-25},
   url = {https://donotdespair.github.io/Bayesian-Autoregressions/},
